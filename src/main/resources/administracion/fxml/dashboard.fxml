@@ -1,13 +1,253 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.shape.Line?>
 
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../css/dashboardStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.administracion.dashboard.mainWindowController">
+    <children>
+        <!-- BARRA SUPERIOR -->
+        <AnchorPane id="top" layoutX="-3.0" prefHeight="33.0" prefWidth="1280.0">
+            <children>
+                <Label id="lblTitulo" layoutX="50.0" layoutY="8.0" text="SISTEMA DE GESTIÓN PARA SPORTMASTER" />
+                <Label fx:id="lblLogBalon" layoutX="14.0" layoutY="7.0" text="Label" />
+            </children>
+        </AnchorPane>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.administracion.dashboard.mainWindowController">
-   <children>
-      <Label layoutX="157.0" layoutY="57.0" text="VENTANA PRINCIPAL DEL SISTEMA DE GESTION" />
-      <Button layoutX="47.0" layoutY="327.0" mnemonicParsing="false" onAction="#logOut" text="CERRAR SESION" />
-   </children>
+        <!-- MENÚ DE NAVEGACIÓN LATERAL -->
+        <AnchorPane id="navMenu" layoutY="36.0" prefHeight="686.0" prefWidth="260.0">
+            <children>
+            <Label id="iconoUsuario" fx:id="iconoUsuario" text="Label" />
+
+                <!-- INFORMACIÓN DEL USUARIO -->
+                <Label id="label" layoutX="14.0" layoutY="20.0" styleClass="labelVentana" text="BIENVENIDO:" />
+                <Label id="label" fx:id="lblUsuario" layoutX="110.0" layoutY="20.0" styleClass="labelVentana" text="USUARIO" />
+
+                <Label layoutX="14.0" layoutY="45.0" styleClass="labelVentana" text="ROL:" />
+                <Label fx:id="lblRol" layoutX="110.0" layoutY="45.0" styleClass="labelVentana" text="ADMIN" />
+
+                <Label layoutX="14.0" layoutY="70.0" styleClass="labelVentana" text="SEDE:" />
+                <Label fx:id="lblSede" layoutX="110.0" layoutY="70.0" styleClass="labelVentana" text="PRINCIPAL" />
+
+                <!-- LÍNEA SEPARADORA -->
+                <Line endX="154.40000915527344" layoutX="76.0" layoutY="105.0" startX="-49.00001525878906">
+                    <stroke>
+                        <LinearGradient endX="0.3749999638759728" endY="0.5833333333333333" startX="0.6931818468552648" startY="0.24242422797463156">
+                            <stops>
+                                <Stop>
+                                    <color>
+                                        <Color red="0.2775438725948334" green="0.6631578803062439" blue="0.3032514750957489" opacity="0.8799999952316284" />
+                                    </color>
+                                </Stop>
+                                <Stop offset="0.006729475100942127">
+                                    <color>
+                                        <Color red="0.2775438725948334" green="0.6631578803062439" blue="0.3032514750957489" opacity="0.8799999952316284" />
+                                    </color>
+                                </Stop>
+                                <Stop offset="1.0">
+                                    <color>
+                                        <Color red="0.4526315927505493" green="0.3922806978225708" blue="0.3922806978225708" />
+                                    </color>
+                                </Stop>
+                            </stops>
+                        </LinearGradient>
+                    </stroke>
+                </Line>
+
+                <!-- SCROLL DEL MENÚ LATERAL -->
+                <ScrollPane id="navContenedor" fitToWidth="true" hbarPolicy="NEVER" layoutX="13.0" layoutY="120.0" prefHeight="450.0" prefWidth="234.0">
+                    <content>
+                        <VBox fx:id="menuBox" prefHeight="200.0" prefWidth="100.0" style="-fx-spacing: 20;">
+                            <children>
+
+                                <!-- SECCIÓN CLIENTES -->
+                                <VBox fx:id="clientesBox" prefHeight="200.0" prefWidth="100.0" styleClass="contenedorMenu">
+                                    <children>
+                                        <Button fx:id="btnClientes" alignment="TOP_LEFT" maxWidth="Infinity" mnemonicParsing="false" onAction="#toggleClientes" styleClass="navBtn" text="CLIENTES" />
+                                        <VBox fx:id="submenuClientes" managed="false" prefHeight="200.0" prefWidth="100.0" styleClass="submenu" visible="false">
+                                            <children>
+                                                <Button fx:id="btnRegistrarCliente" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirRegistrarClientes" text="REGISTRAR NUEVO CLIENTE">
+                                                    <styleClass>
+                                                        <String fx:value="navBtn" />
+                                                        <String fx:value="navBtnSeparation" />
+                                                    </styleClass>
+                                                </Button>
+                                                <Button fx:id="btnGestionClientes" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirGestionClientes" text="GESTIÓN DE CLIENTES">
+                                                    <styleClass>
+                                                        <String fx:value="navBtn" />
+                                                        <String fx:value="navBtnSubmenu" />
+                                                    </styleClass>
+                                                </Button>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+
+                                <!-- SECCIÓN PRODUCTOS -->
+                                <VBox fx:id="productosBox" prefHeight="200.0" prefWidth="100.0" styleClass="contenedorMenu">
+                                    <children>
+                                        <Button fx:id="btnProductos" alignment="TOP_LEFT" maxWidth="Infinity" mnemonicParsing="false" onAction="#toggleProductos" styleClass="navBtn" text="PRODUCTOS" />
+                                        <VBox fx:id="submenuProductos" managed="false" prefHeight="200.0" prefWidth="100.0" styleClass="submenu" visible="false">
+                                            <children>
+                                                <Button fx:id="btnCrearProducto" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirCrearProducto" text="REGISTRAR NUEVO PRODUCTO">
+                                                    <styleClass>
+                                                        <String fx:value="navBtn" />
+                                                        <String fx:value="navBtnSeparation" />
+                                                    </styleClass>
+                                                </Button>
+                                                <Button fx:id="btnConsultarCatalogo" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirConsultarCatálogo" text="CONSULTA CATÁLOGO">
+                                                    <styleClass>
+                                                        <String fx:value="navBtn" />
+                                                        <String fx:value="navBtnSubmenu" />
+                                                    </styleClass>
+                                                </Button>
+                                                <Button fx:id="btnMarketing" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirMarketing" text="INFORMACIÓN MARKETING">
+                                                    <styleClass>
+                                                        <String fx:value="navBtn" />
+                                                        <String fx:value="navBtnSubmenu" />
+                                                    </styleClass>
+                                                </Button>
+                                                <Button fx:id="btnStockLocal" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirStockLocal" text="CONSULTAR STOCK LOCAL">
+                                                    <styleClass>
+                                                        <String fx:value="navBtn" />
+                                                        <String fx:value="navBtnSubmenu" />
+                                                    </styleClass>
+                                                </Button>
+                                                <Button fx:id="btnStockRemoto" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirStockOtraSede" text="CONSULTAR STOCK SEDE ALTERNA">
+                                                    <styleClass>
+                                                        <String fx:value="navBtn" />
+                                                        <String fx:value="navBtnSubmenu" />
+                                                    </styleClass>
+                                                </Button>
+                                                <Button fx:id="btnAjusteStock" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirAjusteStock" text="AJUSTE DE STOCK">
+                                                    <styleClass>
+                                                        <String fx:value="navBtn" />
+                                                        <String fx:value="navBtnSubmenu" />
+                                                    </styleClass>
+                                                </Button>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+
+                                <!-- SECCIÓN FACTURACIÓN -->
+                                <VBox fx:id="facturacionBox" prefHeight="200.0" prefWidth="100.0" styleClass="contenedorMenu">
+                                    <children>
+                                        <Button fx:id="btnFacturacion" alignment="TOP_LEFT" maxWidth="Infinity" mnemonicParsing="false" onAction="#toggleFacturacion" styleClass="navBtn" text="FACTURACIÓN" />
+                                        <VBox fx:id="submenuFacturacion" managed="false" prefHeight="200.0" prefWidth="100.0" styleClass="submenu" visible="false">
+                                            <children>
+                                                <Button fx:id="btnFacturarProductos" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirFacturacion" text="FACTURAR PRODUCTOS">
+                                                    <styleClass>
+                                                        <String fx:value="navBtn" />
+                                                        <String fx:value="navBtnSeparation" />
+                                                    </styleClass>
+                                                </Button>
+                                                <Button fx:id="btnConsultarFacturas" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirConsultarFacturas" text="CONSULTAR FACTURAS">
+                                                    <styleClass>
+                                                        <String fx:value="navBtn" />
+                                                        <String fx:value="navBtnSubmenu" />
+                                                    </styleClass>
+                                                </Button>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+
+                                <!-- SECCIÓN ADMINISTRACIÓN -->
+                                <VBox fx:id="administracionBox" prefHeight="200.0" prefWidth="100.0" styleClass="contenedorMenu">
+                                    <children>
+                                        <Button fx:id="btnAdministracion" alignment="TOP_LEFT" maxWidth="Infinity" mnemonicParsing="false" onAction="#toggleAdministracion" styleClass="navBtn" text="ADMINISTRACIÓN" />
+                                        <VBox fx:id="submenuAdministracion" managed="false" prefHeight="200.0" prefWidth="100.0" styleClass="submenu" visible="false">
+                                            <children>
+
+                                                <!-- SUBMENÚ GESTIÓN USUARIOS -->
+                                                <VBox fx:id="usuariosBox" styleClass="contenedorMenu">
+                                                    <children>
+                                                        <Button fx:id="btnUsuarios" alignment="TOP_LEFT" maxWidth="Infinity" mnemonicParsing="false" onAction="#toggleUsuarios" text="USUARIOS">
+                                                            <styleClass>
+                                                                <String fx:value="navBtn" />
+                                                                <String fx:value="navBtnSubmenu" />
+                                                                <String fx:value="navBtnSeparation" />
+                                                            </styleClass>
+                                                        </Button>
+                                                        <VBox fx:id="usuariosSubMenu" managed="false" prefHeight="200.0" prefWidth="100.0" styleClass="submenu" visible="false">
+                                                            <children>
+                                                                <Button fx:id="btnCrearUsuario" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirCrearUsuario" text="CREAR USUARIO">
+                                                                    <styleClass>
+                                                                        <String fx:value="navBtn" />
+                                                                        <String fx:value="navBtnSeparation" />
+                                                                    </styleClass>
+                                                                </Button>
+                                                                <Button fx:id="btnGestionUsuarios" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abirGestionUsuarios" text="GESTIÓN DE USUARIOS">
+                                                                    <styleClass>
+                                                                        <String fx:value="navBtn" />
+                                                                        <String fx:value="navBtnSubmenu" />
+                                                                    </styleClass>
+                                                                </Button>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </VBox>
+
+                                                <!-- SUBMENÚ GESTIÓN PARÁMETROS -->
+                                                <VBox fx:id="parametrosBox" styleClass="contenedorMenu">
+                                                    <children>
+                                                        <Button fx:id="btnParametros" alignment="TOP_LEFT" maxWidth="Infinity" mnemonicParsing="false" onAction="#toggleParametros" text="PARÁMETROS">
+                                                            <styleClass>
+                                                                <String fx:value="navBtn" />
+                                                                <String fx:value="navBtnSubmenu" />
+                                                                <String fx:value="navBtnSeparation" />
+                                                            </styleClass>
+                                                        </Button>
+                                                        <VBox fx:id="parametrosSubMenu" managed="false" prefHeight="200.0" prefWidth="100.0" styleClass="submenu" visible="false">
+                                                            <children>
+                                                                <Button fx:id="btnRegistrarSucursal" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirRegistrarSucursal" text="REGISTRAR SUCURSAL">
+                                                                    <styleClass>
+                                                                        <String fx:value="navBtn" />
+                                                                        <String fx:value="navBtnSeparation" />
+                                                                    </styleClass>
+                                                                </Button>
+                                                                <Button fx:id="btnGestionParametros" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#abrirGestionParametros" text="GESTIÓN DE PARÁMETROS">
+                                                                    <styleClass>
+                                                                        <String fx:value="navBtn" />
+                                                                        <String fx:value="navBtnSubmenu" />
+                                                                    </styleClass>
+                                                                </Button>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </VBox>
+
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+
+                            </children>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+
+                <!-- BOTÓN NUEVA VENTA (Añadido en la parte inferior del menú) -->
+                <Button id="btnNuevaVenta" fx:id="btnNuevaVenta" layoutX="14.0" layoutY="585.0" mnemonicParsing="false" onAction="#abrirFacturacion" prefHeight="34.0" prefWidth="234.0" styleClass="btnNuevaVenta" text="NUEVA VENTA" />
+
+                <!-- BOTONES DE SALIDA Y MAIN -->
+                <Button id="btnLogOut" fx:id="btnLogOut" layoutX="14.0" layoutY="635.0" mnemonicParsing="false" onAction="#logOut" prefHeight="34.0" prefWidth="55.0" />
+                <Button id="btnLogOut" fx:id="btnGoMain" layoutX="193.0" layoutY="635.0" mnemonicParsing="false" onAction="#goMain" prefHeight="34.0" prefWidth="55.0" />
+
+            </children>
+        </AnchorPane>
+
+        <!-- CONTENEDOR PRINCIPAL PARA REEMPLAZAR CONTENIDO -->
+        <Pane fx:id="contenedorPrincipal" layoutX="260.0" layoutY="36.0" prefHeight="686.0" prefWidth="1016.0" styleClass="imagenFondo" />
+
+    </children>
 </AnchorPane>

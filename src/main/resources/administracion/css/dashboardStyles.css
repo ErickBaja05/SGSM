@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+
+
+#top{
+    -fx-background-color: white;
+    -fx-border-width: 1px;
+}
+
+#navMenu{
+    -fx-background-color: rgb(3, 20, 71);
+    -fx-text-fill: white;
+}
+
+#navContenedor{
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+#navContenedor .viewport{
+    -fx-background-color: transparent;
+}
+
+.navBtn{
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-family: "Roboto";
+    -fx-font-size: 13px;
+
+
+}
+.navBtn-activo {
+    -fx-background-color: #2a9df4;
+    -fx-border-color: transparent transparent transparent #ffffff;
+    -fx-border-width: 0 0 0 4px;
+}
+
+
+
+.navBtn:hover{
+    -fx-cursor: hand;
+    -fx-text-fill: #a18181;
+    -fx-border-width: 0px 0px 0px 2px;
+    -fx-border-color: white;
+}
+.navBtnSeparation{
+    -fx-padding: 20px 0 5px 10 ;
+}
+.navBtnSubmenu:hover,.navBtnSeparation:hover{
+    -fx-border-width: 0px 0px 0px 0px;
+
+}
+.btnNuevaVenta{
+    -fx-background-color: #d12b2b;
+    -fx-font-family: "Roboto";
+    -fx-font-size: 13px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+
+.submenu{
+    -fx-padding: 0 0 0 10;
+    -fx-spacing: 5;
+}
+
+.contenedorMenu{
+
+
+
+}
+#btnLogOut{
+    -fx-background-radius: 20px;
+    -fx-background-color: transparent;
+    -fx-icon-color:  white;
+}
+
+#btnLogOut:hover{
+    -fx-background-radius: 20px;
+    -fx-background-color: transparent;
+    -fx-icon-color:  black;
+}
+
+.labelVentana{
+    -fx-font-family: "Roboto";
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+#lblTitulo{
+    -fx-font-family: "Roboto";
+    -fx-text-fill: black;
+}
+
+.imagenFondo{
+    -fx-background-image: url(../img/fondo.png);
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+}
+
+.buttonsIcon{
+    -fx-icon-color: white;
+    -fx-icon-size: 16;
+}
+.userMdIcon{
+    -fx-icon-color: white;
+    -fx-icon-size: 60;
+
+}
+.soccerBallIcon{
+    -fx-icon-color: black;
+    -fx-icon-size: 26;
+}
+
+.logOutIcon{
+    -fx-icon-color: black;
+    -fx-icon-size: 65;
+}
