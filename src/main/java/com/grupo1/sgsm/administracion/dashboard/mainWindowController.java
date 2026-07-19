@@ -1,9 +1,13 @@
 package com.grupo1.sgsm.administracion.dashboard;
 
 import com.grupo1.sgsm.core.session.SesionActual;
+import com.grupo1.sgsm.core.util.NavigationUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -11,6 +15,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -69,15 +74,35 @@ public class mainWindowController implements Initializable {
     @FXML void abrirCrearProducto(ActionEvent event) {}
     @FXML void abrirCrearUsuario(ActionEvent event) {}
     @FXML void abrirFacturacion(ActionEvent event) {}
-    @FXML void abrirGestionClientes(ActionEvent event) {}
+    @FXML void abrirGestionClientes(ActionEvent event) {
+
+        cargarVista("/clientes/fxml/gestionClientes.fxml");
+    }
     @FXML void abrirGestionParametros(ActionEvent event) {}
     @FXML void abrirMarketing(ActionEvent event) {}
-    @FXML void abrirRegistrarClientes(ActionEvent event) {}
+    @FXML void abrirRegistrarClientes(ActionEvent event) {
+        cargarVista("/clientes/fxml/registrarClientes.fxml");
+    }
     @FXML void abrirRegistrarSucursal(ActionEvent event) {}
     @FXML void abrirStockLocal(ActionEvent event) {}
     @FXML void abrirStockOtraSede(ActionEvent event) {}
-    @FXML void goMain(ActionEvent event) {}
-    @FXML void logOut(ActionEvent event) {}
+    @FXML void goMain(ActionEvent event) throws IOException {
+
+        String vista = "/administracion/fxml/dashboard.fxml";
+
+        Parent root = FXMLLoader.load(getClass().getResource(vista));
+        NavigationUtil.changeScene(event,root);
+    }
+    @FXML void logOut(ActionEvent event) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Hasta pronto");
+        alert.setHeaderText("Sesión cerrada con éxito");
+        alert.setContentText("La sesión se cerró con éxito, deberá volver a iniciar sesión para acceder a cualquier funcionalidad.");
+        alert.showAndWait();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/administracion/fxml/login.fxml"));
+        Parent root = loader.load();
+        NavigationUtil.changeScene(event,root);
+    }
 
     @FXML
     void toggleAdministracion(ActionEvent event) {
@@ -201,5 +226,23 @@ public class mainWindowController implements Initializable {
 
         parametrosBox.setOnMouseEntered(e -> btnAdministracion.getStyleClass().add("navBtn-activo"));
         parametrosBox.setOnMouseExited(e -> btnAdministracion.getStyleClass().remove("navBtn-activo"));
+    }
+
+    private void cargarVista(String rutaFxml) {
+        try {
+            Parent vista = FXMLLoader.load(getClass().getResource(rutaFxml));
+            contenedorPrincipal.getChildren().clear();
+            contenedorPrincipal.getChildren().add(vista);
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+            contenedorPrincipal.getChildren().clear();
+            contenedorPrincipal.getChildren().add(crearPlaceholder("Vista aún no implementada:\n" + rutaFxml));
+        }
+    }
+
+    private Label crearPlaceholder(String mensaje) {
+        Label aviso = new Label(mensaje);
+        aviso.getStyleClass().add("placeholder-label");
+        return aviso;
     }
 }
