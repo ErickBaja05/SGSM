@@ -123,8 +123,6 @@ public class mainWindowController implements Initializable {
     @FXML
     private VBox productosBox;
 
-    @FXML
-    private VBox submenuAdministracion;
 
     @FXML
     private VBox submenuClientes;
@@ -224,72 +222,45 @@ public class mainWindowController implements Initializable {
     @FXML
     void toggleAdministracion(ActionEvent event) {
         boolean abierto = usuariosBox.isVisible() && parametrosBox.isVisible();
-        ocultarTodos();
-        if (!abierto) {
-            usuariosBox.setVisible(true);
-            usuariosBox.setManaged(true);
-            parametrosBox.setVisible(true);
-            parametrosBox.setManaged(true);
-        }
-
+        usuariosBox.setVisible(!abierto);
+        usuariosBox.setManaged(!abierto);
+        parametrosBox.setVisible(!abierto);
+        parametrosBox.setManaged(!abierto);
     }
 
     @FXML
     void toggleClientes(ActionEvent event) {
-
         boolean abierto = submenuClientes.isVisible();
-        ocultarTodos();
-        if (!abierto) {
-            submenuClientes.setVisible(true);
-            submenuClientes.setManaged(true);
-        }
-
+        submenuClientes.setVisible(!abierto);
+        submenuClientes.setManaged(!abierto);
     }
 
     @FXML
     void toggleFacturacion(ActionEvent event) {
-
         boolean abierto = submenuFacturacion.isVisible();
-        ocultarTodos();
-        if (!abierto) {
-            submenuFacturacion.setVisible(true);
-            submenuFacturacion.setManaged(true);
-        }
-
+        submenuFacturacion.setVisible(!abierto);
+        submenuFacturacion.setManaged(!abierto);
     }
 
     @FXML
     void toggleParametros(ActionEvent event) {
-
         boolean abierto = parametrosSubMenu.isVisible();
-        ocultarGestionParametros();
-        if (!abierto) {
-            parametrosSubMenu.setVisible(true);
-            parametrosSubMenu.setManaged(true);
-        }
-
+        parametrosSubMenu.setVisible(!abierto);
+        parametrosSubMenu.setManaged(!abierto);
     }
 
     @FXML
     void toggleProductos(ActionEvent event) {
         boolean abierto = submenuProductos.isVisible();
-        ocultarTodos();
-        if (!abierto) {
-            submenuProductos.setVisible(true);
-            submenuProductos.setManaged(true);
-        }
+        submenuProductos.setVisible(!abierto);
+        submenuProductos.setManaged(!abierto);
     }
 
     @FXML
     void toggleUsuarios(ActionEvent event) {
-
         boolean abierto = usuariosSubMenu.isVisible();
-        ocultarGestionUsuarios();
-        if (!abierto) {
-            usuariosSubMenu.setVisible(true);
-            usuariosSubMenu.setManaged(true);
-        }
-
+        usuariosSubMenu.setVisible(!abierto);
+        usuariosSubMenu.setManaged(!abierto);
     }
 
     @Override
@@ -340,188 +311,53 @@ public class mainWindowController implements Initializable {
 //
 //        }
 
-        // ICONO PARA EL USUARIO
-
-
-
-        FontIcon icon0 = new FontIcon("fa-user-circle-o");
-        icon0.getStyleClass().add("userMdIcon");
-
-        iconoUsuario.setGraphic(icon0);
-
-
-        // ICONO PARA BOTON LOG OUT
-        FontIcon icon = new FontIcon("fa-angle-double-left");
-        icon.getStyleClass().add("buttonsIcon");
-
-        btnLogOut.setGraphic(icon);
-
-
-        // ICONO PARA EL ICONO ALADO DEL TITULO
-        FontIcon icon2 = new FontIcon("fa-soccer-ball-o");
-        icon2.getStyleClass().add("soccerBallIcon");
-
-        lblLogBalon.setGraphic(icon2);
+        // ICONOS PRINCIPALES
+        iconoUsuario.setGraphic(crearIcono("fa-user-circle-o", "userMdIcon"));
+        btnLogOut.setGraphic(crearIcono("fa-angle-double-left", "buttonsIcon"));
+        lblLogBalon.setGraphic(crearIcono("fa-soccer-ball-o", "soccerBallIcon"));
         lblLogBalon.setText(null);
 
-        // ---------------------------------------------------
-
-        // ICONOS PARA LAS OPCIONES DE CLIENTES
-
-        // BOTON PRINCIPAL CLIENTES
-        FontIcon icon3 = new FontIcon("fa-users");
-        icon3.getStyleClass().add("buttonsIcon");
-
-        btnClientes.setGraphic(icon3);
-
-
-        // BOTON REGISTRAR NUEVO CLIENTE
-
-        FontIcon icon4 = new FontIcon("fa-address-book");
-        icon4.getStyleClass().add("buttonsIcon");
-
-        btnRegistrarCliente.setGraphic(icon4);
-
-
-        // BOTON GESTION DE CLIENTES
-
-        FontIcon icon5 = new FontIcon("fa-archive");
-        icon5.getStyleClass().add("buttonsIcon");
-
-        btnGestionClientes.setGraphic(icon5);
-
-        // ---------------------------------------------------
-
-        // ICONO PARA LAS OPCIONES DE PRODUCTOS
-
-        // BOTON PRINCIPAL PRODUCTOS
-
-        FontIcon icon6 = new FontIcon("fa-briefcase");
-        icon6.getStyleClass().add("buttonsIcon");
-
-        btnProductos.setGraphic(icon6);
-
-
-        // BOTON REGISTRAR PRODUCTO
-
-        FontIcon icon7 = new FontIcon("fa-plus-square-o");
-        icon7.getStyleClass().add("buttonsIcon");
-
-        btnCrearProducto.setGraphic(icon7);
-
-        // BOTON CONSULTAR CATALOGO
-
-        FontIcon icon8 = new FontIcon("fa-shopping-bag");
-        icon8.getStyleClass().add("buttonsIcon");
-
-        btnConsultarCatalogo.setGraphic(icon8);
-
-        // BOTON INFORMACION MARKETING
-
-        FontIcon icon9 = new FontIcon("fa-bar-chart-o");
-        icon9.getStyleClass().add("buttonsIcon");
-
-        btnMarketing.setGraphic(icon9);
-
-        // BOTON CONSULTAR STOCK LOCAL
-
-        FontIcon icon10 = new FontIcon("fa-map-pin");
-        icon10.getStyleClass().add("buttonsIcon");
-
-        btnStockLocal.setGraphic(icon10);
-
-        // BOTON CONSULTAR STOCK REMOTO
-
-        FontIcon icon11 = new FontIcon("fa-car");
-        icon11.getStyleClass().add("buttonsIcon");
-
-        btnStockRemoto.setGraphic(icon11);
-
-        // BOTON AJUSTE DE STOCK
-
-        FontIcon icon12 = new FontIcon("fa-edit");
-        icon12.getStyleClass().add("buttonsIcon");
-
-        btnAjusteStock.setGraphic(icon11);
-
-
-        // ---------------------------------------------------
-
-        // ICONOS PARA FACTURACION
-
-
-        // BOTON PRINCIPAL FACTURACION
-
-        FontIcon icon13 = new FontIcon("fa-money");
-        icon13.getStyleClass().add("buttonsIcon");
-
-        btnFacturacion.setGraphic(icon13);
-
-        // BOTON FACTURAR PRODUCTO
-
-        FontIcon icon14 = new FontIcon("fa-cart-plus");
-        icon14.getStyleClass().add("buttonsIcon");
-
-        btnFacturarProductos.setGraphic(icon14);
-
-
-        // BOTON CONSULTAR FACTURA
-
-        FontIcon icon15 = new FontIcon("fa-calendar-o");
-        icon15.getStyleClass().add("buttonsIcon");
-
-        btnConsultarFacturas.setGraphic(icon15);
-
-        // ---------------------------------------------------
-
-
-        // ICONOS PARA ADMINISTRACION
-
-
-        // BOTON PRINCIPAL ADMINISTRACION
-
-        FontIcon icon16 = new FontIcon("fa-black-tie");
-        icon16.getStyleClass().add("buttonsIcon");
-        btnAdministracion.setGraphic(icon16);
-
-        // BOTON USUARIOS
-
-        FontIcon icon17 = new FontIcon("fa-odnoklassniki");
-        icon17.getStyleClass().add("buttonsIcon");
-        btnUsuarios.setGraphic(icon17);
-
-        // BOTON CREAR USUARIO
-
-        btnCrearUsuario.setGraphic(icon7);
-
-
-        // BOTON GESTION DE USUARIOS
-
-        btnGestionUsuarios.setGraphic(icon12);
-
-        // BOTON PARÁMETROS
-
-        FontIcon icon18 = new FontIcon("fa-navicon");
-        icon18.getStyleClass().add("buttonsIcon");
-        btnParametros.setGraphic(icon18);
-
-        // BOTON REGISTRAR NUEVA SUCURSAL
-
-        FontIcon icon19 = new FontIcon("fa-shirtsinbulk");
-        icon19.getStyleClass().add("buttonsIcon");
-        btnRegistrarSucursal.setGraphic(icon19);
-
-        // BOTON GESTIÓN DE PARÁMETROS
-
-        FontIcon icon20 = new FontIcon("fa-sliders");
-        icon20.getStyleClass().add("buttonsIcon");
-        btnRegistrarSucursal.setGraphic(icon20);
-
-        // ---------------------------------------------------
+        // CLIENTES
+        btnClientes.setGraphic(crearIcono("fa-users", "buttonsIcon"));
+        btnRegistrarCliente.setGraphic(crearIcono("fa-address-book", "buttonsIcon"));
+        btnGestionClientes.setGraphic(crearIcono("fa-archive", "buttonsIcon"));
+
+        // PRODUCTOS
+        btnProductos.setGraphic(crearIcono("fa-briefcase", "buttonsIcon"));
+        btnCrearProducto.setGraphic(crearIcono("fa-plus-square-o", "buttonsIcon"));
+        btnConsultarCatalogo.setGraphic(crearIcono("fa-shopping-bag", "buttonsIcon"));
+        btnMarketing.setGraphic(crearIcono("fa-bar-chart-o", "buttonsIcon"));
+        btnStockLocal.setGraphic(crearIcono("fa-map-pin", "buttonsIcon"));
+        btnStockRemoto.setGraphic(crearIcono("fa-car", "buttonsIcon"));
+        btnAjusteStock.setGraphic(crearIcono("fa-edit", "buttonsIcon"));
+
+        // FACTURACIÓN
+        btnFacturacion.setGraphic(crearIcono("fa-money", "buttonsIcon"));
+        btnFacturarProductos.setGraphic(crearIcono("fa-cart-plus", "buttonsIcon"));
+        btnConsultarFacturas.setGraphic(crearIcono("fa-calendar-o", "buttonsIcon"));
+
+        // ADMINISTRACIÓN Y USUARIOS
+        btnAdministracion.setGraphic(crearIcono("fa-black-tie", "buttonsIcon"));
+        btnUsuarios.setGraphic(crearIcono("fa-odnoklassniki", "buttonsIcon"));
+        btnCrearUsuario.setGraphic(crearIcono("fa-plus-square-o", "buttonsIcon"));
+        btnGestionUsuarios.setGraphic(crearIcono("fa-edit", "buttonsIcon"));
+
+        // PARÁMETROS
+        btnParametros.setGraphic(crearIcono("fa-navicon", "buttonsIcon"));
+        btnRegistrarSucursal.setGraphic(crearIcono("fa-shirtsinbulk", "buttonsIcon"));
+        btnGestionParametros.setGraphic(crearIcono("fa-sliders", "buttonsIcon"));
 
         // BOTON NUEVA VENTA
+        btnNuevaVenta.setGraphic(crearIcono("fa-plus-square-o", "buttonsIcon"));
+        btnGoMain.setGraphic(crearIcono("fa-home", "buttonsIcon"));
 
-        btnNuevaVenta.setGraphic(icon7);
+
+        usuariosBox.setVisible(false);
+        usuariosBox.setManaged(false);
+        parametrosBox.setVisible(false);
+        parametrosBox.setManaged(false);
+
+
 
 
         // APLICACION DE ESTILOS
@@ -583,33 +419,14 @@ public class mainWindowController implements Initializable {
 
     }
 
-    void ocultarTodos() {
-        submenuFacturacion.setVisible(false);
-        submenuFacturacion.setManaged(false);
-        submenuClientes.setVisible(false);
-        submenuClientes.setManaged(false);
-        submenuProductos.setVisible(false);
-        submenuProductos.setManaged(false);
-
-        ocultarGestionParametros();
-        ocultarGestionUsuarios();
-        parametrosBox.setVisible(false);
-        parametrosBox.setManaged(false);
-        usuariosBox.setVisible(false);
-        usuariosBox.setManaged(false);
+    // Método auxiliar para evitar duplicidad de nodos de íconos en JavaFX
+    private FontIcon crearIcono(String iconLiteral, String styleClass) {
+        FontIcon icon = new FontIcon(iconLiteral);
+        icon.getStyleClass().add(styleClass);
+        return icon;
     }
 
 
-
-    void ocultarGestionParametros(){
-        parametrosSubMenu.setVisible(false);
-        parametrosSubMenu.setManaged(false);
-    }
-
-    void ocultarGestionUsuarios(){
-        usuariosSubMenu.setVisible(false);
-        usuariosSubMenu.setManaged(false);
-    }
 }
 
 
