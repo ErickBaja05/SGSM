@@ -58,6 +58,16 @@
     -fx-font-weight: bold;
 }
 
+.btnNuevaVenta:hover{
+    -fx-cursor: hand;
+    -fx-background-color: #930a0a;
+}
+
+.btnNavDown:hover{
+    -fx-cursor: hand;
+    -fx-background-color: #930a0a;
+}
+
 
 .submenu{
     -fx-padding: 0 0 0 10;
@@ -101,12 +111,11 @@
 
 .buttonsIcon{
     -fx-icon-color: white;
-    -fx-icon-size: 16;
+    -fx-icon-size: 14;
 }
 .userMdIcon{
     -fx-icon-color: white;
     -fx-icon-size: 60;
-
 }
 .soccerBallIcon{
     -fx-icon-color: black;
@@ -116,4 +125,9 @@
 .logOutIcon{
     -fx-icon-color: black;
     -fx-icon-size: 65;
+}
+
+.navDownIcon{
+    -fx-icon-color: white;
+    -fx-icon-size: 18;
 }

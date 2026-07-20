@@ -1,0 +1,560 @@
+/* Fondo general (Gris muy claro azulado) */
+.main-bg {
+    -fx-background-color: #F8F9FB;
+}
+
+/* Títulos de la ventana principal */
+.page-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-font-family: "Arial";
+    -fx-text-fill: #111111;
+}
+
+.page-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #666666;
+}
+
+/* Tarjeta contenedora */
+.form-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.03), 10, 0, 0, 5);
+}
+
+/* Cabecera de la Tarjeta */
+.card-header {
+    -fx-background-color: #F4F7FB;
+    -fx-background-radius: 8 8 0 0; /* Solo bordes superiores redondeados */
+    -fx-border-color: transparent transparent #E2E8F0 transparent; /* Línea inferior */
+    -fx-border-width: 1;
+}
+
+.header-icon-font {
+    -fx-icon-color: #005A49;
+    -fx-icon-size: 20px;
+}
+
+.header-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00332B;
+}
+
+/* Etiquetas de los inputs */
+.input-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #333333;
+}
+
+.section-subtitle {
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #00796B; /* Verde corporativo */
+    -fx-padding: 10 0 5 0;
+}
+
+.helper-text {
+    -fx-font-size: 11px;
+    -fx-font-style: italic;
+    -fx-text-fill: #888888;
+}
+
+/* === ESTILOS DE LOS INPUTS === */
+
+/* Contenedor HBox (con icono) en estado normal */
+.input-container {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 10;
+    -fx-spacing: 10;
+    -fx-cursor: text;
+}
+
+/* EFECTO HOVER PARA EL CONTENEDOR */
+.input-container:hover {
+    -fx-border-color: #B0BEC5;
+}
+
+/* LA MAGIA DEL FOCUS: Clase agregada desde el controlador */
+.focused-box {
+    -fx-border-color: #00796B;
+    -fx-effect: dropshadow(gaussian, rgba(0, 121, 107, 0.2), 5, 0, 0, 0);
+}
+
+/* Campo de texto (Sin borde, transparente) para dentro del HBox */
+.form-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+    -fx-prompt-text-fill: #A0AAB5;
+}
+
+.form-field:focused {
+    -fx-background-color: transparent; /* Mantiene la transparencia en focus */
+}
+
+/* Campo de texto individual (Como Nombres/Apellidos) */
+.form-field-standalone {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 9 10;
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+    -fx-prompt-text-fill: #A0AAB5;
+}
+
+/* Hover y Focus nativo para los standalones */
+.form-field-standalone:hover {
+    -fx-border-color: #B0BEC5;
+}
+
+.form-field-standalone:focused {
+    -fx-border-color: #00796B;
+    -fx-effect: dropshadow(gaussian, rgba(0, 121, 107, 0.2), 5, 0, 0, 0);
+}
+
+/* Contenedor deshabilitado (Sucursal) */
+.input-container-disabled {
+    -fx-background-color: #F0F4F8; /* Fondo grisáceo */
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 10;
+    -fx-spacing: 10;
+}
+.input-container-disabled .form-field {
+    -fx-text-fill: #555555;
+    -fx-font-weight: bold;
+}
+
+/* Íconos de los inputs */
+.input-icon-font {
+    -fx-icon-color: #8898AA;
+    -fx-icon-size: 16px;
+}
+
+/* === BOTONES === */
+
+/* Botón Principal (Registrar) */
+.btn-primary {
+    -fx-background-color: #006B54;
+    -fx-background-radius: 4;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #00503E; /* Más oscuro en hover */
+}
+
+.btn-primary-text {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.btn-primary-icon-font {
+    -fx-icon-color: white;
+    -fx-icon-size: 14px;
+}
+
+/* Botón Secundario (Cancelar) */
+.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: #444444;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 10 15;
+    -fx-cursor: hand;
+    -fx-background-radius: 4;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #E2E8F0;
+    -fx-text-fill: #111111;
+}
+
+/* --- BARRA DE BÚSQUEDA --- */
+.search-container {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 15;
+    -fx-spacing: 10;
+}
+.search-container:focus-within {
+    -fx-border-color: #00796B;
+}
+.search-icon-font {
+    -fx-icon-color: #555555;
+    -fx-icon-size: 16px;
+}
+.search-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+    -fx-prompt-text-fill: #A0AAB5;
+}
+.search-field:focused {
+    -fx-background-color: transparent;
+}
+
+/* --- ESTILOS DE LA TABLA --- */
+.custom-table {
+    -fx-background-color: transparent;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+.custom-table .column-header-background {
+    -fx-background-color: #121A2F;
+    -fx-background-radius: 5 5 0 0;
+}
+.custom-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 40px;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #2A3654;
+}
+.custom-table .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+}
+.custom-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #E2E8F0;
+    -fx-cell-size: 40px; /* Altura de la fila */
+}
+.custom-table .table-row-cell:odd {
+    -fx-background-color: #F8F9FB; /* Rayado tipo zebra suave */
+}
+.custom-table .table-row-cell:selected {
+    -fx-background-color: #E0F2F1; /* Verde súper claro al seleccionar */
+}
+.custom-table .table-cell {
+    -fx-text-fill: #333333;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER-LEFT;
+    -fx-padding: 0 10;
+}
+/* Color corporativo para el correo */
+.custom-table .table-cell:nth-child(4) {
+    -fx-text-fill: #00796B;
+}
+
+/* --- BOTONES DE LA TABLA Y ACCIONES --- */
+.btn-transparent {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 5;
+}
+.action-table-icon {
+    -fx-icon-color: #00796B;
+    -fx-icon-size: 18px;
+}
+.btn-transparent:hover .action-table-icon {
+    -fx-icon-color: #004D40;
+}
+
+/* --- TARJETA DE EDICIÓN --- */
+.edit-card {
+    -fx-background-color: #F4F7FB;
+    -fx-background-radius: 8;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+}
+.edit-header-icon-font {
+    -fx-icon-color: #00796B;
+    -fx-icon-size: 18px;
+}
+.edit-header-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #223344;
+}
+
+/* --- BOTÓN ELIMINAR (OUTLINE RED) --- */
+.btn-danger-outline {
+    -fx-background-color: #FDF2F2;
+    -fx-border-color: #E57373;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+.btn-danger-outline:hover {
+    -fx-background-color: #FFEBEE;
+    -fx-border-color: #D32F2F;
+}
+.btn-danger-text {
+    -fx-text-fill: #D32F2F;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.btn-danger-icon-font {
+    -fx-icon-color: #D32F2F;
+    -fx-icon-size: 14px;
+}
+
+/* === ESTILOS PARA COMBOBOX === */
+.custom-combo-box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 4 5; /* Ajuste para que cuadre con la altura de los textfields */
+    -fx-font-size: 13px;
+}
+.custom-combo-box:hover {
+    -fx-border-color: #B0BEC5;
+}
+.custom-combo-box:showing {
+    -fx-border-color: #00796B;
+}
+.custom-combo-box .list-cell {
+    -fx-text-fill: #333333;
+}
+.custom-combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+.custom-combo-box .arrow {
+    -fx-background-color: #8898AA;
+}
+
+/* === ESTILOS PARA TEXTAREA (Descripción) === */
+.custom-text-area {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-font-size: 13px;
+    -fx-prompt-text-fill: #A0AAB5;
+}
+.custom-text-area .content {
+    -fx-background-color: transparent;
+}
+.custom-text-area:hover {
+    -fx-border-color: #B0BEC5;
+}
+.custom-text-area:focused {
+    -fx-border-color: #00796B;
+    -fx-effect: dropshadow(gaussian, rgba(0, 121, 107, 0.2), 5, 0, 0, 0);
+}
+
+/* === ESTILOS PARA EL LABEL DE CONFIRMACIÓN === */
+.mensaje-confirmacion {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.mensaje-exito {
+    -fx-text-fill: #00796B; /* Verde corporativo */
+}
+.mensaje-error {
+    -fx-text-fill: #D32F2F; /* Rojo de error */
+}
+
+/* Campo de texto bloqueado/deshabilitado (Ej: Código de Edición) */
+.form-field-disabled {
+    -fx-background-color: #E2E8F0; /* Gris muy tenue del mockup */
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 9 10;
+    -fx-font-size: 13px;
+    -fx-text-fill: #555555;
+    -fx-font-weight: bold;
+}
+
+/* Limpieza visual del ScrollPane dinámico */
+.scroll-pane-transparent {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-pane-transparent > .viewport {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+/* --- TARJETAS ESPECIALES --- */
+.card-accent-top {
+    -fx-border-color: #00796B #E2E8F0 #E2E8F0 #E2E8F0; /* Verde arriba, gris en los lados */
+    -fx-border-width: 4 1 1 1;
+}
+
+.card-footer {
+    -fx-background-color: #F4F7FB; /* Gris súper sutil */
+    -fx-background-radius: 0 0 8 8; /* Redondeado solo abajo */
+    -fx-border-color: #E2E8F0 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 15 25;
+}
+
+.section-icon-font {
+    -fx-icon-color: #00796B;
+    -fx-icon-size: 16px;
+}
+
+/* --- BOTÓN SECUNDARIO CON BORDE (OUTLINE) --- */
+.btn-secondary-outline {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #666666;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 9 15;
+    -fx-cursor: hand;
+}
+
+.btn-secondary-outline:hover {
+    -fx-background-color: #F0F0F0;
+    -fx-text-fill: #111111;
+}
+
+/* --- BOTON PEQUEÑO (Nuevo Cliente) --- */
+.btn-primary-small {
+    -fx-background-color: #006B54;
+    -fx-background-radius: 4;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+.btn-primary-small:hover {
+    -fx-background-color: #00503E;
+}
+
+/* --- BARRA DE BÚSQUEDA PEQUEÑA (Buscar Producto) --- */
+.search-container-small {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 5 10;
+    -fx-spacing: 8;
+    -fx-pref-width: 250px;
+}
+
+/* --- RESUMEN DE VENTA --- */
+.resumen-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #555555;
+}
+.resumen-value {
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+.resumen-total-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #111111;
+    -fx-font-weight: 900;
+}
+.resumen-total-value {
+    -fx-font-size: 24px;
+    -fx-text-fill: #111111;
+    -fx-font-weight: 900;
+}
+
+/* --- BOTONES MÉTODO DE PAGO (TOGGLE) --- */
+.payment-toggle {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 10 15;
+    -fx-cursor: hand;
+    -fx-pref-width: 80px;
+}
+.payment-toggle:selected {
+    -fx-background-color: #F0F4F8;
+    -fx-border-color: #2B4570; /* Azul oscuro seleccionado */
+    -fx-border-width: 2;
+}
+.payment-icon-font {
+    -fx-icon-color: #333333;
+    -fx-icon-size: 20px;
+}
+.payment-text {
+    -fx-font-size: 10px;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+
+/* --- BOTÓN FACTURAR GIGANTE --- */
+.btn-facturar {
+    -fx-background-color: #006B54;
+    -fx-background-radius: 4;
+    -fx-padding: 15 20;
+    -fx-cursor: hand;
+}
+.btn-facturar:hover {
+    -fx-background-color: #004D40;
+}
+.btn-facturar-icon-font {
+    -fx-icon-color: white;
+    -fx-icon-size: 18px;
+}
+.btn-facturar-text {
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-font-size: 16px;
+}
+
+/* --- BOTÓN CARRITO (ACCIÓN TABLA) --- */
+.btn-cart {
+    -fx-background-color: #121A2F; /* Azul marino */
+    -fx-background-radius: 4;
+    -fx-padding: 5 10;
+    -fx-cursor: hand;
+}
+.btn-cart:hover {
+    -fx-background-color: #2A3654;
+}
+.btn-cart-icon {
+    -fx-icon-color: white;
+    -fx-icon-size: 14px;
+}
+
+/* --- TEXTFIELD PARA LA CANTIDAD EN LA TABLA --- */
+.table-textfield {
+    -fx-alignment: center;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 4 5;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-max-width: 60px;
+}
+.table-textfield:focused {
+    -fx-border-color: #00796B;
+}
+
+/* Ícono de Basura en la tabla de Detalle */
+.btn-delete-icon {
+    -fx-icon-color: #888888;
+    -fx-icon-size: 18px;
+}
+.btn-transparent:hover .btn-delete-icon {
+    -fx-icon-color: #D32F2F; /* Se pone rojo al hacer hover */
+}
