@@ -3,12 +3,22 @@ package com.grupo1.sgsm.administracion.gestionUsuarios.dto;
 public class UsuarioSesionDTO {
     private int id;
     private String nombre_us;
-    private String perfil_us;
+    private String rol;
+    private String codigo_sucursal;
 
-    public UsuarioSesionDTO(int id, String nombre_us, String perfil_us) {
+    public UsuarioSesionDTO(int id, String nombre_us, String rol, String codigo_sucursal) {
         this.id = id;
         this.nombre_us = nombre_us;
-        this.perfil_us = perfil_us;
+        this.rol = rol;
+        this.codigo_sucursal = codigo_sucursal;
+    }
+
+    public String getCodigo_sucursal() {
+        return codigo_sucursal;
+    }
+
+    public void setCodigo_sucursal(String codigo_sucursal) {
+        this.codigo_sucursal = codigo_sucursal;
     }
 
     public int getId() {
@@ -27,11 +37,11 @@ public class UsuarioSesionDTO {
         this.nombre_us = nombre_us;
     }
 
-    public String getPerfil_us() {
-        return perfil_us;
+    public String getRol() {
+        return rol;
     }
 
-    public void setPerfil_us(String perfil_us) {
-        this.perfil_us = perfil_us;
+    public void setRol(String rol) {
+        this.rol = rol;
     }
 }

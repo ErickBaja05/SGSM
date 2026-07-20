@@ -1,5 +1,10 @@
 package com.grupo1.sgsm.clientes.controller;
 
+import com.grupo1.sgsm.clientes.dto.NuevoClienteDTO;
+import com.grupo1.sgsm.clientes.exception.ClienteYaExisteException;
+import com.grupo1.sgsm.clientes.service.ClientesService;
+import com.grupo1.sgsm.clientes.service.IClientesService;
+import com.grupo1.sgsm.core.session.SesionActual;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -41,6 +46,7 @@ public class registrarClientesController {
 
     @FXML private Label mensajeConfirmacion;
 
+    private IClientesService clientesService;
     // Método auxiliar para Ikonli
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
@@ -63,6 +69,9 @@ public class registrarClientesController {
         configurarEfectoFocus(txtCorreo, boxCorreo);
         configurarEfectoFocus(txtTelefono, boxTelefono);
         // Sucursal no necesita focus porque es editable="false", pero se puede agregar si deseas.
+
+        clientesService = new ClientesService();
+        txtSucursal.setText(SesionActual.getUsuario().getCodigo_sucursal().toUpperCase());
     }
 
     /**
@@ -85,7 +94,23 @@ public class registrarClientesController {
     @FXML
     void registrarCliente(ActionEvent event) {
         // Lógica de registro para SportMaster
-        System.out.println("Registrando cliente: " + txtNombres.getText() + " " + txtApellidos.getText());
+        if(txtCedula.getText().isEmpty() || txtApellidos.getText().isEmpty() || txtCorreo.getText().isEmpty() || txtTelefono.getText().isEmpty() || txtDireccion.getText().isEmpty() || txtSucursal.getText().isEmpty()) {
+            mensajeConfirmacion.setText("Debes llenar todos los campos");
+            return;
+        };
+
+        String primer_nombre = txtNombres.getText().split(" ")[0];
+        String primer_apellido = txtApellidos.getText().split(" ")[0];
+        String segundo_nombre = txtNombres.getText().split(" ")[1];
+        String segundo_apellido = txtCorreo.getText().split(" ")[1];
+
+        NuevoClienteDTO nuevoClienteDTO = new NuevoClienteDTO(txtCedula.getText(),primer_nombre,segundo_nombre,primer_apellido,segundo_apellido,txtCorreo.getText(),txtTelefono.getText(),txtDireccion.getText(),txtSucursal.getText());
+
+        try{
+            clientesService.guardarCliente(nuevoClienteDTO);
+        } catch(Exception e){
+            mensajeConfirmacion.setText(e.getMessage());
+        }
     }
 
     @FXML
