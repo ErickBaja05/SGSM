@@ -69,9 +69,13 @@ public class mainWindowController implements Initializable {
 
     @FXML void abirGestionUsuarios(ActionEvent event) {}
     @FXML void abrirAjusteStock(ActionEvent event) {}
-    @FXML void abrirConsultarCatálogo(ActionEvent event) {}
+    @FXML void abrirConsultarCatálogo(ActionEvent event) {
+        cargarVista("/inventarioYproductos/fxml/gestionCatalogo.fxml");
+    }
     @FXML void abrirConsultarFacturas(ActionEvent event) {}
-    @FXML void abrirCrearProducto(ActionEvent event) {}
+    @FXML void abrirCrearProducto(ActionEvent event) {
+        cargarVista("/inventarioYproductos/fxml/crearNuevoProducto.fxml");
+    }
     @FXML void abrirCrearUsuario(ActionEvent event) {}
     @FXML void abrirFacturacion(ActionEvent event) {}
     @FXML void abrirGestionClientes(ActionEvent event) {
