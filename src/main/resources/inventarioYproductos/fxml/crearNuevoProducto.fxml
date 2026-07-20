@@ -12,9 +12,13 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="700.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../css/productosStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.inventarioYproductos.controller.crearProductoController">
-    <children>
-        <VBox alignment="TOP_LEFT" maxWidth="800.0" spacing="5.0" VBox.vgrow="ALWAYS">
+<?import javafx.scene.control.ScrollPane?>
+<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" stylesheets="@../css/productosStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.inventarioYproductos.controller.crearProductoController">
+    <content>
+        <VBox alignment="TOP_CENTER" styleClass="main-bg">
+            <children>
+                <!-- Altura mínima añadida para forzar el scroll -->
+                <VBox alignment="TOP_LEFT" maxWidth="800.0" minHeight="750.0" spacing="5.0" VBox.vgrow="ALWAYS">
             <children>
 
                 <!-- Títulos Principales -->
@@ -163,6 +167,8 @@
             <padding>
                 <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
             </padding>
+                </VBox>
+            </children>
         </VBox>
-    </children>
-</VBox>
+    </content>
+</ScrollPane>

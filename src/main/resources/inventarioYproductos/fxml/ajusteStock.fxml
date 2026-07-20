@@ -12,11 +12,13 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="700.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../css/productosStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.inventarioYproductos.controller.ajusteStockController">
-    <children>
+<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" stylesheets="@../css/productosStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.inventarioYproductos.controller.ajusteStockController">
+    <content>
+        <VBox alignment="TOP_CENTER" styleClass="main-bg">
+            <children>
 
         <!-- Encabezado Fijo -->
-        <VBox alignment="TOP_LEFT" maxWidth="900.0" spacing="15.0">
+        <VBox alignment="TOP_LEFT" maxWidth="900.0" spacing="15.0" VBox.vgrow="ALWAYS">
             <children>
                 <VBox spacing="5.0">
                     <Label styleClass="page-title" text="AJUSTE DE STOCK" />
@@ -28,13 +30,10 @@
             </padding>
         </VBox>
 
-        <!-- Área Dinámica con ScrollPane para Responsividad -->
-        <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" VBox.vgrow="ALWAYS">
-            <content>
-                <VBox alignment="TOP_CENTER">
-                    <children>
-                        <!-- Contenedor principal con altura mínima para evitar compresión -->
-                        <VBox alignment="TOP_LEFT" maxWidth="900.0" minHeight="500.0" spacing="20.0" VBox.vgrow="ALWAYS">
+        <!-- Área Dinámica (Ya protegida por la raíz) -->
+        <VBox alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
+            <children>
+                <VBox alignment="TOP_LEFT" maxWidth="900.0" spacing="20.0" VBox.vgrow="ALWAYS">
                             <children>
 
                                 <!-- Tarjeta 1: Búsqueda -->
@@ -69,12 +68,7 @@
                                                         <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="40.0" />
                                                         <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="60.0" />
                                                     </columnConstraints>
-                                                    <rowConstraints>
-                                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                                    </rowConstraints>
+
                                                     <children>
                                                         <!-- Fila 1: Labels -->
                                                         <Label styleClass="input-label" text="CÓDIGO DE PRODUCTO" />
@@ -155,10 +149,10 @@
                             <padding>
                                 <Insets bottom="30.0" left="30.0" right="30.0" top="5.0" />
                             </padding>
-                        </VBox>
-                    </children>
                 </VBox>
-            </content>
-        </ScrollPane>
-    </children>
-</VBox>
+            </children>
+        </VBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>
