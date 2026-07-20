@@ -29,4 +29,5 @@ opens com.grupo1.sgsm.clientes.controller to javafx.fxml;
     exports com.grupo1.sgsm.app;
 
 
+
 }
