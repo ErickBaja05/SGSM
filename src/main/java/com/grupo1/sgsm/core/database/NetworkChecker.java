@@ -11,6 +11,15 @@ public class NetworkChecker {
             return false;
         }
     }
+
+    public static boolean hayConexionGYE() {
+        try (Connection conn = DatabaseConnection.getConnection("GYE")) {
+            // Valida que el nodo remoto realmente responde (timeout de 3 segundos)
+            return conn.isValid(3);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
 
 

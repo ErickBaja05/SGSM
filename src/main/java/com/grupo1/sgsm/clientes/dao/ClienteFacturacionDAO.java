@@ -29,12 +29,12 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // CONSULTAR TODOS (Lectura local)
+    // CONSULTAR TODOS (100% Local)
     // ===============================
     public List<ClienteFacturacion> consultarTodos() {
         validarSesion();
         String nodoLocal = ConfigSucursal.getSucursalActual();
-        String sql = "SELECT * FROM " + obtenerTablaLectura(nodoLocal);
+        String sql = "SELECT * FROM " + obtenerTablaLocal(nodoLocal);
 
         List<ClienteFacturacion> clientes = new ArrayList<>();
 
@@ -54,12 +54,12 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // CONSULTAR POR CÉDULA (Lectura local)
+    // CONSULTAR POR CÉDULA (100% Local)
     // ===============================
     public ClienteFacturacion consultarPorCedula(String cedula) {
         validarSesion();
         String nodoLocal = ConfigSucursal.getSucursalActual();
-        String sql = "SELECT * FROM " + obtenerTablaLectura(nodoLocal) + " WHERE cedula_ciudadania = ?";
+        String sql = "SELECT * FROM " + obtenerTablaLocal(nodoLocal) + " WHERE cedula_ciudadania = ?";
 
         try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -79,7 +79,7 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // INSERTAR (Escritura hacia UIO)
+    // INSERTAR (100% Local)
     // ===============================
     public void insertar(ClienteFacturacion cliente) {
         validarSesion();
@@ -88,7 +88,7 @@ public class ClienteFacturacionDAO {
         String sql = String.format("""
             INSERT INTO %s (cedula_ciudadania, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido)
             VALUES (?, ?, ?, ?, ?)
-            """, obtenerTablaEscritura(nodoLocal));
+            """, obtenerTablaLocal(nodoLocal));
 
         try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -107,14 +107,14 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // ACTUALIZAR NOMBRES POR CÉDULA (Escritura hacia UIO)
+    // ACTUALIZAR NOMBRES POR CÉDULA (100% Local)
     // ===============================
     public void actualizarNombresPorCedula(String cedula, String primerNombre, String segundoNombre) {
         validarSesion();
         String nodoLocal = ConfigSucursal.getSucursalActual();
 
         String sql = String.format("UPDATE %s SET primer_nombre = ?, segundo_nombre = ? WHERE cedula_ciudadania = ?",
-                obtenerTablaEscritura(nodoLocal));
+                obtenerTablaLocal(nodoLocal));
 
         try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -130,13 +130,13 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // ELIMINAR POR CÉDULA (Escritura hacia UIO)
+    // ELIMINAR POR CÉDULA (100% Local)
     // ===============================
     public void eliminarPorCedula(String cedula) {
         validarSesion();
         String nodoLocal = ConfigSucursal.getSucursalActual();
 
-        String sql = String.format("DELETE FROM %s WHERE cedula_ciudadania = ?", obtenerTablaEscritura(nodoLocal));
+        String sql = String.format("DELETE FROM %s WHERE cedula_ciudadania = ?", obtenerTablaLocal(nodoLocal));
 
         try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -150,7 +150,7 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // MÉTODOS AUXILIARES DE ENRUTAMIENTO
+    // MÉTODOS AUXILIARES
     // ===============================
     private void validarSesion() {
         UsuarioSesionDTO usuario = SesionActual.getUsuario();
@@ -159,17 +159,9 @@ public class ClienteFacturacionDAO {
         }
     }
 
-    private String obtenerTablaLectura(String nodoLocal) {
-        // Lectura siempre a la réplica local
+    private String obtenerTablaLocal(String nodoLocal) {
+        // Al ser replicación bidireccional, SIEMPRE operamos sobre la tabla local.
+        // SQL Server se encarga de replicar los Inserts/Updates/Deletes al otro nodo.
         return nodoLocal.toUpperCase() + ".dbo.cliente_facturacion";
-    }
-
-    private String obtenerTablaEscritura(String nodoLocal) {
-        // Escritura forzada a la base de datos principal (UIO) para garantizar consistencia
-        if ("UIO".equalsIgnoreCase(nodoLocal)) {
-            return "UIO.dbo.cliente_facturacion";
-        } else {
-            return "[26.194.51.93].UIO.dbo.cliente_facturacion";
-        }
     }
 }
