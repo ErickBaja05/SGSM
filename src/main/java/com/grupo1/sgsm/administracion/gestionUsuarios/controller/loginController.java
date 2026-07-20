@@ -1,5 +1,9 @@
 package com.grupo1.sgsm.administracion.gestionUsuarios.controller;
 
+import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
+import com.grupo1.sgsm.administracion.gestionUsuarios.service.IUsuarioService;
+import com.grupo1.sgsm.administracion.gestionUsuarios.service.UsuarioServiceImpl;
+import com.grupo1.sgsm.core.session.SesionActual;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,6 +35,9 @@ public class loginController implements Initializable {
     @FXML private Label lblPassIcon;
     @FXML private Label lblEyeIcon;
     @FXML private Label lblBtnIcon;
+
+    private IUsuarioService usuarioService;
+
 
     // Tu método auxiliar para evitar duplicidad
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
@@ -69,16 +76,21 @@ public class loginController implements Initializable {
     public void login(ActionEvent event) {
         String usuario = txtUsuario.getText();
         String contrasena = txtContrasena.getText();
-
         lblMensaje.setText("");
+        cargarDashboard(event);
+        // ELIMINAR ESTAS DOS LINEAS Y DESCOMENTAR EL TRY CUANDO YA ESTEN USUARIOS EN LA BASE DE DATOS
 
-        if (usuario == null || usuario.trim().isEmpty() || contrasena == null || contrasena.trim().isEmpty()) {
-            lblMensaje.setText("Usuario o contraseña vacíos");
-        } else if ("admin".equals(usuario) && "1234".equals(contrasena)) {
-            cargarDashboard(event);
-        } else {
-            lblMensaje.setText("Usuario o contraseña incorrectos");
-        }
+        UsuarioSesionDTO usuariologin= new UsuarioSesionDTO(1,"Erick","ADMINISTRADOR","UIO");
+        SesionActual.iniciarSesion(usuariologin);
+//        try{
+//            UsuarioSesionDTO usuarioLogin = usuarioService.login(usuario, contrasena);
+//            SesionActual.iniciarSesion(usuarioLogin);
+ //              cargarDashboard(event);
+
+//        }catch(Exception e){
+//            lblMensaje.setText(e.getMessage());
+//        }
+
     }
 
     private void cargarDashboard(ActionEvent event) {
@@ -114,6 +126,8 @@ public class loginController implements Initializable {
         if (txtContrasena != null && txtContrasenaVisible != null) {
             txtContrasenaVisible.textProperty().bindBidirectional(txtContrasena.textProperty());
         }
+
+        usuarioService = new UsuarioServiceImpl();
 
     }
 }

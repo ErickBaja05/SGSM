@@ -1,5 +1,6 @@
 package com.grupo1.sgsm.administracion.dashboard;
 
+import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
 import com.grupo1.sgsm.core.session.SesionActual;
 import com.grupo1.sgsm.core.util.NavigationUtil;
 import javafx.event.ActionEvent;
@@ -66,6 +67,8 @@ public class mainWindowController implements Initializable {
     @FXML private VBox submenuProductos;
     @FXML private VBox usuariosBox;
     @FXML private VBox usuariosSubMenu;
+
+    private final UsuarioSesionDTO usuarioActual = SesionActual.getUsuario();
 
     @FXML void abirGestionUsuarios(ActionEvent event) {}
     @FXML void abrirAjusteStock(ActionEvent event) {
@@ -166,12 +169,31 @@ public class mainWindowController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        if(SesionActual.haySesion()){
-            lblUsuario.setText(
-                    SesionActual.getUsuario().getNombre_us().toUpperCase()
-            );
-        }
-        lblRol.setText("ADMINISTRADOR");
+
+        lblUsuario.setText(
+                usuarioActual.getNombre_us().toUpperCase()
+        );
+
+        lblRol.setText(usuarioActual.getRol().toUpperCase());
+        lblSede.setText(usuarioActual.getCodigo_sucursal().toUpperCase());
+
+
+        // CONFIGURAR QUE ROL Y DE QUE SEDE PUEDE O NO VER LOS BOTONES
+
+//        if(!usuarioActual.getRol().equals("ADMINISTRADOR")){
+//            btnAdministracion.setVisible(false);
+//        }
+//
+//        if(usuarioActual.getRol().equals("AUDITOR")){
+//            btnClientes.setVisible(false);
+//            btnProductos.setVisible(false);
+//            btnFacturarProductos.setVisible(false);
+//        }
+//
+//        if(usuarioActual.getRol().equals("CAJERO")){
+//
+//        }
+
 
         // ICONOS PRINCIPALES
         iconoUsuario.setGraphic(crearIcono("fa-user-circle-o", "userMdIcon"));
@@ -234,6 +256,8 @@ public class mainWindowController implements Initializable {
 
         parametrosBox.setOnMouseEntered(e -> btnAdministracion.getStyleClass().add("navBtn-activo"));
         parametrosBox.setOnMouseExited(e -> btnAdministracion.getStyleClass().remove("navBtn-activo"));
+
+
     }
 
     private void cargarVista(String rutaFxml) {

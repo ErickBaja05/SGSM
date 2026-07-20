@@ -1,34 +1,29 @@
 package com.grupo1.sgsm.clientes.controller;
 
+import com.grupo1.sgsm.clientes.exception.ClienteReferenciadoException;
+import com.grupo1.sgsm.clientes.service.ClientesService;
+import com.grupo1.sgsm.clientes.dto.ClienteConsultaDTO; // DTO importado
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
-import org.kordamp.ikonli.javafx.FontIcon; // Ikonli
-
-// IMPORTANTE: Importa aquí tu clase modelo Cliente
-import com.grupo1.sgsm.clientes.model.Cliente;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 public class gestionClientesController {
 
     @FXML private TextField txtBuscar;
 
-    // Configuración de Tabla (Ajusta 'Cliente' al nombre de tu clase modelo)
-    @FXML private TableView<Cliente> tbClientes;
-    @FXML private TableColumn<Cliente, String> colCedula;
-    @FXML private TableColumn<Cliente, String> colNombres;
-    @FXML private TableColumn<Cliente, String> colApellidos;
-    @FXML private TableColumn<Cliente, String> colCorreo;
-    @FXML private TableColumn<Cliente, String> colDireccion;
-    @FXML private TableColumn<Cliente, Void> colAccion; // Void porque no se asocia a un atributo del modelo
+    // 1. Uso del DTO en lugar del modelo genérico Cliente
+    @FXML private TableView<ClienteConsultaDTO> tbClientes;
+    @FXML private TableColumn<ClienteConsultaDTO, String> colCedula;
+    @FXML private TableColumn<ClienteConsultaDTO, String> colNombres;
+    @FXML private TableColumn<ClienteConsultaDTO, String> colApellidos;
+    @FXML private TableColumn<ClienteConsultaDTO, String> colCorreo;
+    @FXML private TableColumn<ClienteConsultaDTO, String> colDireccion;
+    @FXML private TableColumn<ClienteConsultaDTO, Void> colAccion;
 
     // Campos de Edición
     @FXML private TextField txtEditNombres;
@@ -42,7 +37,11 @@ public class gestionClientesController {
     @FXML private Label lblBtnEliminarIcon;
     @FXML private Label lblBtnGuardarIcon;
 
-    private ObservableList<Cliente> masterData = FXCollections.observableArrayList();
+    private ClientesService clientesService;
+    private ObservableList<ClienteConsultaDTO> masterData = FXCollections.observableArrayList();
+
+    // Variable para guardar la cédula en memoria al momento de editar
+    private String cedulaSeleccionada = null;
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
@@ -50,45 +49,49 @@ public class gestionClientesController {
         return icon;
     }
 
+    public gestionClientesController() {
+        this.clientesService = new ClientesService();
+    }
+
     @FXML
     public void initialize() {
-        // 1. Cargar Íconos
         lblSearchIcon.setGraphic(crearIcono("fa-search", "search-icon-font"));
         lblEditHeaderIcon.setGraphic(crearIcono("fa-indent", "edit-header-icon-font"));
         lblBtnEliminarIcon.setGraphic(crearIcono("fa-trash-o", "btn-danger-icon-font"));
         lblBtnGuardarIcon.setGraphic(crearIcono("fa-save", "btn-primary-icon-font"));
 
-        // 2. Configurar Columnas de la Tabla (Los Strings deben coincidir con los atributos de tu clase Cliente)
+        // Propiedades adaptadas a los getters de ClienteConsultaDTO
         colCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
-        colNombres.setCellValueFactory(new PropertyValueFactory<>("nombres"));
+        colNombres.setCellValueFactory(new PropertyValueFactory<>("nombre")); // Es getNombre() en el DTO
         colApellidos.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
         colCorreo.setCellValueFactory(new PropertyValueFactory<>("correo"));
         colDireccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
 
-        // 3. Configurar Columna de Acción (Botón inyectado)
         configurarColumnaAccion();
 
-        // 4. Configurar Búsqueda en tiempo real
         txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
             buscarClienteEnTiempoReal(newValue);
         });
 
-        // (Opcional) Cargar datos de prueba o tu consulta a BD
-        // cargarDatos();
+        cargarDatos();
+    }
+
+    private void cargarDatos() {
+        // Obtenemos los datos desde el service y llenamos la tabla
+        masterData.setAll(clientesService.consultarTodosLosClientes());
+        tbClientes.setItems(masterData);
     }
 
     private void configurarColumnaAccion() {
-        colAccion.setCellFactory(param -> new TableCell<Cliente, Void>() {
+        colAccion.setCellFactory(param -> new TableCell<ClienteConsultaDTO, Void>() {
             private final Button btnAccion = new Button();
 
             {
-                // Configurar el botón transparente y su ícono
                 btnAccion.setGraphic(crearIcono("fa-pencil-square-o", "action-table-icon"));
                 btnAccion.getStyleClass().add("btn-transparent");
 
-                // Evento al hacer clic en el botón de la fila
                 btnAccion.setOnAction(event -> {
-                    Cliente clienteSeleccionado = getTableView().getItems().get(getIndex());
+                    ClienteConsultaDTO clienteSeleccionado = getTableView().getItems().get(getIndex());
                     cargarDatosEdicion(clienteSeleccionado);
                 });
             }
@@ -99,19 +102,28 @@ public class gestionClientesController {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    setGraphic(btnAccion);
+                    ClienteConsultaDTO cliente = getTableView().getItems().get(getIndex());
+
+                    // REGLA DE NEGOCIO: Si son de otra sucursal, no aparece el botón
+                    if ("NO DISPONIBLE".equals(cliente.getCorreo()) || "NO DISPONIBLE".equals(cliente.getDireccion())) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(btnAccion);
+                    }
                 }
             }
         });
     }
 
-    private void cargarDatosEdicion(Cliente cliente) {
+    private void cargarDatosEdicion(ClienteConsultaDTO cliente) {
         if (cliente != null) {
-            txtEditNombres.setText(cliente.getNombres());
+            // Guardamos la cédula para el update
+            this.cedulaSeleccionada = cliente.getCedula();
+
+            // Llenamos los textfields (Deshabilitar Nombres/Apellidos en la UI si no se deben editar)
+            txtEditNombres.setText(cliente.getNombre());
             txtEditApellidos.setText(cliente.getApellidos());
             txtEditCorreo.setText(cliente.getCorreo());
-
-            // Aquí puedes aplicar tu lógica de negocio para ver si puede editar la dirección
             txtEditDireccion.setText(cliente.getDireccion());
         }
     }
@@ -123,11 +135,12 @@ public class gestionClientesController {
         }
 
         String lowerCaseFilter = filtro.toLowerCase();
-        ObservableList<Cliente> filteredData = FXCollections.observableArrayList();
+        ObservableList<ClienteConsultaDTO> filteredData = FXCollections.observableArrayList();
 
-        for (Cliente cliente : masterData) {
+        // Búsqueda adaptada a las propiedades de ClienteConsultaDTO
+        for (ClienteConsultaDTO cliente : masterData) {
             if (cliente.getCedula().toLowerCase().contains(lowerCaseFilter) ||
-                    cliente.getNombres().toLowerCase().contains(lowerCaseFilter) ||
+                    cliente.getNombre().toLowerCase().contains(lowerCaseFilter) ||
                     cliente.getApellidos().toLowerCase().contains(lowerCaseFilter)) {
                 filteredData.add(cliente);
             }
@@ -137,11 +150,59 @@ public class gestionClientesController {
 
     @FXML
     void eliminarCliente(ActionEvent event) {
-        System.out.println("Eliminando cliente...");
+        if (cedulaSeleccionada != null) {
+            // Consumimos el nuevo método del service respetando la FK
+
+            try{
+                clientesService.eliminarCliente(cedulaSeleccionada);
+                // Limpiamos la memoria de la interfaz y refrescamos la tabla
+                cedulaSeleccionada = null;
+                limpiarCamposEdicion();
+                cargarDatos();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Éxito");
+                alert.setHeaderText("Cambios guardados con éxito");
+                alert.setContentText("Cliente eliminado exitosamente");
+            }catch(ClienteReferenciadoException e){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Cambios no efectuados");
+                alert.setContentText(e.getMessage());
+            }
+
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Cambios no efectuados");
+            alert.setContentText("Por favor, seleccione un cliente en la tabla primero (clic en el botón de acción)");
+
+        }
     }
 
     @FXML
     void guardarCambios(ActionEvent event) {
-        System.out.println("Guardando cambios de: " + txtEditNombres.getText());
+        if (cedulaSeleccionada != null) {
+            String nuevoCorreo = txtEditCorreo.getText();
+            String nuevaDireccion = txtEditDireccion.getText();
+
+            // Consumir el service para actualizar en la BD local correspondiente a la sede
+            clientesService.actualizarCliente(cedulaSeleccionada, nuevoCorreo, nuevaDireccion);
+
+            // Refrescar tabla y limpiar variables de memoria
+            cargarDatos();
+            cedulaSeleccionada = null;
+            limpiarCamposEdicion();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Éxito");
+            alert.setHeaderText("Cambios guardados con éxito");
+            alert.setContentText("Informacion guardada correctamente");
+        }
+    }
+
+    private void limpiarCamposEdicion() {
+        txtEditNombres.clear();
+        txtEditApellidos.clear();
+        txtEditCorreo.clear();
+        txtEditDireccion.clear();
     }
 }

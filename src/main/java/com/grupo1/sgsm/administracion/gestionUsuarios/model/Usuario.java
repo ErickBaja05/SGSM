@@ -6,17 +6,27 @@ public class Usuario {
     private String nombre;
     private String correo;
     private String password;
-    private String perfil;
+    private String rol;
+    private String codigo_sucursal;
 
     public Usuario() {
     }
 
-    public Usuario(Integer idUsuario, String nombre, String correo, String password, String perfil) {
+    public Usuario(Integer idUsuario, String nombre, String correo, String password, String rol, String codigo_sucursal) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.correo = correo;
         this.password = password;
-        this.perfil = perfil;
+        this.rol = rol;
+        this.codigo_sucursal = codigo_sucursal;
+    }
+
+    public String getCodigo_sucursal() {
+        return codigo_sucursal;
+    }
+
+    public void setCodigo_sucursal(String codigo_sucursal) {
+        this.codigo_sucursal = codigo_sucursal;
     }
 
     public Integer getIdUsuario() {
@@ -51,11 +61,11 @@ public class Usuario {
         this.password = password;
     }
 
-    public String getPerfil() {
-        return perfil;
+    public String getRol() {
+        return rol;
     }
 
-    public void setPerfil(String perfil) {
-        this.perfil = perfil;
+    public void setRol(String rol) {
+        this.rol = rol;
     }
 }
