@@ -9,11 +9,9 @@ import java.util.List;
 
 import com.grupo1.sgsm.administracion.gestionUsuarios.model.Usuario;
 import com.grupo1.sgsm.core.database.DatabaseConnection;
+import com.grupo1.sgsm.core.util.ConfigSucursal;
 
 public class UsuarioDAO {
-
-    private static final String TABLA_UIO = "[26.194.51.93].UIO.dbo.usuarios";
-    private static final String TABLA_GYE = "[26.34.243.93].GYE.dbo.usuarios";
 
     // ===============================
     // MÉTODO PRIVADO DE MAPEO
@@ -30,15 +28,16 @@ public class UsuarioDAO {
     }
 
     // ===============================
-    // CONSULTAR TODOS
+    // CONSULTAR TODOS (Siempre a la tabla local)
     // ===============================
-    public List<Usuario> consultarTodos(boolean redDisponible, String sucursalActual) {
-        String tabla = redDisponible ? TABLA_UIO : (sucursalActual.equalsIgnoreCase("GYE") ? TABLA_GYE : TABLA_UIO);
-        String sql = String.format("SELECT * FROM %s", tabla);
+    public List<Usuario> consultarTodos() {
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = "SELECT * FROM " + obtenerTablaLectura(nodoLocal);
 
         List<Usuario> usuarios = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnection.getConnection(sucursalActual);
+        // Java siempre abre la conexión al nodo local
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -54,13 +53,13 @@ public class UsuarioDAO {
     }
 
     // ===============================
-    // CONSULTAR POR CORREO
+    // CONSULTAR POR NOMBRE (Siempre a la tabla local)
     // ===============================
-    public Usuario consultarPorNombre(String nombre, boolean redDisponible, String sucursalActual) {
-        String tabla = redDisponible ? TABLA_UIO : (sucursalActual.equalsIgnoreCase("GYE") ? TABLA_GYE : TABLA_UIO);
-        String sql = String.format("SELECT * FROM %s WHERE nombre = ?", tabla);
+    public Usuario consultarPorNombre(String nombre) {
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = "SELECT * FROM " + obtenerTablaLectura(nodoLocal) + " WHERE nombre = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection(sucursalActual);
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, nombre);
@@ -71,22 +70,24 @@ public class UsuarioDAO {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error al consultar usuario por correo", e);
+            throw new RuntimeException("Error al consultar usuario por nombre", e);
         }
 
         return null;
     }
 
     // ===============================
-    // INSERTAR (siempre UIO)
+    // INSERTAR (Siempre hacia UIO)
     // ===============================
     public void insertar(Usuario usuario) {
+        String nodoLocal = ConfigSucursal.getSucursalActual();
         String sql = String.format("""
             INSERT INTO %s (nombre, correo, password, rol, codigo_sucursal)
             VALUES (?, ?, ?, ?, ?)
-            """, TABLA_UIO);
+            """, obtenerTablaEscritura(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection("UIO");
+        // Conexión local, pero el target SQL forzará el envío a UIO si estamos en GYE
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, usuario.getNombre());
@@ -103,12 +104,13 @@ public class UsuarioDAO {
     }
 
     // ===============================
-    // ELIMINAR (siempre UIO)
+    // ELIMINAR (Siempre hacia UIO)
     // ===============================
     public void eliminarPorId(int idUsuario) {
-        String sql = String.format("DELETE FROM %s WHERE idUsuario = ?", TABLA_UIO);
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = String.format("DELETE FROM %s WHERE idUsuario = ?", obtenerTablaEscritura(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection("UIO");
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idUsuario);
@@ -118,5 +120,21 @@ public class UsuarioDAO {
             throw new RuntimeException("Error al eliminar usuario", e);
         }
     }
-}
 
+    // ===============================
+    // MÉTODOS AUXILIARES DE ENRUTAMIENTO
+    // ===============================
+    private String obtenerTablaLectura(String nodoLocal) {
+        // Retorna "UIO.dbo.usuarios" o "GYE.dbo.usuarios" para lectura ultrarrápida local
+        return nodoLocal.toUpperCase() + ".dbo.usuarios";
+    }
+
+    private String obtenerTablaEscritura(String nodoLocal) {
+        // Enrutamiento de escritura: La sede principal (UIO) recibe todos los cambios
+        if ("UIO".equalsIgnoreCase(nodoLocal)) {
+            return "UIO.dbo.usuarios";
+        } else {
+            return "[26.194.51.93].UIO.dbo.usuarios"; // Linked Server de GYE hacia UIO
+        }
+    }
+}

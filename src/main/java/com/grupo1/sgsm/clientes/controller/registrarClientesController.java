@@ -93,21 +93,36 @@ public class registrarClientesController {
 
     @FXML
     void registrarCliente(ActionEvent event) {
-        // Lógica de registro para SportMaster
+        // Validación de campos vacíos
         if(txtCedula.getText().isEmpty() || txtApellidos.getText().isEmpty() || txtCorreo.getText().isEmpty() || txtTelefono.getText().isEmpty() || txtDireccion.getText().isEmpty() || txtSucursal.getText().isEmpty()) {
             mensajeConfirmacion.setText("Debes llenar todos los campos");
             return;
-        };
+        }
 
-        String primer_nombre = txtNombres.getText().split(" ")[0];
-        String primer_apellido = txtApellidos.getText().split(" ")[0];
-        String segundo_nombre = txtNombres.getText().split(" ")[1];
-        String segundo_apellido = txtCorreo.getText().split(" ")[1];
+        // VALIDACIÓN DE RED ANTES DE ESCRIBIR
+        if (!com.grupo1.sgsm.core.database.NetworkChecker.hayConexionUIO()) {
+            mensajeConfirmacion.setText("Error: Sin conexión con la Matriz (UIO). No se puede registrar.");
+            return;
+        }
 
-        NuevoClienteDTO nuevoClienteDTO = new NuevoClienteDTO(txtCedula.getText(),primer_nombre,segundo_nombre,primer_apellido,segundo_apellido,txtCorreo.getText(),txtTelefono.getText(),txtDireccion.getText(),txtSucursal.getText());
+        // Extracción segura de nombres y apellidos (evita ArrayIndexOutOfBoundsException)
+        String[] nombresArray = txtNombres.getText().trim().split("\\s+");
+        String primer_nombre = nombresArray[0];
+        String segundo_nombre = nombresArray.length > 1 ? nombresArray[1] : "";
+
+        String[] apellidosArray = txtApellidos.getText().trim().split("\\s+");
+        String primer_apellido = apellidosArray[0];
+        String segundo_apellido = apellidosArray.length > 1 ? apellidosArray[1] : ""; // Corregido: ya no usa txtCorreo
+
+        NuevoClienteDTO nuevoClienteDTO = new NuevoClienteDTO(
+                txtCedula.getText(), primer_nombre, segundo_nombre,
+                primer_apellido, segundo_apellido, txtCorreo.getText(),
+                txtTelefono.getText(), txtDireccion.getText(), txtSucursal.getText()
+        );
 
         try{
             clientesService.guardarCliente(nuevoClienteDTO);
+            mensajeConfirmacion.setText("Cliente registrado exitosamente.");
         } catch(Exception e){
             mensajeConfirmacion.setText(e.getMessage());
         }

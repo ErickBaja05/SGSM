@@ -11,6 +11,7 @@ import com.grupo1.sgsm.clientes.model.ClienteFacturacion;
 import com.grupo1.sgsm.core.database.DatabaseConnection;
 import com.grupo1.sgsm.core.session.SesionActual;
 import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
+import com.grupo1.sgsm.core.util.ConfigSucursal;
 
 public class ClienteFacturacionDAO {
 
@@ -28,51 +29,16 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // INSERTAR
-    // ===============================
-    public void insertar(ClienteFacturacion cliente) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
-
-        String tabla = obtenerTablaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = String.format("""
-            INSERT INTO %s (cedula_ciudadania, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido)
-            VALUES (?, ?, ?, ?, ?)
-            """, tabla);
-
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, cliente.getCedula_ciudadania());
-            ps.setString(2, cliente.getPrimer_nombre());
-            ps.setString(3, cliente.getSegundo_nombre());
-            ps.setString(4, cliente.getPrimer_apellido());
-            ps.setString(5, cliente.getSegundo_apellido());
-
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al insertar cliente de facturación", e);
-        }
-    }
-
-    // ===============================
-    // CONSULTAR TODOS
+    // CONSULTAR TODOS (Lectura local)
     // ===============================
     public List<ClienteFacturacion> consultarTodos() {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
-
-        String tabla = obtenerTablaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = String.format("SELECT * FROM %s", tabla);
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = "SELECT * FROM " + obtenerTablaLectura(nodoLocal);
 
         List<ClienteFacturacion> clientes = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -88,18 +54,14 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // CONSULTAR POR CÉDULA
+    // CONSULTAR POR CÉDULA (Lectura local)
     // ===============================
     public ClienteFacturacion consultarPorCedula(String cedula) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = "SELECT * FROM " + obtenerTablaLectura(nodoLocal) + " WHERE cedula_ciudadania = ?";
 
-        String tabla = obtenerTablaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = String.format("SELECT * FROM %s WHERE cedula_ciudadania = ?", tabla);
-
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cedula);
@@ -117,18 +79,44 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // ACTUALIZAR NOMBRES POR CÉDULA
+    // INSERTAR (Escritura hacia UIO)
+    // ===============================
+    public void insertar(ClienteFacturacion cliente) {
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+
+        String sql = String.format("""
+            INSERT INTO %s (cedula_ciudadania, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido)
+            VALUES (?, ?, ?, ?, ?)
+            """, obtenerTablaEscritura(nodoLocal));
+
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, cliente.getCedula_ciudadania());
+            ps.setString(2, cliente.getPrimer_nombre());
+            ps.setString(3, cliente.getSegundo_nombre());
+            ps.setString(4, cliente.getPrimer_apellido());
+            ps.setString(5, cliente.getSegundo_apellido());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al insertar cliente de facturación", e);
+        }
+    }
+
+    // ===============================
+    // ACTUALIZAR NOMBRES POR CÉDULA (Escritura hacia UIO)
     // ===============================
     public void actualizarNombresPorCedula(String cedula, String primerNombre, String segundoNombre) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
 
-        String tabla = obtenerTablaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = String.format("UPDATE %s SET primer_nombre = ?, segundo_nombre = ? WHERE cedula_ciudadania = ?", tabla);
+        String sql = String.format("UPDATE %s SET primer_nombre = ?, segundo_nombre = ? WHERE cedula_ciudadania = ?",
+                obtenerTablaEscritura(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, primerNombre);
@@ -142,18 +130,15 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // ELIMINAR POR CÉDULA
+    // ELIMINAR POR CÉDULA (Escritura hacia UIO)
     // ===============================
     public void eliminarPorCedula(String cedula) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
 
-        String tabla = obtenerTablaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = String.format("DELETE FROM %s WHERE cedula_ciudadania = ?", tabla);
+        String sql = String.format("DELETE FROM %s WHERE cedula_ciudadania = ?", obtenerTablaEscritura(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cedula);
@@ -165,16 +150,26 @@ public class ClienteFacturacionDAO {
     }
 
     // ===============================
-    // AUXILIAR PARA TABLA
+    // MÉTODOS AUXILIARES DE ENRUTAMIENTO
     // ===============================
-    private String obtenerTablaPorSucursal(String codigoSucursal) {
-        switch (codigoSucursal.toUpperCase()) {
-            case "UIO":
-                return "[26.194.51.93].UIO.dbo.cliente_facturacion";
-            case "GYE":
-                return "[26.34.243.93].GYE.dbo.cliente_facturacion";
-            default:
-                throw new IllegalArgumentException("Sucursal desconocida: " + codigoSucursal);
+    private void validarSesion() {
+        UsuarioSesionDTO usuario = SesionActual.getUsuario();
+        if (usuario == null) {
+            throw new RuntimeException("No hay sesión activa");
+        }
+    }
+
+    private String obtenerTablaLectura(String nodoLocal) {
+        // Lectura siempre a la réplica local
+        return nodoLocal.toUpperCase() + ".dbo.cliente_facturacion";
+    }
+
+    private String obtenerTablaEscritura(String nodoLocal) {
+        // Escritura forzada a la base de datos principal (UIO) para garantizar consistencia
+        if ("UIO".equalsIgnoreCase(nodoLocal)) {
+            return "UIO.dbo.cliente_facturacion";
+        } else {
+            return "[26.194.51.93].UIO.dbo.cliente_facturacion";
         }
     }
 }

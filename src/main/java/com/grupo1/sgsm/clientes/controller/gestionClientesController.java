@@ -148,10 +148,20 @@ public class gestionClientesController {
         tbClientes.setItems(filteredData);
     }
 
+
     @FXML
     void eliminarCliente(ActionEvent event) {
         if (cedulaSeleccionada != null) {
-            // Consumimos el nuevo método del service respetando la FK
+
+            // VALIDACIÓN DE RED
+            if (!com.grupo1.sgsm.core.database.NetworkChecker.hayConexionUIO()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Problema de Red");
+                alert.setHeaderText("Sin conexión con Matriz");
+                alert.setContentText("No se puede eliminar el cliente en este momento. Verifique su conexión con UIO.");
+                alert.showAndWait();
+                return;
+            }
 
             try{
                 clientesService.eliminarCliente(cedulaSeleccionada);
@@ -163,11 +173,13 @@ public class gestionClientesController {
                 alert.setTitle("Éxito");
                 alert.setHeaderText("Cambios guardados con éxito");
                 alert.setContentText("Cliente eliminado exitosamente");
+                alert.showAndWait(); // Te faltaba el .showAndWait() para que la alerta se vea jeje
             }catch(ClienteReferenciadoException e){
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText("Cambios no efectuados");
                 alert.setContentText(e.getMessage());
+                alert.showAndWait();
             }
 
         } else {
@@ -175,27 +187,39 @@ public class gestionClientesController {
             alert.setTitle("Error");
             alert.setHeaderText("Cambios no efectuados");
             alert.setContentText("Por favor, seleccione un cliente en la tabla primero (clic en el botón de acción)");
-
+            alert.showAndWait();
         }
     }
 
     @FXML
     void guardarCambios(ActionEvent event) {
         if (cedulaSeleccionada != null) {
+
+            // VALIDACIÓN DE RED
+            if (!com.grupo1.sgsm.core.database.NetworkChecker.hayConexionUIO()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Problema de Red");
+                alert.setHeaderText("Sin conexión con Matriz");
+                alert.setContentText("No se pueden actualizar los datos en este momento. Verifique su conexión con UIO.");
+                alert.showAndWait();
+                return;
+            }
+
             String nuevoCorreo = txtEditCorreo.getText();
             String nuevaDireccion = txtEditDireccion.getText();
 
-            // Consumir el service para actualizar en la BD local correspondiente a la sede
             clientesService.actualizarCliente(cedulaSeleccionada, nuevoCorreo, nuevaDireccion);
 
             // Refrescar tabla y limpiar variables de memoria
             cargarDatos();
             cedulaSeleccionada = null;
             limpiarCamposEdicion();
+
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Éxito");
             alert.setHeaderText("Cambios guardados con éxito");
-            alert.setContentText("Informacion guardada correctamente");
+            alert.setContentText("Información guardada correctamente");
+            alert.showAndWait(); // Mostrar la alerta
         }
     }
 

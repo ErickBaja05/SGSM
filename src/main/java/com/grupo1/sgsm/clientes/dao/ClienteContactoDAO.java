@@ -1,6 +1,5 @@
 package com.grupo1.sgsm.clientes.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +11,7 @@ import com.grupo1.sgsm.clientes.model.ClienteContacto;
 import com.grupo1.sgsm.core.database.DatabaseConnection;
 import com.grupo1.sgsm.core.session.SesionActual;
 import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
+import com.grupo1.sgsm.core.util.ConfigSucursal;
 
 public class ClienteContactoDAO {
 
@@ -31,17 +31,13 @@ public class ClienteContactoDAO {
     // CONSULTAR TODOS
     // ===============================
     public List<ClienteContacto> consultarTodos() {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
-
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = "SELECT * FROM " + vista;
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = "SELECT * FROM " + obtenerVistaLocal(nodoLocal);
 
         List<ClienteContacto> clientes = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -60,15 +56,11 @@ public class ClienteContactoDAO {
     // CONSULTAR POR CÉDULA
     // ===============================
     public ClienteContacto consultarPorCedula(String cedula) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = "SELECT * FROM " + obtenerVistaLocal(nodoLocal) + " WHERE cedula_ciudadania = ?";
 
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = "SELECT * FROM " + vista + " WHERE cedula_ciudadania = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cedula);
@@ -85,25 +77,19 @@ public class ClienteContactoDAO {
         return null;
     }
 
-
-
     // ===============================
     // INSERTAR
     // ===============================
     public void insertar(ClienteContacto cliente) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
-
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
 
         String sql = String.format("""
         INSERT INTO %s (cedula_ciudadania, correo_electronico, direccion, cod_sucursal_registro)
         VALUES (?, ?, ?, ?)
-        """, vista);
+        """, obtenerVistaLocal(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cliente.getCedula_ciudadania());
@@ -119,26 +105,19 @@ public class ClienteContactoDAO {
     }
 
     // ===============================
-    // ACTUALIZAR
+    // ACTUALIZAR CORREO POR CÉDULA
     // ===============================
-    // ===============================
-// ACTUALIZAR CORREO POR CÉDULA
-// ===============================
     public void actualizarCorreoPorCedula(String cedula, String nuevoCorreo) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
-
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
 
         String sql = String.format("""
         UPDATE %s
         SET correo_electronico = ?
         WHERE cedula_ciudadania = ?
-        """, vista);
+        """, obtenerVistaLocal(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, nuevoCorreo);
@@ -147,28 +126,24 @@ public class ClienteContactoDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error al actualizar correo del cliente de contacto", e);
+            throw new RuntimeException("Error al actualizar correo", e);
         }
     }
 
     // ===============================
-// ACTUALIZAR DIRECCIÓN POR CÉDULA
-// ===============================
+    // ACTUALIZAR DIRECCIÓN POR CÉDULA
+    // ===============================
     public void actualizarDireccionPorCedula(String cedula, String nuevaDireccion) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
-
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
 
         String sql = String.format("""
         UPDATE %s
         SET direccion = ?
         WHERE cedula_ciudadania = ?
-        """, vista);
+        """, obtenerVistaLocal(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, nuevaDireccion);
@@ -177,25 +152,19 @@ public class ClienteContactoDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error al actualizar dirección del cliente de contacto", e);
+            throw new RuntimeException("Error al actualizar dirección", e);
         }
     }
-
-
 
     // ===============================
     // ELIMINAR POR CÉDULA
     // ===============================
     public void eliminarPorCedula(String cedula) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = "DELETE FROM " + obtenerVistaLocal(nodoLocal) + " WHERE cedula_ciudadania = ?";
 
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = "DELETE FROM " + vista + " WHERE cedula_ciudadania = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cedula);
@@ -207,17 +176,18 @@ public class ClienteContactoDAO {
     }
 
     // ===============================
-    // AUXILIAR PARA VISTA
+    // MÉTODOS AUXILIARES
     // ===============================
-    private String obtenerVistaPorSucursal(String codigoSucursal) {
-        switch (codigoSucursal.toUpperCase()) {
-            case "UIO":
-                return "[26.194.51.93].UIO.dbo.V_clientesContacto";
-            case "GYE":
-                return "[26.34.243.93].GYE.dbo.V_clientesContacto";
-            default:
-                throw new IllegalArgumentException("Sucursal desconocida: " + codigoSucursal);
+    private void validarSesion() {
+        UsuarioSesionDTO usuario = SesionActual.getUsuario();
+        if (usuario == null) {
+            throw new RuntimeException("No hay sesión activa");
         }
     }
-}
 
+    private String obtenerVistaLocal(String nodoLocal) {
+        // Retorna directamente la vista de la base de datos donde se ejecuta la app
+        // Ejemplo: "UIO.dbo.V_clientesContacto" o "GYE.dbo.V_clientesContacto"
+        return nodoLocal.toUpperCase() + ".dbo.V_clientesContacto";
+    }
+}

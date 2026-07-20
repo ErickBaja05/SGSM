@@ -13,8 +13,8 @@ public class UsuarioServiceImpl implements IUsuarioService{
     @Override
     public UsuarioSesionDTO login(String username, String password) {
 
-        String sucursalActual = ConfigSucursal.getSucursalActual();
-        boolean redDisponible = NetworkChecker.hayConexionUIO();
+        // Ya no necesitamos NetworkChecker ni ConfigSucursal aquí,
+        // el DAO se encarga de todo el enrutamiento de forma interna.
 
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("El usuario no puede estar vacío.");
@@ -24,9 +24,10 @@ public class UsuarioServiceImpl implements IUsuarioService{
             throw new IllegalArgumentException("La contraseña no puede estar vacía.");
         }
 
-        Usuario usuario = usuarioDAO.consultarPorNombre(username,redDisponible,sucursalActual);
+        // El DAO actualizado ahora solo recibe el nombre
+        Usuario usuario = usuarioDAO.consultarPorNombre(username);
 
-        if(usuario == null || !usuario.getPassword().equals(password)) {
+        if (usuario == null || !usuario.getPassword().equals(password)) {
             throw new IllegalArgumentException("Credenciales incorrectas");
         }
 
@@ -36,7 +37,6 @@ public class UsuarioServiceImpl implements IUsuarioService{
                 usuario.getRol(),
                 usuario.getCodigo_sucursal()
         );
-
     }
 
 }
