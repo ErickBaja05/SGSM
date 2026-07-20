@@ -68,7 +68,9 @@ public class mainWindowController implements Initializable {
     @FXML private VBox usuariosSubMenu;
 
     @FXML void abirGestionUsuarios(ActionEvent event) {}
-    @FXML void abrirAjusteStock(ActionEvent event) {}
+    @FXML void abrirAjusteStock(ActionEvent event) {
+        cargarVista("/inventarioYproductos/fxml/ajusteStock.fxml");
+    }
     @FXML void abrirConsultarCatálogo(ActionEvent event) {
         cargarVista("/inventarioYproductos/fxml/gestionCatalogo.fxml");
     }
@@ -77,7 +79,9 @@ public class mainWindowController implements Initializable {
         cargarVista("/inventarioYproductos/fxml/crearNuevoProducto.fxml");
     }
     @FXML void abrirCrearUsuario(ActionEvent event) {}
-    @FXML void abrirFacturacion(ActionEvent event) {}
+    @FXML void abrirFacturacion(ActionEvent event) {
+        cargarVista(("/ventasYFacturacion/fxml/facturarProductos.fxml"));
+    }
     @FXML void abrirGestionClientes(ActionEvent event) {
 
         cargarVista("/clientes/fxml/gestionClientes.fxml");

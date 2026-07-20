@@ -1,19 +1,23 @@
 package com.grupo1.sgsm.inventarioYproductos.model;
 
+import java.nio.DoubleBuffer;
+
 public class Producto {
     // Atributos
     private String codigo;
     private String nombre;
     private String marca;
     private String categoria;
+    private Double stock;
     private double precio;
 
-    // Constructor
-    public Producto(String codigo, String nombre, String marca, String categoria, double precio) {
+
+    public Producto(String codigo, String nombre, String marca, String categoria, Double stock, double precio) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.marca = marca;
         this.categoria = categoria;
+        this.stock = stock;
         this.precio = precio;
     }
 
@@ -56,6 +60,14 @@ public class Producto {
 
     public void setPrecio(double precio) {
         this.precio = precio;
+    }
+
+    public Double getStock() {
+        return stock;
+    }
+
+    public void setStock(Double stock) {
+        this.stock = stock;
     }
 
     // Método toString (para imprimir el objeto de forma legible)
