@@ -10,9 +10,13 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="900.0" styleClass="main-bg" stylesheets="@../css/clientesStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.clientes.controller.registrarClientesController">
-    <children>
-        <VBox alignment="TOP_LEFT" maxWidth="800.0" spacing="5.0" VBox.vgrow="ALWAYS">
+<?import javafx.scene.control.ScrollPane?>
+<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" stylesheets="@../css/clientesStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.clientes.controller.registrarClientesController">
+    <content>
+        <VBox alignment="TOP_CENTER" styleClass="main-bg">
+            <children>
+                <!-- Le agregué minHeight="650.0" para forzar la aparición del scroll -->
+                <VBox alignment="TOP_LEFT" maxWidth="800.0" spacing="5.0" VBox.vgrow="ALWAYS">
             <children>
 
                 <!-- Título Principal -->
@@ -44,15 +48,7 @@
                                 <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="50.0" />
                                 <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="50.0" />
                             </columnConstraints>
-                            <rowConstraints>
-                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                            </rowConstraints>
+
                             <padding>
                                 <Insets bottom="25.0" left="25.0" right="25.0" top="20.0" />
                             </padding>
@@ -181,6 +177,8 @@
             <padding>
                 <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
             </padding>
+                </VBox>
+            </children>
         </VBox>
-    </children>
-</VBox>
+    </content>
+</ScrollPane>
