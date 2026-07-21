@@ -1,0 +1,775 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+/* ==========================================================================
+   SPORTMASTER - HOJA DE ESTILOS GLOBAL
+   Índice:
+   1. Dashboard y Navegación
+   2. Login
+   3. Estilos Generales y Tipografía
+   4. Tarjetas (Cards)
+   5. Formularios e Inputs
+   6. Botones Generales
+   7. Tablas
+   8. Módulo de Facturación y Cajas
+   9. Mensajes, Alertas y Utilidades
+   ========================================================================== */
+
+/* ==========================================================================
+   1. DASHBOARD Y NAVEGACIÓN
+   ========================================================================== */
+#top {
+    -fx-background-color: white;
+    -fx-border-width: 1px;
+}
+
+#navMenu {
+    -fx-background-color: rgb(3, 20, 71);
+    -fx-text-fill: white;
+}
+
+#navContenedor {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+#navContenedor .viewport {
+    -fx-background-color: transparent;
+}
+
+.navBtn {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-family: "Roboto";
+    -fx-font-size: 13px;
+}
+
+.navBtn-activo {
+    -fx-background-color: #2a9df4;
+    -fx-border-color: transparent transparent transparent #ffffff;
+    -fx-border-width: 0 0 0 4px;
+}
+
+.navBtn:hover {
+    -fx-cursor: hand;
+    -fx-text-fill: #a18181;
+    -fx-border-width: 0px 0px 0px 2px;
+    -fx-border-color: white;
+}
+
+.navBtnSeparation {
+    -fx-padding: 20px 0 5px 10;
+}
+
+.navBtnSubmenu:hover, .navBtnSeparation:hover {
+    -fx-border-width: 0px 0px 0px 0px;
+}
+
+.btnNavDown:hover {
+    -fx-cursor: hand;
+    -fx-background-color: #930a0a;
+}
+
+.submenu {
+    -fx-padding: 0 0 0 10;
+    -fx-spacing: 5;
+}
+
+#btnLogOut {
+    -fx-background-radius: 20px;
+    -fx-background-color: transparent;
+    -fx-icon-color: white;
+}
+#btnLogOut:hover {
+    -fx-background-radius: 20px;
+    -fx-background-color: transparent;
+    -fx-icon-color: black;
+}
+
+/* Íconos del Dashboard */
+.buttonsIcon { -fx-icon-color: white; -fx-icon-size: 14; }
+.userMdIcon { -fx-icon-color: white; -fx-icon-size: 60; }
+.soccerBallIcon { -fx-icon-color: black; -fx-icon-size: 26; }
+.logOutIcon { -fx-icon-color: black; -fx-icon-size: 65; }
+.navDownIcon { -fx-icon-color: white; -fx-icon-size: 18; }
+
+
+/* ==========================================================================
+   2. LOGIN
+   ========================================================================== */
+.login-bg {
+    -fx-background-color: #121A2F;
+}
+
+.login-card {
+    -fx-background-color: #F8F9FA;
+    -fx-background-radius: 12;
+    -fx-padding: 40 45 30 45;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 25, 0, 0, 10);
+}
+
+.logo-box {
+    -fx-background-color: #121A2F;
+    -fx-background-radius: 8;
+    -fx-min-width: 60px;
+    -fx-min-height: 60px;
+}
+.logo-icon {
+    -fx-icon-color: white;
+    -fx-icon-size: 32px;
+}
+
+.login-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-font-family: "Arial";
+    -fx-text-fill: #111111;
+}
+
+.login-subtitle {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #888888;
+    -fx-letter-spacing: 2px;
+}
+
+.login-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #555555;
+}
+
+.login-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+    -fx-prompt-text-fill: #B0B0B0;
+}
+
+.login-btn {
+    -fx-background-color: #121A2F;
+    -fx-background-radius: 6;
+    -fx-padding: 12 20;
+    -fx-cursor: hand;
+}
+.login-btn:hover {
+    -fx-background-color: #1E2B4D;
+}
+
+
+/* ==========================================================================
+   3. ESTILOS GENERALES Y TIPOGRAFÍA
+   ========================================================================== */
+.main-bg {
+    -fx-background-color: #F8F9FB;
+}
+
+.imagenFondo {
+    -fx-background-image: url(../../administracion/img/fondo.png);
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+}
+
+.page-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-font-family: "Arial";
+    -fx-text-fill: #111111;
+}
+
+.page-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #666666;
+}
+
+.section-title-container {
+    -fx-spacing: 10px;
+}
+.section-line {
+    -fx-background-color: #1F7D65;
+    -fx-min-width: 4px;
+    -fx-pref-width: 4px;
+    -fx-min-height: 20px;
+}
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #223344;
+}
+.section-subtitle {
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #00796B;
+    -fx-padding: 10 0 5 0;
+}
+
+.labelVentana {
+    -fx-font-family: "Roboto";
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+#lblTitulo {
+    -fx-font-family: "Roboto";
+    -fx-text-fill: black;
+}
+
+.footer-text {
+    -fx-font-size: 9px;
+    -fx-text-fill: #999999;
+}
+
+
+/* ==========================================================================
+   4. TARJETAS (CARDS)
+   ========================================================================== */
+.form-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.03), 10, 0, 0, 5);
+}
+
+.card-header {
+    -fx-background-color: #F4F7FB;
+    -fx-background-radius: 8 8 0 0;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+    -fx-border-width: 1;
+}
+
+.header-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00332B;
+}
+
+.header-icon-font {
+    -fx-icon-color: #005A49;
+    -fx-icon-size: 20px;
+}
+
+.edit-card {
+    -fx-background-color: #F4F7FB;
+    -fx-background-radius: 8;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+}
+
+.edit-header-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #223344;
+}
+
+.edit-header-icon-font {
+    -fx-icon-color: #00796B;
+    -fx-icon-size: 18px;
+}
+
+.card-accent-top {
+    -fx-border-color: #00796B #E2E8F0 #E2E8F0 #E2E8F0;
+    -fx-border-width: 4 1 1 1;
+}
+
+.card-footer {
+    -fx-background-color: #F4F7FB;
+    -fx-background-radius: 0 0 8 8;
+    -fx-border-color: #E2E8F0 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 15 25;
+}
+
+
+/* ==========================================================================
+   5. FORMULARIOS E INPUTS
+   ========================================================================== */
+.input-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #333333;
+}
+.helper-text {
+    -fx-font-size: 11px;
+    -fx-font-style: italic;
+    -fx-text-fill: #888888;
+}
+
+.input-container {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 10;
+    -fx-spacing: 10;
+    -fx-cursor: text;
+}
+.input-container:hover {
+    -fx-border-color: #B0BEC5;
+}
+.focused-box {
+    -fx-border-color: #00796B;
+    -fx-effect: dropshadow(gaussian, rgba(0, 121, 107, 0.2), 5, 0, 0, 0);
+}
+
+.form-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+    -fx-prompt-text-fill: #A0AAB5;
+}
+.form-field:focused {
+    -fx-background-color: transparent;
+}
+
+.form-field-standalone {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 9 10;
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+    -fx-prompt-text-fill: #A0AAB5;
+}
+.form-field-standalone:hover {
+    -fx-border-color: #B0BEC5;
+}
+.form-field-standalone:focused {
+    -fx-border-color: #00796B;
+    -fx-effect: dropshadow(gaussian, rgba(0, 121, 107, 0.2), 5, 0, 0, 0);
+}
+
+.form-field-disabled {
+    -fx-background-color: #E2E8F0;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 9 10;
+    -fx-font-size: 13px;
+    -fx-text-fill: #555555;
+    -fx-font-weight: bold;
+}
+
+.input-container-disabled {
+    -fx-background-color: #F0F4F8;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 10;
+    -fx-spacing: 10;
+}
+.input-container-disabled .form-field {
+    -fx-text-fill: #555555;
+    -fx-font-weight: bold;
+}
+
+.custom-combo-box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 4 5;
+    -fx-font-size: 13px;
+}
+.custom-combo-box:hover {
+    -fx-border-color: #B0BEC5;
+}
+.custom-combo-box:showing {
+    -fx-border-color: #00796B;
+}
+.custom-combo-box .list-cell {
+    -fx-text-fill: #333333;
+}
+.custom-combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+.custom-combo-box .arrow {
+    -fx-background-color: #8898AA;
+}
+
+.custom-text-area {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-font-size: 13px;
+    -fx-prompt-text-fill: #A0AAB5;
+}
+.custom-text-area .content {
+    -fx-background-color: transparent;
+}
+.custom-text-area:hover {
+    -fx-border-color: #B0BEC5;
+}
+.custom-text-area:focused {
+    -fx-border-color: #00796B;
+    -fx-effect: dropshadow(gaussian, rgba(0, 121, 107, 0.2), 5, 0, 0, 0);
+}
+
+.input-icon-font, .input-icon, .action-icon {
+    -fx-icon-color: #8898AA;
+    -fx-icon-size: 16px;
+}
+.section-icon-font {
+    -fx-icon-color: #00796B;
+    -fx-icon-size: 16px;
+}
+.action-icon {
+    -fx-cursor: hand;
+}
+.action-icon:hover {
+    -fx-icon-color: #121A2F;
+}
+
+/* ==========================================================================
+   6. BOTONES GENERALES
+   ========================================================================== */
+.btn-primary {
+    -fx-background-color: #006B54;
+    -fx-background-radius: 4;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-background-color: #00503E;
+}
+.btn-primary-text, .btn-text {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.btn-primary-icon-font, .btn-icon {
+    -fx-icon-color: white;
+    -fx-icon-size: 14px;
+}
+
+.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: #444444;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 10 15;
+    -fx-cursor: hand;
+    -fx-background-radius: 4;
+}
+.btn-secondary:hover {
+    -fx-background-color: #E2E8F0;
+    -fx-text-fill: #111111;
+}
+
+.btn-secondary-outline {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #666666;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 9 15;
+    -fx-cursor: hand;
+}
+.btn-secondary-outline:hover {
+    -fx-background-color: #F0F0F0;
+    -fx-text-fill: #111111;
+}
+
+.btn-danger-outline {
+    -fx-background-color: #FDF2F2;
+    -fx-border-color: #E57373;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+.btn-danger-outline:hover {
+    -fx-background-color: #FFEBEE;
+    -fx-border-color: #D32F2F;
+}
+.btn-danger-text {
+    -fx-text-fill: #D32F2F;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.btn-danger-icon-font {
+    -fx-icon-color: #D32F2F;
+    -fx-icon-size: 14px;
+}
+
+.btn-transparent {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 5;
+}
+
+
+/* ==========================================================================
+   7. TABLAS Y BÚSQUEDAS
+   ========================================================================== */
+.search-container {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 15;
+    -fx-spacing: 10;
+}
+.search-container:focus-within {
+    -fx-border-color: #00796B;
+}
+.search-icon-font {
+    -fx-icon-color: #555555;
+    -fx-icon-size: 16px;
+}
+.search-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+    -fx-prompt-text-fill: #A0AAB5;
+}
+.search-field:focused {
+    -fx-background-color: transparent;
+}
+
+.custom-table {
+    -fx-background-color: transparent;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+.custom-table .column-header-background {
+    -fx-background-color: #121A2F;
+    -fx-background-radius: 5 5 0 0;
+}
+.custom-table .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 40px;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #2A3654;
+}
+.custom-table .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+}
+.custom-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #E2E8F0;
+    -fx-cell-size: 40px;
+}
+.custom-table .table-row-cell:odd {
+    -fx-background-color: #F8F9FB;
+}
+.custom-table .table-row-cell:selected {
+    -fx-background-color: #E0F2F1;
+}
+.custom-table .table-cell {
+    -fx-text-fill: #333333;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER-LEFT;
+    -fx-padding: 0 10;
+}
+.custom-table .table-cell:nth-child(4) {
+    -fx-text-fill: #00796B;
+}
+
+.action-table-icon {
+    -fx-icon-color: #00796B;
+    -fx-icon-size: 18px;
+}
+.btn-transparent:hover .action-table-icon {
+    -fx-icon-color: #004D40;
+}
+
+
+/* ==========================================================================
+   8. MÓDULO DE FACTURACIÓN Y CAJAS
+   ========================================================================== */
+.btnNuevaVenta {
+    -fx-background-color: #d12b2b;
+    -fx-font-family: "Roboto";
+    -fx-font-size: 13px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+.btnNuevaVenta:hover {
+    -fx-cursor: hand;
+    -fx-background-color: #930a0a;
+}
+
+.btn-primary-small {
+    -fx-background-color: #006B54;
+    -fx-background-radius: 4;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+.btn-primary-small:hover {
+    -fx-background-color: #00503E;
+}
+
+.search-container-small {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 5 10;
+    -fx-spacing: 8;
+    -fx-pref-width: 250px;
+}
+
+.resumen-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #555555;
+}
+.resumen-value {
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+.resumen-total-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #111111;
+    -fx-font-weight: 900;
+}
+.resumen-total-value {
+    -fx-font-size: 24px;
+    -fx-text-fill: #111111;
+    -fx-font-weight: 900;
+}
+
+.payment-toggle {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 10 15;
+    -fx-cursor: hand;
+    -fx-pref-width: 80px;
+}
+.payment-toggle:selected {
+    -fx-background-color: #F0F4F8;
+    -fx-border-color: #2B4570;
+    -fx-border-width: 2;
+}
+.payment-icon-font {
+    -fx-icon-color: #333333;
+    -fx-icon-size: 20px;
+}
+.payment-text {
+    -fx-font-size: 10px;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+
+.btn-facturar {
+    -fx-background-color: #006B54;
+    -fx-background-radius: 4;
+    -fx-padding: 15 20;
+    -fx-cursor: hand;
+}
+.btn-facturar:hover {
+    -fx-background-color: #004D40;
+}
+.btn-facturar-icon-font {
+    -fx-icon-color: white;
+    -fx-icon-size: 18px;
+}
+.btn-facturar-text {
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-font-size: 16px;
+}
+
+.btn-cart {
+    -fx-background-color: #121A2F;
+    -fx-background-radius: 4;
+    -fx-padding: 5 10;
+    -fx-cursor: hand;
+}
+.btn-cart:hover {
+    -fx-background-color: #2A3654;
+}
+.btn-cart-icon {
+    -fx-icon-color: white;
+    -fx-icon-size: 14px;
+}
+
+.table-textfield {
+    -fx-alignment: center;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D9E6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 4 5;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-max-width: 60px;
+}
+.table-textfield:focused {
+    -fx-border-color: #00796B;
+}
+
+.btn-delete-icon {
+    -fx-icon-color: #888888;
+    -fx-icon-size: 18px;
+}
+.btn-transparent:hover .btn-delete-icon {
+    -fx-icon-color: #D32F2F;
+}
+
+
+/* ==========================================================================
+   9. MENSAJES, ALERTAS Y UTILIDADES
+   ========================================================================== */
+.mensaje-confirmacion {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.mensaje-exito, .mensaje-error, .error-message{
+
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+.mensaje-error, .error-message {
+    -fx-text-fill: #D32F2F;
+}
+
+.mensaje-exito{
+    -fx-text-fill: #00796B;
+}
+
+/* Pantalla de Error de Conexión */
+.error-giant-icon-font {
+    -fx-icon-color: #D32F2F;
+    -fx-icon-size: 70px;
+}
+.btn-black {
+    -fx-background-color: #000000;
+    -fx-background-radius: 4;
+    -fx-text-fill: white;
+    -fx-font-weight: 900;
+    -fx-font-size: 14px;
+    -fx-padding: 15 20;
+    -fx-cursor: hand;
+}
+.btn-black:hover {
+    -fx-background-color: #333333;
+}
+
+/* ScrollPanes */
+.scroll-pane-transparent {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+.scroll-pane-transparent > .viewport {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}

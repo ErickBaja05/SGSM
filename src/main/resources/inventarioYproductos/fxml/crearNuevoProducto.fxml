@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.control.ScrollPane?>
-<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" stylesheets="@../css/productosStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.inventarioYproductos.controller.crearProductoController">
+<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" stylesheets=" @../../core/css/globalStyles.css  " xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.inventarioYproductos.controller.crearProductoController">
     <content>
         <VBox alignment="TOP_CENTER" styleClass="main-bg">
             <children>

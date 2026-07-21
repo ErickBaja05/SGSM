@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <!-- Le quitamos el main-bg al ScrollPane -->
-<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" stylesheets="@../css/ventasYFacturacionStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.ventasYfacturacion.controller.facturarProductosController">
+<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" stylesheets=" @../../core/css/globalStyles.css  " xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.ventasYfacturacion.controller.facturarProductosController">
     <content>
         <!-- AQUÍ ESTÁ LA MAGIA: Le pasamos el main-bg a este VBox para que pinte el fondo -->
         <VBox alignment="TOP_CENTER" spacing="20.0" styleClass="main-bg">
