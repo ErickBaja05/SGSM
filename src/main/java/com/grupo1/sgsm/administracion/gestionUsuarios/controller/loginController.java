@@ -80,18 +80,18 @@ public class loginController implements Initializable {
 
         // ELIMINAR ESTAS DOS LINEAS Y DESCOMENTAR EL TRY CUANDO YA ESTEN USUARIOS EN LA BASE DE DATOS
 
-        UsuarioSesionDTO usuariologin= new UsuarioSesionDTO(1,"Erick","ADMINISTRADOR","UIO");
-        SesionActual.iniciarSesion(usuariologin);
+        //UsuarioSesionDTO usuariologin= new UsuarioSesionDTO(1,"Erick","ADMINISTRADOR","UIO");
+        //SesionActual.iniciarSesion(usuariologin);
 
         cargarDashboard(event);
-//        try{
-//            UsuarioSesionDTO usuarioLogin = usuarioService.login(usuario, contrasena);
-//            SesionActual.iniciarSesion(usuarioLogin);
- //              cargarDashboard(event);
+        try{
+            UsuarioSesionDTO usuarioLogin = usuarioService.login(usuario, contrasena);
+            SesionActual.iniciarSesion(usuarioLogin);
+            cargarDashboard(event);
 
-//        }catch(Exception e){
-//            lblMensaje.setText(e.getMessage());
-//        }
+        }catch(Exception e){
+           lblMensaje.setText(e.getMessage());
+        }
 
     }
 

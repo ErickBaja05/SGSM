@@ -70,6 +70,8 @@ public class UsuarioDAO {
             }
 
         } catch (SQLException e) {
+            //e.printStackTrace();
+
             throw new RuntimeException("Error al consultar usuario por nombre", e);
         }
 
@@ -125,16 +127,16 @@ public class UsuarioDAO {
     // MÉTODOS AUXILIARES DE ENRUTAMIENTO
     // ===============================
     private String obtenerTablaLectura(String nodoLocal) {
-        // Retorna "UIO.dbo.usuarios" o "GYE.dbo.usuarios" para lectura ultrarrápida local
-        return nodoLocal.toUpperCase() + ".dbo.usuarios";
+        // Retorna "UIO.dbo.usuario" o "GYE.dbo.usuario" para lectura ultrarrápida local
+        return nodoLocal.toUpperCase() + ".dbo.usuario";
     }
 
     private String obtenerTablaEscritura(String nodoLocal) {
         // Enrutamiento de escritura: La sede principal (UIO) recibe todos los cambios
         if ("UIO".equalsIgnoreCase(nodoLocal)) {
-            return "UIO.dbo.usuarios";
+            return "UIO.dbo.usuario";
         } else {
-            return "[26.194.51.93].UIO.dbo.usuarios"; // Linked Server de GYE hacia UIO
+            return "[26.194.51.93].UIO.dbo.usuario"; // Linked Server de GYE hacia UIO
         }
     }
 }
