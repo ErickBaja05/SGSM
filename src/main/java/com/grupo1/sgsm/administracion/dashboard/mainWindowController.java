@@ -1,7 +1,9 @@
 package com.grupo1.sgsm.administracion.dashboard;
 
 import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
+import com.grupo1.sgsm.core.database.NetworkChecker;
 import com.grupo1.sgsm.core.session.SesionActual;
+import com.grupo1.sgsm.core.util.ConfigSucursal;
 import com.grupo1.sgsm.core.util.NavigationUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -68,7 +70,7 @@ public class mainWindowController implements Initializable {
     @FXML private VBox usuariosBox;
     @FXML private VBox usuariosSubMenu;
 
-    private final UsuarioSesionDTO usuarioActual = SesionActual.getUsuario();
+    private UsuarioSesionDTO usuarioActual;
 
     @FXML void abirGestionUsuarios(ActionEvent event) {}
     @FXML void abrirAjusteStock(ActionEvent event) {
@@ -86,8 +88,11 @@ public class mainWindowController implements Initializable {
         cargarVista(("/ventasYFacturacion/fxml/facturarProductos.fxml"));
     }
     @FXML void abrirGestionClientes(ActionEvent event) {
+        if(verificarConectividad()){
+            cargarVista("/clientes/fxml/gestionClientes.fxml");
+        }
+        cargarVista("/administracion/fxml/errorConexion.fxml");
 
-        cargarVista("/clientes/fxml/gestionClientes.fxml");
     }
     @FXML void abrirGestionParametros(ActionEvent event) {}
     @FXML void abrirMarketing(ActionEvent event) {}
@@ -270,6 +275,13 @@ public class mainWindowController implements Initializable {
             contenedorPrincipal.getChildren().clear();
             contenedorPrincipal.getChildren().add(crearPlaceholder("Vista aún no implementada:\n" + rutaFxml));
         }
+    }
+
+    private boolean verificarConectividad(){
+        if(ConfigSucursal.getSucursalActual().equalsIgnoreCase("UIO")){
+            return NetworkChecker.hayConexionGYE();
+        }
+        return NetworkChecker.hayConexionUIO();
     }
 
     private Label crearPlaceholder(String mensaje) {

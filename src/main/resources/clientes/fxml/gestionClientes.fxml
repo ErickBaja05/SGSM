@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -12,14 +13,13 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.ScrollPane?>
-<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" stylesheets="@../css/clientesStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.clientes.controller.gestionClientesController">
+<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" stylesheets="@../../core/css/globalStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.clientes.controller.gestionClientesController">
     <content>
         <!-- El main-bg ahora está aquí adentro para tapar el fondo -->
         <VBox alignment="TOP_CENTER" styleClass="main-bg">
             <children>
                 <!-- Le agregué minHeight="700.0" para forzar la aparición del scroll -->
-                <VBox alignment="TOP_LEFT" maxWidth="1000.0"  spacing="15.0" VBox.vgrow="ALWAYS">
+                <VBox alignment="TOP_LEFT" maxWidth="1000.0" spacing="15.0" VBox.vgrow="ALWAYS">
             <children>
 
                 <!-- Títulos -->
@@ -90,6 +90,10 @@
                                 <Label styleClass="input-label" text="Dirección" GridPane.columnIndex="3" />
                                 <TextField fx:id="txtEditDireccion" styleClass="form-field-standalone" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                             </children>
+                           <rowConstraints>
+                              <RowConstraints />
+                              <RowConstraints />
+                           </rowConstraints>
                         </GridPane>
 
                         <!-- Botones de Acción -->

@@ -8,11 +8,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-public class gestionClientesController {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class gestionClientesController implements Initializable {
 
     @FXML private TextField txtBuscar;
 
@@ -53,28 +57,6 @@ public class gestionClientesController {
         this.clientesService = new ClientesService();
     }
 
-    @FXML
-    public void initialize() {
-        lblSearchIcon.setGraphic(crearIcono("fa-search", "search-icon-font"));
-        lblEditHeaderIcon.setGraphic(crearIcono("fa-indent", "edit-header-icon-font"));
-        lblBtnEliminarIcon.setGraphic(crearIcono("fa-trash-o", "btn-danger-icon-font"));
-        lblBtnGuardarIcon.setGraphic(crearIcono("fa-save", "btn-primary-icon-font"));
-
-        // Propiedades adaptadas a los getters de ClienteConsultaDTO
-        colCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
-        colNombres.setCellValueFactory(new PropertyValueFactory<>("nombre")); // Es getNombre() en el DTO
-        colApellidos.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
-        colCorreo.setCellValueFactory(new PropertyValueFactory<>("correo"));
-        colDireccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
-
-        configurarColumnaAccion();
-
-        txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
-            buscarClienteEnTiempoReal(newValue);
-        });
-
-        cargarDatos();
-    }
 
     private void cargarDatos() {
         // Obtenemos los datos desde el service y llenamos la tabla
@@ -228,5 +210,28 @@ public class gestionClientesController {
         txtEditApellidos.clear();
         txtEditCorreo.clear();
         txtEditDireccion.clear();
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        lblSearchIcon.setGraphic(crearIcono("fa-search", "search-icon-font"));
+        lblEditHeaderIcon.setGraphic(crearIcono("fa-indent", "edit-header-icon-font"));
+        lblBtnEliminarIcon.setGraphic(crearIcono("fa-trash-o", "btn-danger-icon-font"));
+        lblBtnGuardarIcon.setGraphic(crearIcono("fa-save", "btn-primary-icon-font"));
+
+        // Propiedades adaptadas a los getters de ClienteConsultaDTO
+        colCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
+        colNombres.setCellValueFactory(new PropertyValueFactory<>("nombre")); // Es getNombre() en el DTO
+        colApellidos.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
+        colCorreo.setCellValueFactory(new PropertyValueFactory<>("correo"));
+        colDireccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
+
+        configurarColumnaAccion();
+
+        txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
+            buscarClienteEnTiempoReal(newValue);
+        });
+
+        cargarDatos();
     }
 }

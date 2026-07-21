@@ -7,13 +7,17 @@ import com.grupo1.sgsm.clientes.service.IClientesService;
 import com.grupo1.sgsm.core.session.SesionActual;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import org.kordamp.ikonli.javafx.FontIcon; // Import de Ikonli
 
-public class registrarClientesController {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class registrarClientesController implements Initializable {
 
     // Contenedores HBox que necesitan el efecto de Focus
     @FXML private HBox boxCedula;
@@ -54,25 +58,6 @@ public class registrarClientesController {
         return icon;
     }
 
-    @FXML
-    public void initialize() {
-        // Carga de Íconos (ajusta los literales "fa-" según la versión de FontAwesome en tu POM)
-        lblHeaderIcon.setGraphic(crearIcono("fa-user-plus", "header-icon-font"));
-        lblCedulaIcon.setGraphic(crearIcono("fa-id-card-o", "input-icon-font"));
-        lblCorreoIcon.setGraphic(crearIcono("fa-envelope-o", "input-icon-font"));
-        lblTelefonoIcon.setGraphic(crearIcono("fa-phone", "input-icon-font"));
-        lblSucursalIcon.setGraphic(crearIcono("fa-building-o", "input-icon-font"));
-        lblBtnRegistrarIcon.setGraphic(crearIcono("fa-save", "btn-primary-icon-font"));
-
-        // Configurar los efectos de Focus en los contenedores
-        configurarEfectoFocus(txtCedula, boxCedula);
-        configurarEfectoFocus(txtCorreo, boxCorreo);
-        configurarEfectoFocus(txtTelefono, boxTelefono);
-        // Sucursal no necesita focus porque es editable="false", pero se puede agregar si deseas.
-
-        clientesService = new ClientesService();
-        txtSucursal.setText(SesionActual.getUsuario().getCodigo_sucursal().toUpperCase());
-    }
 
     /**
      * Aplica la clase CSS "focused-box" al HBox padre cuando el TextField gana foco.
@@ -123,14 +108,42 @@ public class registrarClientesController {
         try{
             clientesService.guardarCliente(nuevoClienteDTO);
             mensajeConfirmacion.setText("Cliente registrado exitosamente.");
+            mensajeConfirmacion.getStyleClass().setAll("mensaje-exito");
         } catch(Exception e){
             mensajeConfirmacion.setText(e.getMessage());
+            mensajeConfirmacion.getStyleClass().setAll("mensaje-error");
         }
     }
 
     @FXML
     void cancelarOperacion(ActionEvent event) {
         // Lógica para limpiar el form o volver
-        System.out.println("Operación cancelada.");
+        txtCedula.setText("");
+        txtApellidos.setText("");
+        txtCorreo.setText("");
+        txtTelefono.setText("");
+        txtDireccion.setText("");
+
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Carga de Íconos (ajusta los literales "fa-" según la versión de FontAwesome en tu POM)
+        lblHeaderIcon.setGraphic(crearIcono("fa-user-plus", "header-icon-font"));
+        lblCedulaIcon.setGraphic(crearIcono("fa-id-card-o", "input-icon-font"));
+        lblCorreoIcon.setGraphic(crearIcono("fa-envelope-o", "input-icon-font"));
+        lblTelefonoIcon.setGraphic(crearIcono("fa-phone", "input-icon-font"));
+        lblSucursalIcon.setGraphic(crearIcono("fa-building-o", "input-icon-font"));
+        lblBtnRegistrarIcon.setGraphic(crearIcono("fa-save", "btn-primary-icon-font"));
+
+        // Configurar los efectos de Focus en los contenedores
+        configurarEfectoFocus(txtCedula, boxCedula);
+        configurarEfectoFocus(txtCorreo, boxCorreo);
+        configurarEfectoFocus(txtTelefono, boxTelefono);
+        // Sucursal no necesita focus porque es editable="false", pero se puede agregar si deseas.
+
+        clientesService = new ClientesService();
+        txtSucursal.setText(SesionActual.getUsuario().getCodigo_sucursal().toUpperCase());
+        txtSucursal.setDisable(true);
     }
 }
