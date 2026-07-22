@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-pane-transparent" stylesheets="@../../core/css/globalStyles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.grupo1.sgsm.inventarioYproductos.controller.consultarStockLocalController">
+    <content>
+        <VBox alignment="TOP_CENTER" styleClass="main-bg">
+            <children>
+                <!-- Contenedor responsivo -->
+                <VBox alignment="TOP_LEFT" maxWidth="1000.0" spacing="20.0" VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+                    </padding>
+                    <children>
+
+                        <!-- Títulos -->
+                        <VBox spacing="2.0">
+                            <children>
+                                <Label styleClass="page-title" text="CONSULTAR STOCK LOCAL" />
+                                <Label styleClass="page-subtitle" text="Revisa la disponibilidad de productos en la sucursal UIO." />
+                            </children>
+                        </VBox>
+
+                        <!-- Tarjeta que contiene la búsqueda y la tabla -->
+                        <VBox spacing="15.0" styleClass="form-card" VBox.vgrow="ALWAYS">
+                            <padding>
+                                <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+                            </padding>
+                            <children>
+
+                                <!-- Barra de Búsqueda -->
+                                <HBox alignment="CENTER_LEFT" styleClass="search-container">
+                                    <children>
+                                        <Label fx:id="lblSearchIcon" styleClass="search-icon-font" />
+                                        <TextField fx:id="txtBuscar" promptText="Buscar..." styleClass="search-field" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+
+                                <!-- Tabla de Stock -->
+                                <TableView fx:id="tbStock" styleClass="custom-table" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colCodigo" prefWidth="180.0" text="CÓDIGO DE PRODUCTO" />
+                                        <TableColumn fx:id="colNombre" prefWidth="300.0" text="NOMBRE" />
+                                        <TableColumn fx:id="colStock" prefWidth="150.0" style="-fx-alignment: CENTER;" text="STOCK DE SEDE" />
+                                        <TableColumn fx:id="colSucursal" prefWidth="150.0" style="-fx-alignment: CENTER;" text="CÓDIGO DE SUCURSAL" />
+                                    </columns>
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                    </columnResizePolicy>
+                                </TableView>
+
+                            </children>
+                        </VBox>
+
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>
