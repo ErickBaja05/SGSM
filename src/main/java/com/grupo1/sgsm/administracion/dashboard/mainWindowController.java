@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -72,20 +73,44 @@ public class mainWindowController implements Initializable {
 
 
 
-    @FXML void abirGestionUsuarios(ActionEvent event) {}
+    @FXML void abirGestionUsuarios(ActionEvent event) {
+        cargarVista("/administracion/gestionUsuarios.fxml");
+    }
     @FXML void abrirAjusteStock(ActionEvent event) {
-        cargarVista("/inventarioYproductos/fxml/ajusteStock.fxml");
+        if(verificarConectividad()){
+            cargarVista("/inventarioYproductos/fxml/ajusteStock.fxml");
+            return;
+        }
+        cargarVista("/administracion/fxml/errorConexion.fxml");
     }
     @FXML void abrirConsultarCatálogo(ActionEvent event) {
         cargarVista("/inventarioYproductos/fxml/gestionCatalogo.fxml");
     }
-    @FXML void abrirConsultarFacturas(ActionEvent event) {}
+    @FXML void abrirConsultarFacturas(ActionEvent event) {
+        if(SesionActual.getUsuario().getCodigo_sucursal().equalsIgnoreCase("GYE")){
+            cargarVista("/ventasYfacturacion/consultarFacturasGYE");
+        }else{
+            if(SesionActual.getUsuario().getRol().equalsIgnoreCase("ADMINISTRACION") ||SesionActual.getUsuario().getRol().equalsIgnoreCase("CAJERO")  ){
+                cargarVista("/ventasYfacturacion/consultarFacturas/consultarFacturasUIOOperativo");
+            }else{
+                cargarVista("/ventasYfacturacion/consultarFacturas/consultarFacturaContableUIO");
+            }
+        }
+    }
     @FXML void abrirCrearProducto(ActionEvent event) {
         cargarVista("/inventarioYproductos/fxml/crearNuevoProducto.fxml");
     }
-    @FXML void abrirCrearUsuario(ActionEvent event) {}
+    @FXML void abrirCrearUsuario(ActionEvent event) {
+        cargarVista("/administracion/crearUsuario.fxml");
+    }
     @FXML void abrirFacturacion(ActionEvent event) {
-        cargarVista(("/ventasYFacturacion/fxml/facturarProductos.fxml"));
+
+        if(verificarConectividad()){
+            cargarVista(("/ventasYFacturacion/fxml/facturarProductos.fxml"));
+            return;
+        }
+        cargarVista(("/administracion/fxml/errorConexion.fxml"));
+
     }
     @FXML void abrirGestionClientes(ActionEvent event) {
 
@@ -96,14 +121,33 @@ public class mainWindowController implements Initializable {
         cargarVista("/administracion/fxml/errorConexion.fxml");
 
     }
-    @FXML void abrirGestionParametros(ActionEvent event) {}
-    @FXML void abrirMarketing(ActionEvent event) {}
-    @FXML void abrirRegistrarClientes(ActionEvent event) {
-        cargarVista("/clientes/fxml/registrarClientes.fxml");
+    @FXML void abrirGestionParametros(ActionEvent event) {
+        cargarVista("/administracion/fxml/gestionSucursales.fxml");
     }
-    @FXML void abrirRegistrarSucursal(ActionEvent event) {}
-    @FXML void abrirStockLocal(ActionEvent event) {}
-    @FXML void abrirStockOtraSede(ActionEvent event) {}
+    @FXML void abrirMarketing(ActionEvent event) {
+        cargarVista("/inventarioYProductos/fxml/productoMarketing.fxml");
+    }
+    @FXML void abrirRegistrarClientes(ActionEvent event) {
+        if(verificarConectividad()){
+            cargarVista("/clientes/fxml/registrarClientes.fxml");
+            return;
+        }
+        cargarVista("/administracion/fxml/errorConexion.fxml");
+    }
+    @FXML void abrirRegistrarSucursal(ActionEvent event) {
+        cargarVista("/administracion/fxml/registrarSucursal.fxml");
+    }
+    @FXML void abrirStockLocal(ActionEvent event) {
+        cargarVista("/inventarioYProductos/fxml/consultarStockLocal.fxml");
+    }
+    @FXML void abrirStockOtraSede(ActionEvent event) {
+        if(verificarConectividad()){
+            cargarVista("/inventarioYProductos/fxml/consultarStockRemoto.fxml");
+            return;
+        }
+        cargarVista("/administracion/fxml/errorConexion.fxml");
+
+    }
     @FXML void goMain(ActionEvent event) throws IOException {
 
         String vista = "/administracion/fxml/dashboard.fxml";
@@ -187,19 +231,8 @@ public class mainWindowController implements Initializable {
 
         // CONFIGURAR QUE ROL Y DE QUE SEDE PUEDE O NO VER LOS BOTONES
 
-//        if(!usuarioActual.getRol().equals("ADMINISTRADOR")){
-//            btnAdministracion.setVisible(false);
-//        }
-//
-//        if(usuarioActual.getRol().equals("AUDITOR")){
-//            btnClientes.setVisible(false);
-//            btnProductos.setVisible(false);
-//            btnFacturarProductos.setVisible(false);
-//        }
-//
-//        if(usuarioActual.getRol().equals("CAJERO")){
-//
-//        }
+        aplicarRestriccionesPorRol();
+
 
 
         // ICONOS PRINCIPALES
@@ -291,4 +324,29 @@ public class mainWindowController implements Initializable {
         aviso.getStyleClass().add("placeholder-label");
         return aviso;
     }
+
+    private void aplicarRestriccionesPorRol() {
+        String rol = SesionActual.getUsuario().getRol();
+
+        if ("CAJERO".equals(rol)) {
+            ocultar(btnAdministracion, btnAjusteStock, btnCrearProducto, btnConsultarCatalogo, btnMarketing);
+        }
+
+        if ("AUDITOR".equals(rol)) {
+            ocultar(btnClientes, btnProductos, btnFacturarProductos, btnAdministracion, btnNuevaVenta);
+        }
+
+        if ("MARKETING".equals(rol)) {
+            ocultar(btnClientes, btnAjusteStock, btnCrearProducto, btnConsultarCatalogo,
+                    btnStockRemoto, btnStockLocal, btnFacturacion, btnAdministracion, btnNuevaVenta);
+        }
+    }
+
+    private void ocultar(Node... nodos) {
+        for (Node n : nodos) {
+            n.setVisible(false);
+            n.setManaged(false);
+        }
+    }
+
 }
