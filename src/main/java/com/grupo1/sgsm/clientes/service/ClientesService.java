@@ -8,6 +8,8 @@ import com.grupo1.sgsm.clientes.exception.ClienteReferenciadoException;
 import com.grupo1.sgsm.clientes.exception.ClienteYaExisteException;
 import com.grupo1.sgsm.clientes.model.ClienteContacto;
 import com.grupo1.sgsm.clientes.model.ClienteFacturacion;
+import com.grupo1.sgsm.core.session.SesionActual;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,12 +55,13 @@ public class ClientesService implements IClientesService {
         List<ClienteFacturacion> facturacionClientes = clienteFacturacionDAO.consultarTodos();
 
         Map<String, ClienteContacto> mapaContactos = new HashMap<>();
-
         for (ClienteContacto contacto : informacionClientes) {
             mapaContactos.put(contacto.getCedula_ciudadania(), contacto);
         }
 
         List<ClienteConsultaDTO> listaClienteConsultaDTO = new ArrayList<>();
+
+        String sucursalSesion = SesionActual.getUsuario().getCodigo_sucursal(); // UIO o GYE
 
         for (ClienteFacturacion datosFacturacion : facturacionClientes) {
 
@@ -70,25 +73,35 @@ public class ClientesService implements IClientesService {
             ClienteContacto contacto = mapaContactos.get(datosFacturacion.getCedula_ciudadania());
 
             if (contacto != null) {
-                if (contacto.getDireccion() != null && !contacto.getDireccion().trim().isEmpty()) {
-                    clienteConsulta.setDireccion(contacto.getDireccion());
-                } else {
+                // Aquí decides si mostrar o no según la sucursal
+                if (sucursalSesion.equalsIgnoreCase("UIO") && contacto.getCod_sucursal_registro().equalsIgnoreCase("GYE")) {
                     clienteConsulta.setDireccion("NO DISPONIBLE");
-                }
-
-                if (contacto.getCorreo_electronico() != null && !contacto.getCorreo_electronico().trim().isEmpty()) {
-                    clienteConsulta.setCorreo(contacto.getCorreo_electronico());
-                } else {
                     clienteConsulta.setCorreo("NO DISPONIBLE");
+                } else if (sucursalSesion.equalsIgnoreCase("GYE") && contacto.getCod_sucursal_registro().equalsIgnoreCase("UIO")) {
+                    clienteConsulta.setDireccion("NO DISPONIBLE");
+                    clienteConsulta.setCorreo("NO DISPONIBLE");
+                } else {
+                    clienteConsulta.setDireccion(
+                            contacto.getDireccion() != null && !contacto.getDireccion().trim().isEmpty()
+                                    ? contacto.getDireccion()
+                                    : "NO DISPONIBLE"
+                    );
+                    clienteConsulta.setCorreo(
+                            contacto.getCorreo_electronico() != null && !contacto.getCorreo_electronico().trim().isEmpty()
+                                    ? contacto.getCorreo_electronico()
+                                    : "NO DISPONIBLE"
+                    );
                 }
             } else {
                 clienteConsulta.setDireccion("NO DISPONIBLE");
                 clienteConsulta.setCorreo("NO DISPONIBLE");
             }
+
             listaClienteConsultaDTO.add(clienteConsulta);
         }
         return listaClienteConsultaDTO;
     }
+
 
     @Override
     public void actualizarCliente(String cedula, String nuevoCorreo, String nuevoDireccion) {
