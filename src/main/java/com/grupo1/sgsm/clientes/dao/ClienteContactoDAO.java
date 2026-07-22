@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.grupo1.sgsm.clientes.model.ClienteContacto;
 import com.grupo1.sgsm.core.database.DatabaseConnection;
+import com.grupo1.sgsm.core.database.NetworkChecker;
 import com.grupo1.sgsm.core.session.SesionActual;
 import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
 import com.grupo1.sgsm.core.util.ConfigSucursal;
@@ -188,6 +189,17 @@ public class ClienteContactoDAO {
     private String obtenerVistaLocal(String nodoLocal) {
         // Retorna directamente la vista de la base de datos donde se ejecuta la app
         // Ejemplo: "UIO.dbo.V_clientesContacto" o "GYE.dbo.V_clientesContacto"
-        return nodoLocal.toUpperCase() + ".dbo.V_clientesContacto";
+        if(verificarConectividad()){
+            return nodoLocal.toUpperCase() + ".dbo.V_clientesContacto";
+        }
+        return nodoLocal.toUpperCase() + ".dbo.cliente_contacto" + nodoLocal.toUpperCase();
+
+    }
+
+    private boolean verificarConectividad(){
+        if(ConfigSucursal.getSucursalActual().equalsIgnoreCase("UIO")){
+            return NetworkChecker.hayConexionGYE();
+        }
+        return NetworkChecker.hayConexionUIO();
     }
 }
