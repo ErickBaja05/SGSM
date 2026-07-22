@@ -70,7 +70,7 @@ public class mainWindowController implements Initializable {
     @FXML private VBox usuariosBox;
     @FXML private VBox usuariosSubMenu;
 
-    private UsuarioSesionDTO usuarioActual;
+
 
     @FXML void abirGestionUsuarios(ActionEvent event) {}
     @FXML void abrirAjusteStock(ActionEvent event) {
@@ -176,11 +176,11 @@ public class mainWindowController implements Initializable {
 
 
         lblUsuario.setText(
-                usuarioActual.getNombre_us().toUpperCase()
+                SesionActual.getUsuario().getNombre_us().toUpperCase()
         );
 
-        lblRol.setText(usuarioActual.getRol().toUpperCase());
-        lblSede.setText(usuarioActual.getCodigo_sucursal().toUpperCase());
+        lblRol.setText(SesionActual.getUsuario().getRol().toUpperCase());
+        lblSede.setText(SesionActual.getUsuario().getCodigo_sucursal().toUpperCase());
 
 
         // CONFIGURAR QUE ROL Y DE QUE SEDE PUEDE O NO VER LOS BOTONES
