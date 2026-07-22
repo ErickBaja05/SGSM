@@ -144,7 +144,7 @@
                         <Insets bottom="20.0" left="15.0" right="15.0" top="10.0" />
                     </padding>
                     <children>
-                        <Button id="btnNuevaVenta" fx:id="btnNuevaVenta" maxWidth="Infinity" mnemonicParsing="false" onAction="#abrirFacturacion" styleClass="btnNuevaVenta" text="NUEVA VENTA" />
+                        <Button id="btnNuevaVenta" fx:id="btnNuevaVenta" maxWidth="Infinity" mnemonicParsing="false" onAction="#abrirFacturacion" styleClass="btnNuevaVenta" text="NUEVA VENTA"/>
                         <HBox alignment="CENTER" spacing="40.0">
                             <Button id="btnLogOut" fx:id="btnLogOut" mnemonicParsing="false" onAction="#logOut" styleClass="btnNavDown" />
                             <Button id="btnLogOut" fx:id="btnGoMain" mnemonicParsing="false" onAction="#goMain" styleClass="btnNavDown" />

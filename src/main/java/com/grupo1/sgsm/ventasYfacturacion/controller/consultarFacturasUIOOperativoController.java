@@ -5,11 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -17,7 +13,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
-public class consultarFacturasGYEController implements Initializable {
+public class consultarFacturasUIOOperativoController implements Initializable {
 
     // --- Filtros ---
     @FXML private DatePicker dpFechaInicio;
@@ -32,14 +28,11 @@ public class consultarFacturasGYEController implements Initializable {
 
     // --- Paginación y Footer ---
     @FXML private Label lblPaginacion;
-    @FXML private Label lblFacturaSeleccionada;
-    @FXML private Button btnVerCompleta;
+
 
     // --- Íconos ---
     @FXML private Label lblIconFiltrar;
-    @FXML private Label lblIconPrev;
-    @FXML private Label lblIconNext;
-    @FXML private Label lblIconVer;
+
 
     // --- Variables de Estado ---
     private ObservableList<FacturaResumen> listaFacturas = FXCollections.observableArrayList();
@@ -55,9 +48,7 @@ public class consultarFacturasGYEController implements Initializable {
 
     private void cargarIconos() {
         lblIconFiltrar.setGraphic(crearIcono("fa-filter", "btn-primary-icon-font"));
-        lblIconPrev.setGraphic(crearIcono("fa-angle-left", ""));
-        lblIconNext.setGraphic(crearIcono("fa-angle-right", ""));
-        lblIconVer.setGraphic(crearIcono("fa-eye", "btn-primary-icon-font"));
+
     }
 
     private void configurarTabla() {
@@ -106,25 +97,6 @@ public class consultarFacturasGYEController implements Initializable {
         cargarIconos();
         configurarTabla();
 
-        // MAGIA: Listener para detectar cuando se selecciona una fila en la tabla
-        tbFacturas.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                // Hay una fila seleccionada
-                facturaActualSeleccionada = newSelection;
-                btnVerCompleta.setDisable(false); // Habilitar botón
-
-                // Actualizar Label con estilos en línea para resaltar
-                lblFacturaSeleccionada.setText("Factura seleccionada: " + newSelection.getNumeroFactura());
-                lblFacturaSeleccionada.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #00796B;");
-            } else {
-                // Se desmarcó la fila
-                facturaActualSeleccionada = null;
-                btnVerCompleta.setDisable(true); // Deshabilitar botón
-
-                lblFacturaSeleccionada.setText("Factura seleccionada: Ninguna");
-                lblFacturaSeleccionada.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555555;");
-            }
-        });
 
         // (Opcional) Cargar datos de prueba al iniciar si así lo deseas
         cargarDatosPrueba();

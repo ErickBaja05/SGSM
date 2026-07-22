@@ -6,6 +6,7 @@ import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
 public class SesionActual {
 
     private static UsuarioSesionDTO usuario;
+    private static Integer valorIva ;
 
     private SesionActual() {
         // Evita instanciación
@@ -25,5 +26,13 @@ public class SesionActual {
 
     public static void cerrarSesion() {
         usuario = null;
+    }
+
+    public static Integer getValorIva() {
+        return valorIva;
+    }
+
+    public static void setValorIva(Integer valorIva) {
+        SesionActual.valorIva = valorIva;
     }
 }
