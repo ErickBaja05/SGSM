@@ -82,8 +82,7 @@ public class loginController implements Initializable {
 
         //UsuarioSesionDTO usuariologin= new UsuarioSesionDTO(1,"Erick","ADMINISTRADOR","UIO");
         //SesionActual.iniciarSesion(usuariologin);
-
-        cargarDashboard(event);
+        
         try{
             UsuarioSesionDTO usuarioLogin = usuarioService.login(usuario, contrasena);
             SesionActual.iniciarSesion(usuarioLogin);
