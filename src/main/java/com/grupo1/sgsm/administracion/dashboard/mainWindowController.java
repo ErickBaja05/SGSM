@@ -88,6 +88,7 @@ public class mainWindowController implements Initializable {
         cargarVista(("/ventasYFacturacion/fxml/facturarProductos.fxml"));
     }
     @FXML void abrirGestionClientes(ActionEvent event) {
+
         if(verificarConectividad()){
             cargarVista("/clientes/fxml/gestionClientes.fxml");
         }
