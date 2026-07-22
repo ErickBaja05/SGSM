@@ -106,13 +106,14 @@
                                         <!-- Detalles Técnicos -->
                                         <VBox spacing="15.0">
                                             <children>
-                                                <HBox alignment="CENTER_SPACE_BETWEEN">
+                                                <HBox alignment="CENTER_LEFT">
                                                     <children>
                                                         <Label style="-fx-font-size: 12px; -fx-text-fill: #555555;" text="Código Interno" />
+                                                        <Region HBox.hgrow="ALWAYS" />
                                                         <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;" text="GYE-01" />
                                                     </children>
                                                 </HBox>
-                                                <HBox alignment="CENTER_SPACE_BETWEEN">
+                                                <HBox alignment="CENTER_LEFT">
                                                     <children>
                                                         <VBox>
                                                             <children>
@@ -120,6 +121,7 @@
                                                                 <Label style="-fx-font-size: 12px; -fx-text-fill: #555555;" text="Sincronización" />
                                                             </children>
                                                         </VBox>
+                                                        <Region HBox.hgrow="ALWAYS" />
                                                         <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;" text="Hace 2 min" />
                                                     </children>
                                                 </HBox>

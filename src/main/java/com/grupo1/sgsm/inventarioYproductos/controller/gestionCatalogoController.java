@@ -13,7 +13,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 // IMPORTANTE: Importa aquí tu clase modelo Producto

@@ -1,6 +1,5 @@
 package com.grupo1.sgsm.administracion.dashboard;
 
-import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
 import com.grupo1.sgsm.core.database.NetworkChecker;
 import com.grupo1.sgsm.core.session.SesionActual;
 import com.grupo1.sgsm.core.util.ConfigSucursal;
@@ -74,7 +73,7 @@ public class mainWindowController implements Initializable {
 
 
     @FXML void abirGestionUsuarios(ActionEvent event) {
-        cargarVista("/administracion/gestionUsuarios.fxml");
+        cargarVista("/administracion/fxml/gestionUsuarios.fxml");
     }
     @FXML void abrirAjusteStock(ActionEvent event) {
         if(verificarConectividad()){
@@ -88,12 +87,12 @@ public class mainWindowController implements Initializable {
     }
     @FXML void abrirConsultarFacturas(ActionEvent event) {
         if(SesionActual.getUsuario().getCodigo_sucursal().equalsIgnoreCase("GYE")){
-            cargarVista("/ventasYfacturacion/consultarFacturasGYE");
+            cargarVista("/ventasYfacturacion/fxml/consultarFacturasGYE.fxml");
         }else{
             if(SesionActual.getUsuario().getRol().equalsIgnoreCase("ADMINISTRACION") ||SesionActual.getUsuario().getRol().equalsIgnoreCase("CAJERO")  ){
-                cargarVista("/ventasYfacturacion/consultarFacturas/consultarFacturasUIOOperativo");
+                cargarVista("/ventasYfacturacion/fxml/consultarFacturasUIOOperativo.fxml");
             }else{
-                cargarVista("/ventasYfacturacion/consultarFacturas/consultarFacturaContableUIO");
+                cargarVista("/ventasYfacturacion/fxml/consultarFacturaContableUIO.fxml");
             }
         }
     }
@@ -101,12 +100,12 @@ public class mainWindowController implements Initializable {
         cargarVista("/inventarioYproductos/fxml/crearNuevoProducto.fxml");
     }
     @FXML void abrirCrearUsuario(ActionEvent event) {
-        cargarVista("/administracion/crearUsuario.fxml");
+        cargarVista("/administracion/fxml/crearUsuario.fxml");
     }
     @FXML void abrirFacturacion(ActionEvent event) {
 
         if(verificarConectividad()){
-            cargarVista(("/ventasYFacturacion/fxml/facturarProductos.fxml"));
+            cargarVista("/ventasYfacturacion/fxml/facturarProductos.fxml");
             return;
         }
         cargarVista(("/administracion/fxml/errorConexion.fxml"));
@@ -125,7 +124,7 @@ public class mainWindowController implements Initializable {
         cargarVista("/administracion/fxml/gestionSucursales.fxml");
     }
     @FXML void abrirMarketing(ActionEvent event) {
-        cargarVista("/inventarioYProductos/fxml/productoMarketing.fxml");
+        cargarVista("/inventarioYproductos/fxml/productoMarketing.fxml");
     }
     @FXML void abrirRegistrarClientes(ActionEvent event) {
         if(verificarConectividad()){
@@ -138,11 +137,11 @@ public class mainWindowController implements Initializable {
         cargarVista("/administracion/fxml/registrarSucursal.fxml");
     }
     @FXML void abrirStockLocal(ActionEvent event) {
-        cargarVista("/inventarioYProductos/fxml/consultarStockLocal.fxml");
+        cargarVista("/inventarioYproductos/fxml/consultarStockLocal.fxml");
     }
     @FXML void abrirStockOtraSede(ActionEvent event) {
         if(verificarConectividad()){
-            cargarVista("/inventarioYProductos/fxml/consultarStockRemoto.fxml");
+            cargarVista("/inventarioYproductos/fxml/consultarStockRemoto.fxml");
             return;
         }
         cargarVista("/administracion/fxml/errorConexion.fxml");

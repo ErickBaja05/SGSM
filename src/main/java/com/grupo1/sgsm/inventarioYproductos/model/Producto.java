@@ -1,6 +1,5 @@
 package com.grupo1.sgsm.inventarioYproductos.model;
 
-import java.nio.DoubleBuffer;
 
 public class Producto {
     // Atributos

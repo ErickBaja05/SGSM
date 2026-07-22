@@ -1,4 +1,4 @@
-package com.grupo1.sgsm.ventasYFacturacion.controller;
+package com.grupo1.sgsm.ventasYfacturacion.controller;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;

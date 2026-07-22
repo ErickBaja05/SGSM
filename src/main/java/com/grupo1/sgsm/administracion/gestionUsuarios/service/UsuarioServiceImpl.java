@@ -3,8 +3,6 @@ package com.grupo1.sgsm.administracion.gestionUsuarios.service;
 import com.grupo1.sgsm.administracion.gestionUsuarios.dao.UsuarioDAO;
 import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
 import com.grupo1.sgsm.administracion.gestionUsuarios.model.Usuario;
-import com.grupo1.sgsm.core.database.NetworkChecker;
-import com.grupo1.sgsm.core.util.ConfigSucursal;
 
 public class UsuarioServiceImpl implements IUsuarioService{
 

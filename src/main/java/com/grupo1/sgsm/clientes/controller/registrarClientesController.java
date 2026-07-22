@@ -1,7 +1,6 @@
 package com.grupo1.sgsm.clientes.controller;
 
 import com.grupo1.sgsm.clientes.dto.NuevoClienteDTO;
-import com.grupo1.sgsm.clientes.exception.ClienteYaExisteException;
 import com.grupo1.sgsm.clientes.service.ClientesService;
 import com.grupo1.sgsm.clientes.service.IClientesService;
 import com.grupo1.sgsm.core.session.SesionActual;
