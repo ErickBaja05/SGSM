@@ -91,6 +91,7 @@ public class mainWindowController implements Initializable {
 
         if(verificarConectividad()){
             cargarVista("/clientes/fxml/gestionClientes.fxml");
+            return;
         }
         cargarVista("/administracion/fxml/errorConexion.fxml");
 
