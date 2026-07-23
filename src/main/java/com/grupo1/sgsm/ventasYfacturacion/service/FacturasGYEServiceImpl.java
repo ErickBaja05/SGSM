@@ -105,6 +105,14 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
     }
 
     @Override
+    public List<DetalleFacturaDTO> obtenerDetallesFactura(String numeroFactura) {
+        if (numeroFactura == null || numeroFactura.trim().isEmpty()) {
+            throw new IllegalArgumentException("El número de factura no puede ser nulo o vacío");
+        }
+        return detalleFacturaDAO.consultarDetallesPorNumeroFactura(numeroFactura.trim());
+    }
+
+    @Override
     public String obtenerSiguienteNumeroFactura() {
         String ultimo = facturaGyeDAO.consultarUltimoNumeroFactura();
 

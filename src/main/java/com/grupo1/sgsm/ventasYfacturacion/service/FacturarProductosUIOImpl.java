@@ -9,7 +9,6 @@ import com.grupo1.sgsm.inventarioYproductos.service.StockLocalService;
 import com.grupo1.sgsm.ventasYfacturacion.dao.DetalleFacturaDAO;
 import com.grupo1.sgsm.ventasYfacturacion.dao.FacturaUIO_ContableDAO;
 import com.grupo1.sgsm.ventasYfacturacion.dao.FacturaUIO_OperativoDAO;
-import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTOFacturacion;
 import com.grupo1.sgsm.ventasYfacturacion.dto.NuevaFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.exception.NoSePudoFacturarException;

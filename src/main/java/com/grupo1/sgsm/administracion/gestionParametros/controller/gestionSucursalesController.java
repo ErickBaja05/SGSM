@@ -3,7 +3,6 @@ package com.grupo1.sgsm.administracion.gestionParametros.controller;
 import com.grupo1.sgsm.administracion.gestionParametros.dto.SucursalDTO;
 import com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService;
 import com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl;
-import com.grupo1.sgsm.core.session.SesionActual;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

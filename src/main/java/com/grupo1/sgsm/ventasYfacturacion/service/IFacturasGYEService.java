@@ -16,6 +16,5 @@ public interface IFacturasGYEService {
     InfoProductoDTO agregarProductoCarrito(String codigoProducto);
     List<ProductoConsultaDTO> productosParaCarrito();
     public String obtenerSiguienteNumeroFactura();
-
-
+    List<DetalleFacturaDTO> obtenerDetallesFactura(String numeroFactura);
 }
