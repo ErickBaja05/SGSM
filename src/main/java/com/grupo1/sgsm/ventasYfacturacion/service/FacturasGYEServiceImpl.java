@@ -1,7 +1,11 @@
 package com.grupo1.sgsm.ventasYfacturacion.service;
 
+import com.grupo1.sgsm.inventarioYproductos.service.IProductoService;
+import com.grupo1.sgsm.inventarioYproductos.service.ProductoService;
 import com.grupo1.sgsm.ventasYfacturacion.dao.FacturaGyeDAO;
+import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.FacturaGYEConsultadaDTO;
+import com.grupo1.sgsm.ventasYfacturacion.dto.InfoProductoDTO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.NuevaFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.exception.FechasNoValidasException;
 import com.grupo1.sgsm.ventasYfacturacion.model.FacturaGYE;
@@ -13,6 +17,7 @@ import java.util.List;
 public class FacturasGYEServiceImpl implements IFacturasGYEService {
 
     private FacturaGyeDAO facturaGyeDAO = new FacturaGyeDAO();
+    private IProductoService productoService = new ProductoService();
 
     @Override
     public List<FacturaGYEConsultadaDTO> consultarFacturas(LocalDate fechaInicio, LocalDate fechaFin) {
@@ -29,7 +34,12 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
     }
 
     @Override
-    public void facturarProductos(NuevaFacturaDTO nuevaFacturaDTO) {
+    public void facturarProductos(NuevaFacturaDTO nuevaFacturaDTO, List<DetalleFacturaDTO> detallesFacturaDTO) {
 
     }
+
+    @Override
+    public InfoProductoDTO agregarProductoCarrito(String codigoProducto) {
+    }
+
 }
