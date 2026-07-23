@@ -149,6 +149,43 @@ public class StockLocalService implements IStockLocalService {
         }
     }
 
+    @Override
+    public int obtenerStockLocalPorProducto(String codigoProducto) {
+        if (codigoProducto == null || codigoProducto.trim().isEmpty()) {
+            return 0;
+        }
+        Inventario inv = inventarioDAO.consultarPorProducto(codigoProducto.trim());
+        return (inv != null && inv.getStock() != null) ? inv.getStock() : 0;
+    }
+
+    @Override
+    public ConsultaStockLocalDTO consultarStockLocalPorProducto(String codigoProducto) {
+        if (codigoProducto == null || codigoProducto.trim().isEmpty()) {
+            return null;
+        }
+        String codTrim = codigoProducto.trim();
+        Inventario inv = inventarioDAO.consultarPorProducto(codTrim);
+        if (inv == null) {
+            return null;
+        }
+
+        String nombre = "Producto " + codTrim;
+        try {
+            Producto p = productoInfoDAO.consultarPorCodigo(codTrim);
+            if (p != null && p.getNombre() != null) {
+                nombre = p.getNombre();
+            }
+        } catch (Exception e) {
+            System.err.println("Advertencia al obtener nombre de producto: " + e.getMessage());
+        }
+
+        String codSucursal = (inv.getCodigo_sucursal() != null && !inv.getCodigo_sucursal().isEmpty())
+                ? inv.getCodigo_sucursal().toUpperCase()
+                : obtenerSucursalSesion();
+
+        return new ConsultaStockLocalDTO(codTrim, nombre, inv.getStock(), codSucursal);
+    }
+
     private String obtenerSucursalSesion() {
         UsuarioSesionDTO usuario = SesionActual.getUsuario();
         if (usuario != null && usuario.getCodigo_sucursal() != null && !usuario.getCodigo_sucursal().isEmpty()) {

@@ -17,7 +17,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import com.grupo1.sgsm.core.util.NavigationUtil;
 import com.grupo1.sgsm.ventasYfacturacion.dto.FacturaContableDTO;
 import com.grupo1.sgsm.ventasYfacturacion.service.IFacturacionService;
 import com.grupo1.sgsm.ventasYfacturacion.service.FacturacionService;

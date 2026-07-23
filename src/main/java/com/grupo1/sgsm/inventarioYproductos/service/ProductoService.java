@@ -1,10 +1,13 @@
 package com.grupo1.sgsm.inventarioYproductos.service;
 
+import com.grupo1.sgsm.inventarioYproductos.dao.InventarioDAO;
 import com.grupo1.sgsm.inventarioYproductos.dao.ProductoInfoDAO;
 import com.grupo1.sgsm.inventarioYproductos.dao.ProductoMarketingDAO;
+import com.grupo1.sgsm.inventarioYproductos.dto.InfoProductoDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.NuevoProductoDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.ProductoMarketingDTO;
+import com.grupo1.sgsm.inventarioYproductos.model.Inventario;
 import com.grupo1.sgsm.inventarioYproductos.model.Producto;
 import com.grupo1.sgsm.inventarioYproductos.model.ProductoMarketing;
 
@@ -17,6 +20,7 @@ public class ProductoService implements IProductoService {
 
     private final ProductoInfoDAO productoInfoDAO = new ProductoInfoDAO();
     private final ProductoMarketingDAO productoMarketingDAO = new ProductoMarketingDAO();
+    private final InventarioDAO inventarioDAO = new InventarioDAO();
 
     @Override
     public List<ProductoConsultaDTO> obtenerTodosProductos() {
@@ -132,5 +136,56 @@ public class ProductoService implements IProductoService {
             pm.setDescripcion(descripcion);
             productoMarketingDAO.insertar(pm);
         }
+    }
+
+    @Override
+    public InfoProductoDTO consultarStockProducto(String codigoProducto) {
+        Producto producto = productoInfoDAO.consultarPorCodigo(codigoProducto);
+        String categoria = (producto != null && producto.getCategoria() != null) ? producto.getCategoria() : "";
+
+        int stock = 0;
+        try {
+            Inventario inv = inventarioDAO.consultarPorProducto(codigoProducto);
+            if (inv != null) {
+                stock = inv.getStock();
+            }
+        } catch (Exception e) {
+            System.err.println("Advertencia al consultar inventario para " + codigoProducto + ": " + e.getMessage());
+        }
+
+        return new InfoProductoDTO(String.valueOf(stock), categoria);
+    }
+
+    @Override
+    public List<ProductoConsultaDTO> obtenerProductosConStockDisponible() {
+        List<Inventario> inventarios = inventarioDAO.consultarTodos();
+        Map<String, Integer> mapStock = new HashMap<>();
+        if (inventarios != null) {
+            for (Inventario inv : inventarios) {
+                if (inv.getCodigo_producto() != null && inv.getStock() != null) {
+                    mapStock.put(inv.getCodigo_producto().trim(), inv.getStock());
+                }
+            }
+        }
+
+        List<Producto> productos = productoInfoDAO.consultarTodos();
+        List<ProductoConsultaDTO> resultado = new ArrayList<>();
+
+        if (productos != null) {
+            for (Producto p : productos) {
+                String cod = (p.getCodigo() != null) ? p.getCodigo().trim() : "";
+                int stock = mapStock.getOrDefault(cod, 0);
+                if (stock > 0) {
+                    resultado.add(new ProductoConsultaDTO(
+                            p.getCodigo(),
+                            p.getNombre(),
+                            p.getMarca(),
+                            p.getCategoria(),
+                            p.getPrecio()
+                    ));
+                }
+            }
+        }
+        return resultado;
     }
 }

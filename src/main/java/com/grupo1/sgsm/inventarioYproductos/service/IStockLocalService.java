@@ -12,4 +12,6 @@ public interface IStockLocalService {
     void eliminarStockLocal(String codigoProducto);
     DetalleAjusteStockDTO buscarProductoParaAjuste(String query);
     void ajustarStock(String codigoProducto, int nuevoStock, String codigoSucursal);
+    int obtenerStockLocalPorProducto(String codigoProducto);
+    ConsultaStockLocalDTO consultarStockLocalPorProducto(String codigoProducto);
 }

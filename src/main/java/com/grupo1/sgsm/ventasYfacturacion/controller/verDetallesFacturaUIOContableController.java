@@ -11,7 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;

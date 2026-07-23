@@ -1,5 +1,6 @@
 package com.grupo1.sgsm.inventarioYproductos.service;
 
+import com.grupo1.sgsm.inventarioYproductos.dto.InfoProductoDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.NuevoProductoDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.ProductoMarketingDTO;
@@ -12,4 +13,6 @@ public interface IProductoService {
     void eliminarProducto(String codigo);
     List<ProductoMarketingDTO> obtenerProductosMarketing();
     void actualizarDescripcionMarketing(String codigo, String descripcion);
+    InfoProductoDTO consultarStockProducto(String codigoProducto);
+    List<ProductoConsultaDTO> obtenerProductosConStockDisponible();
 }
