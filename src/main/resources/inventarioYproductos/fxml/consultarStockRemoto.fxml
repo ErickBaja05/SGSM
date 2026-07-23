@@ -25,8 +25,8 @@
                         <!-- Títulos -->
                         <VBox spacing="2.0">
                             <children>
-                                <Label styleClass="page-title" text="CONSULTAR STOCK GYE" />
-                                <Label styleClass="page-subtitle" text="Existencias en tiempo real de la sede de Guayaquil" />
+                                <Label fx:id="lblTitulo" styleClass="page-title" text="CONSULTAR STOCK GYE" />
+                                <Label fx:id="lblSubtitulo" styleClass="page-subtitle" text="Existencias en tiempo real de la sede de Guayaquil" />
                             </children>
                         </VBox>
 
@@ -51,7 +51,7 @@
                                         <!-- Cabecera de la Tabla con Botón Reload -->
                                         <HBox alignment="CENTER_LEFT">
                                             <children>
-                                                <Label styleClass="header-title" text="Inventario GYE" />
+                                                <Label fx:id="lblInventarioTitulo" styleClass="header-title" text="Inventario GYE" />
                                                 <Region HBox.hgrow="ALWAYS" />
                                                 <Button fx:id="btnRecargar" mnemonicParsing="false" onAction="#recargarDatos" styleClass="btn-transparent">
                                                     <graphic>
@@ -93,8 +93,8 @@
                                                 </VBox>
                                                 <VBox alignment="CENTER_LEFT" spacing="2.0">
                                                     <children>
-                                                        <Label style="-fx-font-size: 16px; -fx-font-weight: 900; -fx-text-fill: #111111;" text="Guayaquil" />
-                                                        <Label style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #888888;" text="SEDE COSTA" />
+                                                        <Label fx:id="lblNombreSede" style="-fx-font-size: 16px; -fx-font-weight: 900; -fx-text-fill: #111111;" text="Guayaquil" />
+                                                        <Label fx:id="lblTipoSede" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #888888;" text="SEDE COSTA" />
                                                     </children>
                                                 </VBox>
                                             </children>
@@ -110,7 +110,7 @@
                                                     <children>
                                                         <Label style="-fx-font-size: 12px; -fx-text-fill: #555555;" text="Código Interno" />
                                                         <Region HBox.hgrow="ALWAYS" />
-                                                        <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;" text="GYE-01" />
+                                                        <Label fx:id="lblCodigoInterno" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;" text="GYE-01" />
                                                     </children>
                                                 </HBox>
                                                 <HBox alignment="CENTER_LEFT">
@@ -122,7 +122,7 @@
                                                             </children>
                                                         </VBox>
                                                         <Region HBox.hgrow="ALWAYS" />
-                                                        <Label style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;" text="Hace 2 min" />
+                                                        <Label fx:id="lblSincronizacion" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333333;" text="Hace 0 s" />
                                                     </children>
                                                 </HBox>
                                             </children>

@@ -27,6 +27,8 @@ public class consultarStockLocalController implements Initializable {
     private TextField txtBuscar;
     @FXML
     private Label lblSearchIcon;
+    @FXML
+    private Label lblSubtitulo;
 
     // --- Tabla y Columnas ---
     @FXML
@@ -132,6 +134,11 @@ public class consultarStockLocalController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Cargar ícono de lupa
         lblSearchIcon.setGraphic(crearIcono("fa-search", "search-icon-font"));
+
+        String sucursalLocal = com.grupo1.sgsm.core.util.ConfigSucursal.getSucursalActual().toUpperCase();
+        if (lblSubtitulo != null) {
+            lblSubtitulo.setText("Revisa la disponibilidad de productos en la sucursal " + sucursalLocal + ".");
+        }
 
         configurarTabla();
 
