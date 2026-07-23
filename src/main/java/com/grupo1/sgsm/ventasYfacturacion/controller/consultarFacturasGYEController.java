@@ -146,7 +146,6 @@ public class consultarFacturasGYEController implements Initializable {
             }
         });
 
-        cargarDatos();
     }
 
     // --- Método utilitario para no repetir código de alertas ---

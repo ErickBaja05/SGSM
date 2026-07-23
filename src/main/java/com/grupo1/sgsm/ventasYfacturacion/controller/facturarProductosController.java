@@ -1,65 +1,70 @@
 package com.grupo1.sgsm.ventasYfacturacion.controller;
 
-import com.grupo1.sgsm.ventasYfacturacion.model.DetalleVenta;
+import com.grupo1.sgsm.clientes.dto.ClienteConsultaDTO;
+import com.grupo1.sgsm.clientes.service.ClientesService;
+import com.grupo1.sgsm.clientes.service.IClientesService;
+import com.grupo1.sgsm.core.util.ConfigSucursal;
+import com.grupo1.sgsm.inventarioYproductos.dto.InfoProductoDTO;
+import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
+import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTOFacturacion;
+import com.grupo1.sgsm.ventasYfacturacion.dto.NuevaFacturaDTO;
+import com.grupo1.sgsm.ventasYfacturacion.service.FacturarProductosUIOImpl;
+import com.grupo1.sgsm.ventasYfacturacion.service.FacturasGYEServiceImpl;
+import com.grupo1.sgsm.ventasYfacturacion.service.IFacturarProductosUIO;
+import com.grupo1.sgsm.ventasYfacturacion.service.IFacturasGYEService;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
-
-import com.grupo1.sgsm.inventarioYproductos.model.Producto;
-
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
-
-
-import com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService;
-import com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl;
-
 public class facturarProductosController implements Initializable {
-
-    private IParametrosService parametrosService = new ParametrosServiceImpl();
 
     // --- SECCIÓN CLIENTE ---
     @FXML private TextField txtCedulaRuc;
     @FXML private TextField txtNombreCliente;
     @FXML private TextField txtApellidoCliente;
+    @FXML private Button btnBuscarCliente;
 
     // --- SECCIÓN RESUMEN ---
     @FXML private Label lblSubtotal;
-    @FXML private Label lblTituloIva;
     @FXML private Label lblIva;
     @FXML private Label lblTotal;
 
     // --- SECCIÓN BÚSQUEDA PRODUCTO ---
     @FXML private TextField txtBuscarProducto;
-    @FXML private TableView<Producto> tbProductosBuscar;
-    @FXML private TableColumn<Producto, String> colBusqCod;
-    @FXML private TableColumn<Producto, String> colBusqNombre;
-    @FXML private TableColumn<Producto, String> colBusqPrecio;
-    @FXML private TableColumn<Producto, Void> colBusqAccion;
+    @FXML private TableView<ProductoConsultaDTO> tbProductosBuscar;
+    @FXML private TableColumn<ProductoConsultaDTO, String> colBusqCod;
+    @FXML private TableColumn<ProductoConsultaDTO, String> colBusqNombre;
+    @FXML private TableColumn<ProductoConsultaDTO, String> colBusqPrecio;
+    @FXML private TableColumn<ProductoConsultaDTO, Void> colBusqAccion;
 
     // --- SECCIÓN DETALLE FACTURA ---
-    @FXML private TableView<DetalleVenta> tbDetalleFactura;
-    @FXML private TableColumn<DetalleVenta, String> colDetCod;
-    @FXML private TableColumn<DetalleVenta, String> colDetDesc;
-    @FXML private TableColumn<DetalleVenta, DetalleVenta> colDetCant; // Recibe el objeto entero para el TextField
-    @FXML private TableColumn<DetalleVenta, String> colDetPUnit;
-    @FXML private TableColumn<DetalleVenta, String> colDetSubtotal;
-    @FXML private TableColumn<DetalleVenta, Void> colDetAcciones;
+    @FXML private TableView<ItemCarrito> tbDetalleFactura;
+    @FXML private TableColumn<ItemCarrito, String> colDetCod;
+    @FXML private TableColumn<ItemCarrito, String> colDetDesc;
+    @FXML private TableColumn<ItemCarrito, ItemCarrito> colDetCant;
+    @FXML private TableColumn<ItemCarrito, String> colDetPUnit;
+    @FXML private TableColumn<ItemCarrito, String> colDetSubtotal;
+    @FXML private TableColumn<ItemCarrito, Void> colDetAcciones;
+
+    // --- MÉTODOS DE PAGO ---
+    @FXML private ToggleGroup tgMetodoPago;
+    @FXML private ToggleButton btnEfectivo;
+    @FXML private ToggleButton btnTarjeta;
+    @FXML private ToggleButton btnTransf;
 
     // --- ÍCONOS ---
     @FXML private Label lblIconNuevoCliente;
@@ -70,9 +75,45 @@ public class facturarProductosController implements Initializable {
     @FXML private Label lblIconTransf;
     @FXML private Label lblIconFacturar;
 
-    // Listas de datos
-    private ObservableList<Producto> masterProductos = FXCollections.observableArrayList();
-    private ObservableList<DetalleVenta> detallesFactura = FXCollections.observableArrayList();
+    // --- SERVICES & ESTADO ---
+    private IClientesService clientesService;
+    private IFacturarProductosUIO serviceUIO;
+    private IFacturasGYEService serviceGYE;
+    private String sedeActual;
+
+    // Variables para totales financieros
+    private double subtotalGlobal = 0.0;
+    private double ivaGlobal = 0.0;
+    private double totalGlobal = 0.0;
+
+    // Listas observables mapeadas a DTOs reales
+    private ObservableList<ProductoConsultaDTO> masterProductos = FXCollections.observableArrayList();
+    private ObservableList<ItemCarrito> detallesFactura = FXCollections.observableArrayList();
+
+    // ==========================================
+    // CLASE VIEW-MODEL PARA LA TABLA CARRITO
+    // ==========================================
+    public static class ItemCarrito {
+        private ProductoConsultaDTO producto;
+        private int cantidad;
+        private int stockDisponible;
+        private String categoria;
+
+        public ItemCarrito(ProductoConsultaDTO producto, int cantidad, int stockDisponible, String categoria) {
+            this.producto = producto;
+            this.cantidad = cantidad;
+            this.stockDisponible = stockDisponible;
+            this.categoria = categoria;
+        }
+
+        public ProductoConsultaDTO getProducto() { return producto; }
+        public int getCantidad() { return cantidad; }
+        public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+        public int getStockDisponible() { return stockDisponible; }
+        public void setStockDisponible(int stockDisponible) { this.stockDisponible = stockDisponible; }
+        public String getCategoria() { return categoria; }
+        public double getSubtotal() { return producto.getPrecio() * cantidad; }
+    }
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
@@ -80,35 +121,101 @@ public class facturarProductosController implements Initializable {
         return icon;
     }
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        cargarIconos();
+
+        // Inicializar Servicios
+        clientesService = new ClientesService();
+        sedeActual = ConfigSucursal.getSucursalActual().toUpperCase();
+
+        if ("UIO".equals(sedeActual)) {
+            serviceUIO = new FacturarProductosUIOImpl();
+        } else {
+            serviceGYE = new FacturasGYEServiceImpl();
+        }
+
+        configurarTablaBusqueda();
+        configurarTablaDetalle();
+
+        // Cargar los productos reales del backend
+        cargarProductosDesdeBD();
+
+        // Listeners de búsqueda
+        txtBuscarProducto.textProperty().addListener((obs, oldV, newV) -> buscarProductoRealTime(newV));
+        btnBuscarCliente.setOnAction(e -> buscarClienteEnBD());
+    }
 
     private void cargarIconos() {
         lblIconNuevoCliente.setGraphic(crearIcono("fa-user-plus", "btn-primary-icon-font"));
         lblIconBuscarCliente.setGraphic(crearIcono("fa-search", "btn-primary-icon-font"));
         lblIconBuscarProd.setGraphic(crearIcono("fa-search", "search-icon-font"));
-
         lblIconEfectivo.setGraphic(crearIcono("fa-money", "payment-icon-font"));
         lblIconTarjeta.setGraphic(crearIcono("fa-credit-card", "payment-icon-font"));
         lblIconTransf.setGraphic(crearIcono("fa-bank", "payment-icon-font"));
-
         lblIconFacturar.setGraphic(crearIcono("fa-print", "btn-facturar-icon-font"));
     }
 
+    private void cargarProductosDesdeBD() {
+        try {
+            List<ProductoConsultaDTO> prodsBD;
+            if ("UIO".equals(sedeActual)) {
+                prodsBD = serviceUIO.productosParaCarrito();
+            } else {
+                prodsBD = serviceGYE.productosParaCarrito();
+            }
+            masterProductos.setAll(prodsBD);
+            tbProductosBuscar.setItems(masterProductos);
+        } catch (Exception e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de Conexión", "No se pudieron cargar los productos del inventario.");
+        }
+    }
+
+    private void buscarClienteEnBD() {
+        String cedulaBuscada = txtCedulaRuc.getText().trim();
+        if (cedulaBuscada.isEmpty()) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Campo Vacío", "Ingrese una cédula o RUC para buscar.");
+            return;
+        }
+
+        try {
+            List<ClienteConsultaDTO> clientes = clientesService.consultarTodosLosClientes();
+            boolean encontrado = false;
+
+            for (ClienteConsultaDTO c : clientes) {
+                if (c.getCedula().equals(cedulaBuscada)) {
+                    txtNombreCliente.setText(c.getNombre());
+                    txtApellidoCliente.setText(c.getApellidos());
+                    encontrado = true;
+                    break;
+                }
+            }
+
+            if (!encontrado) {
+                mostrarAlerta(Alert.AlertType.INFORMATION, "No Encontrado", "El cliente no está registrado en el sistema. Utilice el botón 'Nuevo'.");
+                txtNombreCliente.clear();
+                txtApellidoCliente.clear();
+            }
+        } catch (Exception e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Error", "Problema de red al buscar el cliente.");
+        }
+    }
+
     // ==========================================
-    // CONFIGURACIÓN DE LA TABLA "BUSCAR PRODUCTO"
+    // TABLA "BUSCAR PRODUCTO"
     // ==========================================
     private void configurarTablaBusqueda() {
         colBusqCod.setCellValueFactory(new PropertyValueFactory<>("codigo"));
         colBusqNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colBusqPrecio.setCellValueFactory(data -> new SimpleStringProperty(String.format("$%.2f", data.getValue().getPrecio())));
 
-        // Botón de carrito de compras
-        colBusqAccion.setCellFactory(param -> new TableCell<Producto, Void>() {
+        colBusqAccion.setCellFactory(param -> new TableCell<ProductoConsultaDTO, Void>() {
             private final Button btnAdd = new Button();
             {
                 btnAdd.setGraphic(crearIcono("fa-shopping-cart", "btn-cart-icon"));
                 btnAdd.getStyleClass().add("btn-cart");
                 btnAdd.setOnAction(event -> {
-                    Producto p = getTableView().getItems().get(getIndex());
+                    ProductoConsultaDTO p = getTableView().getItems().get(getIndex());
                     agregarAlDetalle(p);
                 });
             }
@@ -121,28 +228,26 @@ public class facturarProductosController implements Initializable {
     }
 
     // ==========================================
-    // CONFIGURACIÓN DE LA TABLA "DETALLE FACTURA"
+    // TABLA "DETALLE FACTURA"
     // ==========================================
     private void configurarTablaDetalle() {
         tbDetalleFactura.setItems(detallesFactura);
 
         colDetCod.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getProducto().getCodigo()));
 
-        // Celda personalizada para mostrar Nombre y abajo un texto extra (Stock/Cat)
-        colDetDesc.setCellValueFactory(new PropertyValueFactory<>("productoNombre")); // Retorna dummy, se dibuja en CellFactory
-        colDetDesc.setCellFactory(param -> new TableCell<DetalleVenta, String>() {
+        colDetDesc.setCellFactory(param -> new TableCell<ItemCarrito, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || getTableRow().getItem() == null) {
                     setGraphic(null);
                 } else {
-                    DetalleVenta detalle = getTableRow().getItem();
+                    ItemCarrito detalle = getTableRow().getItem();
                     VBox box = new VBox();
                     Label lblNombre = new Label(detalle.getProducto().getNombre());
                     lblNombre.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
 
-                    Label lblSub = new Label("Stock: " + detalle.getProducto().getStock() + " | Cat: " + detalle.getProducto().getCategoria());
+                    Label lblSub = new Label("Cat: " + detalle.getCategoria() + " | Stock: " + detalle.getStockDisponible());
                     lblSub.setStyle("-fx-font-size: 10px; -fx-text-fill: #888;");
 
                     box.getChildren().addAll(lblNombre, lblSub);
@@ -151,30 +256,35 @@ public class facturarProductosController implements Initializable {
             }
         });
 
-        // La magia de la cantidad editable (solo números)
         colDetCant.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue()));
-        colDetCant.setCellFactory(param -> new TableCell<DetalleVenta, DetalleVenta>() {
+        colDetCant.setCellFactory(param -> new TableCell<ItemCarrito, ItemCarrito>() {
             private final TextField txtCant = new TextField();
             {
                 txtCant.getStyleClass().add("table-textfield");
-                // Filtro para aceptar solo números
-                txtCant.setTextFormatter(new TextFormatter<>(change ->
-                        change.getControlNewText().matches("\\d*") ? change : null));
+                txtCant.setTextFormatter(new TextFormatter<>(change -> change.getControlNewText().matches("\\d*") ? change : null));
 
-                // Listener cuando cambia el texto
                 txtCant.textProperty().addListener((obs, oldV, newV) -> {
                     if (getTableRow() != null && getTableRow().getItem() != null) {
-                        DetalleVenta det = getTableRow().getItem();
+                        ItemCarrito det = getTableRow().getItem();
                         int nuevaCant = newV.isEmpty() ? 0 : Integer.parseInt(newV);
-                        det.setCantidad(nuevaCant);
-                        // Refrescar la tabla para actualizar subtotales
+
+                        if (nuevaCant > det.getStockDisponible()) {
+                            mostrarAlerta(Alert.AlertType.WARNING, "Límite Excedido",
+                                    "Solo hay " + det.getStockDisponible() + " unidades disponibles en inventario.");
+
+                            txtCant.setText(oldV);
+                            det.setCantidad(oldV.isEmpty() ? 0 : Integer.parseInt(oldV));
+                        } else {
+                            det.setCantidad(nuevaCant);
+                        }
+
                         tbDetalleFactura.refresh();
                         calcularTotales();
                     }
                 });
             }
             @Override
-            protected void updateItem(DetalleVenta detalle, boolean empty) {
+            protected void updateItem(ItemCarrito detalle, boolean empty) {
                 super.updateItem(detalle, empty);
                 if (empty || detalle == null) {
                     setGraphic(null);
@@ -186,21 +296,15 @@ public class facturarProductosController implements Initializable {
         });
 
         colDetPUnit.setCellValueFactory(data -> new SimpleStringProperty(String.format("$%.2f", data.getValue().getProducto().getPrecio())));
+        colDetSubtotal.setCellValueFactory(data -> new SimpleStringProperty(String.format("$%.2f", data.getValue().getSubtotal())));
 
-        // El subtotal de la fila
-        colDetSubtotal.setCellValueFactory(data -> {
-            double sub = data.getValue().getCantidad() * data.getValue().getProducto().getPrecio();
-            return new SimpleStringProperty(String.format("$%.2f", sub));
-        });
-
-        // Botón Eliminar Fila (Basurero)
-        colDetAcciones.setCellFactory(param -> new TableCell<DetalleVenta, Void>() {
+        colDetAcciones.setCellFactory(param -> new TableCell<ItemCarrito, Void>() {
             private final Button btnDel = new Button();
             {
                 btnDel.setGraphic(crearIcono("fa-trash-o", "btn-delete-icon"));
                 btnDel.getStyleClass().add("btn-transparent");
                 btnDel.setOnAction(event -> {
-                    DetalleVenta det = getTableView().getItems().get(getIndex());
+                    ItemCarrito det = getTableView().getItems().get(getIndex());
                     detallesFactura.remove(det);
                     calcularTotales();
                 });
@@ -213,18 +317,41 @@ public class facturarProductosController implements Initializable {
         });
     }
 
-    private void agregarAlDetalle(Producto p) {
-        // Verifica si ya existe en la factura
-        for (DetalleVenta det : detallesFactura) {
+    private void agregarAlDetalle(ProductoConsultaDTO p) {
+        // 1. Consultar en vivo el InfoProductoDTO utilizando el método correspondiente
+        InfoProductoDTO info;
+        if ("UIO".equals(sedeActual)) {
+            info = serviceUIO.agregarProductoCarrito(p.getCodigo());
+        } else {
+            info = serviceGYE.agregarProductoCarrito(p.getCodigo());
+        }
+
+        int stockActual = Integer.parseInt(info.getStock());
+
+        if (stockActual < 1) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Agotado", "Este producto no tiene stock disponible.");
+            return;
+        }
+
+        // 2. Verificar si ya existe en la factura
+        for (ItemCarrito det : detallesFactura) {
             if (det.getProducto().getCodigo().equals(p.getCodigo())) {
+                if ((det.getCantidad() + 1) > stockActual) {
+                    mostrarAlerta(Alert.AlertType.WARNING, "Stock Insuficiente",
+                            "No puede agregar más. El stock máximo de este producto es " + stockActual);
+                    return;
+                }
+
+                det.setStockDisponible(stockActual);
                 det.setCantidad(det.getCantidad() + 1);
                 tbDetalleFactura.refresh();
                 calcularTotales();
                 return;
             }
         }
-        // Si no existe, lo agrega
-        detallesFactura.add(new DetalleVenta(p, 1));
+
+        // 3. Si no existe, agregarlo al carrito con su stock y categoría reales
+        detallesFactura.add(new ItemCarrito(p, 1, stockActual, info.getCategoria()));
         calcularTotales();
     }
 
@@ -233,8 +360,8 @@ public class facturarProductosController implements Initializable {
             tbProductosBuscar.setItems(masterProductos);
             return;
         }
-        ObservableList<Producto> filtrados = FXCollections.observableArrayList();
-        for (Producto p : masterProductos) {
+        ObservableList<ProductoConsultaDTO> filtrados = FXCollections.observableArrayList();
+        for (ProductoConsultaDTO p : masterProductos) {
             if (p.getNombre().toLowerCase().contains(query.toLowerCase()) ||
                     p.getCodigo().toLowerCase().contains(query.toLowerCase())) {
                 filtrados.add(p);
@@ -244,51 +371,105 @@ public class facturarProductosController implements Initializable {
     }
 
     private void calcularTotales() {
-        double subtotal = 0;
-        for (DetalleVenta d : detallesFactura) {
-            subtotal += d.getCantidad() * d.getProducto().getPrecio();
+        subtotalGlobal = 0;
+        for (ItemCarrito d : detallesFactura) {
+            subtotalGlobal += d.getSubtotal();
         }
-        double valIva = parametrosService.obtenerIVA();
-        int porcIva = (int) Math.round(valIva);
-        if (lblTituloIva != null) {
-            lblTituloIva.setText("IVA (" + porcIva + "%)");
-        }
-        double iva = subtotal * (valIva / 100.0);
-        double total = subtotal + iva;
+        ivaGlobal = subtotalGlobal * 0.15;
+        totalGlobal = subtotalGlobal + ivaGlobal;
 
-        lblSubtotal.setText(String.format("$%.2f", subtotal));
-        lblIva.setText(String.format("$%.2f", iva));
-        lblTotal.setText(String.format("$%.2f", total));
+        lblSubtotal.setText(String.format("$%.2f", subtotalGlobal));
+        lblIva.setText(String.format("$%.2f", ivaGlobal));
+        lblTotal.setText(String.format("$%.2f", totalGlobal));
     }
 
+    // ==========================================
+    // ORQUESTACIÓN: FACTURACIÓN EN EL BACKEND
+    // ==========================================
     @FXML
     void generarFactura(ActionEvent event) {
-        System.out.println("Enviando factura a BD...");
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        cargarIconos();
-        configurarTablaBusqueda();
-        configurarTablaDetalle();
-
-        double valIva = parametrosService.obtenerIVA();
-        int porcIva = (int) Math.round(valIva);
-        if (lblTituloIva != null) {
-            lblTituloIva.setText("IVA (" + porcIva + "%)");
+        if (txtCedulaRuc.getText().trim().isEmpty() || txtNombreCliente.getText().trim().isEmpty()) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Falta Cliente", "Por favor, busque y seleccione un cliente válido.");
+            return;
+        }
+        if (detallesFactura.isEmpty()) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Carrito Vacío", "No puede facturar sin productos en el carrito.");
+            return;
+        }
+        for (ItemCarrito item : detallesFactura) {
+            if (item.getCantidad() <= 0) {
+                mostrarAlerta(Alert.AlertType.WARNING, "Cantidad Inválida", "La cantidad de los productos debe ser mayor a cero.");
+                return;
+            }
         }
 
-        // Búsqueda en tiempo real
-        txtBuscarProducto.textProperty().addListener((obs, oldV, newV) -> {
-            buscarProductoRealTime(newV);
-        });
+        ToggleButton btnPagoSeleccionado = (ToggleButton) tgMetodoPago.getSelectedToggle();
+        String metodoPago = "Efectivo";
+        if (btnPagoSeleccionado == btnTarjeta) {
+            metodoPago = "Tarjeta de Crédito";
+        } else if (btnPagoSeleccionado == btnTransf) {
+            metodoPago = "Transferencia";
+        }
 
-        // Simulación de carga (Esto lo borrarás cuando conectes tu BD)
-        masterProductos.addAll(
-                new Producto("1042", "Balón de Fútbol Profesional FIFA Q Pro", "Nike", "12", 12.00,14.66),
-                new Producto("8891", "Zapatillas Running Pro Elite V2", "Adidas", "5", 12.00,13.66),
-                new Producto("4520", "Camiseta Deportiva Transpirable Azul", "Marathon", "6", 12.00,14.66)
-        );
-        tbProductosBuscar.setItems(masterProductos);
+        try {
+            String numeroFactura;
+            if ("UIO".equals(sedeActual)) {
+                numeroFactura = serviceUIO.obtenerSiguienteNumeroFactura();
+            } else {
+                numeroFactura = serviceGYE.obtenerSiguienteNumeroFactura();
+            }
+
+            NuevaFacturaDTO nuevaFactura = new NuevaFacturaDTO(
+                    numeroFactura,
+                    txtCedulaRuc.getText().trim(),
+                    sedeActual,
+                    LocalDate.now(),
+                    totalGlobal,
+                    metodoPago,
+                    subtotalGlobal,
+                    ivaGlobal
+            );
+
+            List<DetalleFacturaDTOFacturacion> listaDetalles = new ArrayList<>();
+            for (ItemCarrito item : detallesFactura) {
+                listaDetalles.add(new DetalleFacturaDTOFacturacion(
+                        item.getProducto().getCodigo(),
+                        sedeActual,
+                        item.getCantidad(),
+                        item.getProducto().getPrecio(),
+                        item.getSubtotal()
+                ));
+            }
+
+            if ("UIO".equals(sedeActual)) {
+                serviceUIO.facturarProductos(nuevaFactura, listaDetalles);
+            } else {
+                serviceGYE.facturarProductos(nuevaFactura, listaDetalles);
+            }
+
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Factura Registrada", "La factura " + numeroFactura + " ha sido guardada exitosamente y el stock actualizado.");
+            limpiarInterfaz();
+
+        } catch (Exception e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Error en Transacción", e.getMessage());
+        }
+    }
+
+    private void limpiarInterfaz() {
+        txtCedulaRuc.clear();
+        txtNombreCliente.clear();
+        txtApellidoCliente.clear();
+        detallesFactura.clear();
+        calcularTotales();
+        tgMetodoPago.selectToggle(btnEfectivo);
+        cargarProductosDesdeBD();
+    }
+
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }

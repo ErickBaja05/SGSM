@@ -15,6 +15,7 @@ import com.grupo1.sgsm.core.util.ConfigSucursal;
 import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.FacturaContableDTO;
+import com.grupo1.sgsm.ventasYfacturacion.model.FacturaUIOContable;
 
 public class FacturaUIO_ContableDAO {
 
@@ -38,6 +39,36 @@ public class FacturaUIO_ContableDAO {
                 rs.getDouble("IVA"),
                 rs.getString("metodo_pago") != null ? rs.getString("metodo_pago").trim() : ""
         );
+    }
+
+    // ===============================
+    // INSERTAR
+    // ===============================
+    public void insertar(FacturaUIOContable factura) {
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String prefijo = obtenerPrefijoUIO(nodoLocal);
+
+        String sql = String.format("""
+            INSERT INTO %sfacturaUIO_contable (numero_factura, codigo_sucursal, total, metodo_pago, subtotal, IVA)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """, prefijo);
+
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal.toLowerCase());
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, factura.getNumero_factura());
+            ps.setString(2, factura.getCodigo_sucursal());
+            ps.setDouble(3, factura.getTotal());
+            ps.setString(4, factura.getMetodo_pago());
+            ps.setDouble(5, factura.getSubtotal());
+            ps.setDouble(6, factura.getIVA());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al insertar factura contable en UIO", e);
+        }
     }
 
     public List<FacturaContableDTO> consultarTodasFacturasContables() {
@@ -111,12 +142,12 @@ public class FacturaUIO_ContableDAO {
         String nodoLocal = ConfigSucursal.getSucursalActual();
         String prefijo = obtenerPrefijoUIO(nodoLocal);
 
+        // Corregido: Solicitamos exactamente los 5 campos que necesita el DTO sin hacer JOINs innecesarios
         String sql = String.format("""
-            SELECT d.codigo_producto, p.nombre AS descripcion, d.cantidad, d.precio_unitario
+            SELECT d.codigo_producto, d.codigo_sucursal, d.cantidad, d.precio_unitario, d.subtotal_producto
             FROM %sdetalle_facturaUIO d
-            LEFT JOIN %sproducto_info p ON d.codigo_producto = p.codigo_producto
             WHERE d.numero_factura = ?
-            """, prefijo, prefijo);
+            """, prefijo);
 
         List<DetalleFacturaDTO> detalles = new ArrayList<>();
 
@@ -127,11 +158,13 @@ public class FacturaUIO_ContableDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
+                    // Corregido: Instanciamos el DTO con sus 5 parámetros requeridos
                     detalles.add(new DetalleFacturaDTO(
                             rs.getString("codigo_producto").trim(),
-                            rs.getString("descripcion") != null ? rs.getString("descripcion").trim() : "Producto Desconocido",
+                            rs.getString("codigo_sucursal").trim(),
                             rs.getInt("cantidad"),
-                            rs.getDouble("precio_unitario")
+                            rs.getDouble("precio_unitario"),
+                            rs.getDouble("subtotal_producto")
                     ));
                 }
             }
@@ -141,6 +174,34 @@ public class FacturaUIO_ContableDAO {
         }
 
         return detalles;
+    }
+
+    // ===============================
+    // CONSULTAR ÚLTIMO NÚMERO DE FACTURA
+    // ===============================
+    public String consultarUltimoNumeroFactura() {
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String prefijo = obtenerPrefijoUIO(nodoLocal);
+
+        String sql = String.format("""
+            SELECT MAX(numero_factura) AS ultimo_numero
+            FROM %sfacturaUIO_contable
+            """, prefijo);
+
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal.toLowerCase());
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getString("ultimo_numero");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al consultar el último número de factura en UIO", e);
+        }
+
+        return null; // Si no hay facturas aún
     }
 
     // ===============================

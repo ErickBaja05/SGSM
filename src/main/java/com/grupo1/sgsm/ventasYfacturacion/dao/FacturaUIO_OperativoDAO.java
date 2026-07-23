@@ -14,6 +14,7 @@ import com.grupo1.sgsm.core.session.SesionActual;
 import com.grupo1.sgsm.core.util.ConfigSucursal;
 import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.FacturaOperativaDTO;
+import com.grupo1.sgsm.ventasYfacturacion.model.FacturaUIOOperativo;
 
 public class FacturaUIO_OperativoDAO {
 
@@ -45,6 +46,34 @@ public class FacturaUIO_OperativoDAO {
                 rs.getString("cedula_ciudadania") != null ? rs.getString("cedula_ciudadania").trim() : "",
                 clienteNombre
         );
+    }
+
+    // ===============================
+    // INSERTAR
+    // ===============================
+    public void insertar(FacturaUIOOperativo factura) {
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String prefijo = obtenerPrefijoUIO(nodoLocal);
+
+        String sql = String.format("""
+            INSERT INTO %sfacturaUIO_operativo (numero_factura, codigo_sucursal, cedula_ciudadania, fecha_emision)
+            VALUES (?, ?, ?, ?)
+            """, prefijo);
+
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal.toLowerCase());
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, factura.getNumero_factura());
+            ps.setString(2, factura.getCodigo_sucursal());
+            ps.setString(3, factura.getCedula_ciudadania());
+            ps.setDate(4, Date.valueOf(factura.getFecha_emision()));
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al insertar factura operativa en UIO", e);
+        }
     }
 
     public List<FacturaOperativaDTO> consultarTodasFacturasOperativas() {
