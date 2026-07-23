@@ -15,7 +15,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.grupo1.sgsm.inventarioYproductos.dto.ConsultaStockRemotoDTO;
+import com.grupo1.sgsm.inventarioYproductos.service.IStockRemotoService;
+import com.grupo1.sgsm.inventarioYproductos.service.StockRemotoService;
+
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class consultarStockRemotoController implements Initializable {
@@ -27,21 +32,21 @@ public class consultarStockRemotoController implements Initializable {
     @FXML private Button btnRecargar;
 
     // --- Tabla y Columnas ---
-    @FXML private TableView<StockRemoto> tbStock;
-    @FXML private TableColumn<StockRemoto, String> colCodigo;
-    @FXML private TableColumn<StockRemoto, String> colNombre;
-    @FXML private TableColumn<StockRemoto, Integer> colStock;
-    @FXML private TableColumn<StockRemoto, String> colSucursal;
+    @FXML private TableView<ConsultaStockRemotoDTO> tbStock;
+    @FXML private TableColumn<ConsultaStockRemotoDTO, String> colCodigo;
+    @FXML private TableColumn<ConsultaStockRemotoDTO, String> colNombre;
+    @FXML private TableColumn<ConsultaStockRemotoDTO, Integer> colStock;
+    @FXML private TableColumn<ConsultaStockRemotoDTO, String> colSucursal;
 
+    private final IStockRemotoService stockRemotoService = new StockRemotoService();
     // Lista maestra para la búsqueda dinámica
-    private ObservableList<StockRemoto> masterData = FXCollections.observableArrayList();
+    private ObservableList<ConsultaStockRemotoDTO> masterData = FXCollections.observableArrayList();
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
         icon.getStyleClass().add(styleClass);
         return icon;
     }
-    
 
     private void configurarTabla() {
         colCodigo.setCellValueFactory(new PropertyValueFactory<>("codigo"));
@@ -52,7 +57,7 @@ public class consultarStockRemotoController implements Initializable {
         colStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
         // Magia visual: Crear las "píldoras" de stock y pintar de rojo si es bajo
-        colStock.setCellFactory(param -> new TableCell<StockRemoto, Integer>() {
+        colStock.setCellFactory(param -> new TableCell<ConsultaStockRemotoDTO, Integer>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
@@ -89,11 +94,11 @@ public class consultarStockRemotoController implements Initializable {
         }
 
         String lowerCaseFilter = query.toLowerCase();
-        ObservableList<StockRemoto> filteredData = FXCollections.observableArrayList();
+        ObservableList<ConsultaStockRemotoDTO> filteredData = FXCollections.observableArrayList();
 
-        for (StockRemoto p : masterData) {
-            if (p.getCodigo().toLowerCase().contains(lowerCaseFilter) ||
-                    p.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+        for (ConsultaStockRemotoDTO p : masterData) {
+            if ((p.getCodigo() != null && p.getCodigo().toLowerCase().contains(lowerCaseFilter)) ||
+                    (p.getNombre() != null && p.getNombre().toLowerCase().contains(lowerCaseFilter))) {
                 filteredData.add(p);
             }
         }
@@ -102,27 +107,21 @@ public class consultarStockRemotoController implements Initializable {
 
     @FXML
     void recargarDatos(ActionEvent event) {
-        // Aquí lanzarías tu consulta SQL hacia el nodo remoto para traer los datos más frescos
-        System.out.println("Sincronizando con el nodo de la sede Costa (GYE)...");
-
-        // Simulamos un parpadeo de recarga limpiando y volviendo a poner la data
-        tbStock.setItems(FXCollections.observableArrayList());
-
-        // Simular un pequeño delay de red no bloquearía la UI si usas un Task,
-        // pero para efectos visuales directos, volvemos a asignar:
-        tbStock.setItems(masterData);
+        cargarDatosRemotos();
     }
 
-    // --- Clase Auxiliar (Reemplaza con tu modelo real) ---
     private void cargarDatosRemotos() {
-        masterData.clear();
-        masterData.addAll(
-                new StockRemoto("APP-SH-001", "Zapatillas Running Pro X1", 45, "GYE"),
-                new StockRemoto("APP-TS-045", "Camiseta Técnica Entrenamiento", 112, "GYE"),
-                new StockRemoto("EQ-BL-012", "Balón Fútbol Liga Premium", 3, "GYE"), // Este saldrá rojo
-                new StockRemoto("ACC-BT-009", "Botella Agua Acero Inox 750ml", 28, "GYE")
-        );
-        tbStock.setItems(masterData);
+        try {
+            List<ConsultaStockRemotoDTO> datosRemotos = stockRemotoService.consultarStockRemoto();
+            masterData.clear();
+            if (datosRemotos != null) {
+                masterData.addAll(datosRemotos);
+            }
+            tbStock.setItems(masterData);
+        } catch (Exception e) {
+            System.err.println("Error al cargar stock remoto: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -139,23 +138,7 @@ public class consultarStockRemotoController implements Initializable {
             buscarProductoRealTime(newValue);
         });
 
-        // Cargar datos (Simulación del nodo remoto GYE)
+        // Cargar datos reales desde el nodo remoto
         cargarDatosRemotos();
-    }
-
-    // Clase Modelo Interna
-    public static class StockRemoto {
-        private String codigo;
-        private String nombre;
-        private int stock;
-        private String sucursal;
-
-        public StockRemoto(String codigo, String nombre, int stock, String sucursal) {
-            this.codigo = codigo; this.nombre = nombre; this.stock = stock; this.sucursal = sucursal;
-        }
-        public String getCodigo() { return codigo; }
-        public String getNombre() { return nombre; }
-        public int getStock() { return stock; }
-        public String getSucursal() { return sucursal; }
     }
 }
