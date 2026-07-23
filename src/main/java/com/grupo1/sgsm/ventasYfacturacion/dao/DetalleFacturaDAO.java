@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.grupo1.sgsm.ventasYfacturacion.model.DetalleFactura;
 import com.grupo1.sgsm.ventasYfacturacion.dto.FacturaCompletaDTO;
+import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
 import com.grupo1.sgsm.core.database.DatabaseConnection;
 import com.grupo1.sgsm.core.database.NetworkChecker;
 import com.grupo1.sgsm.core.util.ConfigSucursal;
@@ -150,8 +151,59 @@ public class DetalleFacturaDAO {
     }
 
     // ===============================
+    // CONSULTA DE DETALLES CON PRODUCTO (DTO)
+    // ===============================
+    public List<DetalleFacturaDTO> consultarDetallesPorNumeroFactura(String numeroFactura) {
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String tablaDetalle = obtenerTablaOVistaLocal(nodoLocal);
+        String tablaProducto = obtenerTablaProductoInfo(nodoLocal);
+
+        String sql = String.format("""
+            SELECT d.codigo_producto, p.nombre AS descripcion, d.cantidad, d.precio_unitario
+            FROM %s d
+            LEFT JOIN %s p ON d.codigo_producto = p.codigo_producto
+            WHERE d.numero_factura = ?
+            """, tablaDetalle, tablaProducto);
+
+        List<DetalleFacturaDTO> detalles = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, numeroFactura);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    detalles.add(new DetalleFacturaDTO(
+                            rs.getString("codigo_producto") != null ? rs.getString("codigo_producto").trim() : "",
+                            rs.getString("descripcion") != null ? rs.getString("descripcion").trim() : "Producto Desconocido",
+                            rs.getInt("cantidad"),
+                            rs.getDouble("precio_unitario")
+                    ));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al consultar detalles de la factura GYE", e);
+        }
+
+        return detalles;
+    }
+
+    // ===============================
     // MÉTODOS AUXILIARES DE ENRUTAMIENTO
     // ===============================
+    private String obtenerTablaProductoInfo(String nodoLocal) {
+        if ("UIO".equalsIgnoreCase(nodoLocal)) {
+            return "UIO.dbo.producto_info";
+        } else if ("GYE".equalsIgnoreCase(nodoLocal)) {
+            if (verificarConectividad()) {
+                return "[26.194.51.93].UIO.dbo.producto_info";
+            }
+            return "GYE.dbo.producto_info";
+        }
+        return nodoLocal.toUpperCase() + ".dbo.producto_info";
+    }
+
     private String obtenerTablaOVistaLocal(String nodoLocal) {
         if (verificarConectividad()) {
             return nodoLocal.toUpperCase() + ".dbo.V_detalleFactura";

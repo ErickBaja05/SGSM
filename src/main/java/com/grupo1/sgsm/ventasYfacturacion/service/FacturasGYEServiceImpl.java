@@ -92,4 +92,12 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
     public List<ProductoConsultaDTO> productosParaCarrito() {
         return productoService.obtenerProductosConStockDisponible();
     }
+
+    @Override
+    public List<DetalleFacturaDTO> obtenerDetallesFactura(String numeroFactura) {
+        if (numeroFactura == null || numeroFactura.trim().isEmpty()) {
+            throw new IllegalArgumentException("El número de factura no puede ser nulo o vacío");
+        }
+        return detalleFacturaDAO.consultarDetallesPorNumeroFactura(numeroFactura.trim());
+    }
 }
