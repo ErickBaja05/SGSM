@@ -1,5 +1,11 @@
 package com.grupo1.sgsm.administracion.gestionUsuarios.controller;
 
+import com.grupo1.sgsm.administracion.gestionParametros.exception.CorreoNoValidoException;
+import com.grupo1.sgsm.administracion.gestionUsuarios.dto.NuevoUsuarioDTO;
+import com.grupo1.sgsm.administracion.gestionUsuarios.exception.PasswordInseguroException;
+import com.grupo1.sgsm.administracion.gestionUsuarios.exception.UsuarioYaRegistradoException;
+import com.grupo1.sgsm.administracion.gestionUsuarios.service.IUsuarioService;
+import com.grupo1.sgsm.administracion.gestionUsuarios.service.UsuarioServiceImpl;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -46,6 +52,8 @@ public class crearUsuarioController implements Initializable {
     @FXML private Label mensajeConfirmacion;
     @FXML private Button btnGuardar;
     @FXML private Button btnCancelar;
+
+    private IUsuarioService usuarioService;
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
@@ -105,26 +113,33 @@ public class crearUsuarioController implements Initializable {
         // Validaciones básicas
         if (txtUsuario.getText().isEmpty() || txtPassword.getText().isEmpty() || txtEmail.getText().isEmpty() || cmbRol.getValue() == null) {
             mensajeConfirmacion.setText("Por favor, complete todos los campos obligatorios.");
-            mensajeConfirmacion.getStyleClass().add("mensaje-error");
+            mensajeConfirmacion.getStyleClass().addAll("mensaje-error");
             return;
         }
 
         if (!txtPassword.getText().equals(txtConfirmPassword.getText())) {
             mensajeConfirmacion.setText("Las contraseñas no coinciden. Verifíquelas e intente de nuevo.");
-            mensajeConfirmacion.getStyleClass().add("mensaje-error");
+            mensajeConfirmacion.getStyleClass().addAll("mensaje-error");
             return;
         }
 
-        System.out.println("Creando usuario: " + txtUsuario.getText() + " con rol: " + cmbRol.getValue());
 
-        mensajeConfirmacion.setText("Usuario creado exitosamente.");
-        mensajeConfirmacion.getStyleClass().add("mensaje-exito");
+        NuevoUsuarioDTO nuevoUsuario = new NuevoUsuarioDTO(txtUsuario.getText(),cmbRol.getValue(),txtPassword.getText(),cmbSucursal.getValue(),txtEmail.getText());
+
+        try{
+            usuarioService.crearUsuario(nuevoUsuario);
+            mensajeConfirmacion.setText("Usuario creado exitosamente.");
+            mensajeConfirmacion.getStyleClass().addAll("mensaje-exito");
+        }catch (UsuarioYaRegistradoException | PasswordInseguroException | CorreoNoValidoException e){
+            mensajeConfirmacion.setText(e.getMessage());
+            mensajeConfirmacion.getStyleClass().addAll("mensaje-error");
+        }
+
     }
 
     @FXML
     void cancelarOperacion(ActionEvent event) {
-        System.out.println("Operación de creación cancelada.");
-        // Lógica para retroceder de ventana o limpiar form
+
         txtUsuario.clear();
         txtPassword.clear();
         txtConfirmPassword.clear();
@@ -139,7 +154,7 @@ public class crearUsuarioController implements Initializable {
         cargarIconos();
 
         // Cargar combos (puedes adaptarlo para que venga de BD)
-        cmbRol.setItems(FXCollections.observableArrayList("ADMINISTRADOR", "AUDITOR", "CAJERO"));
+        cmbRol.setItems(FXCollections.observableArrayList("ADMINISTRADOR", "AUDITOR", "CAJERO", "MARKETING"));
         cmbSucursal.setItems(FXCollections.observableArrayList("UIO", "GYE"));
 
         // Binding bidireccional para el "ojito" de la contraseña
@@ -150,5 +165,8 @@ public class crearUsuarioController implements Initializable {
         // Configurar efecto Focus nativo
         configurarEfectoFocus(txtPassword, boxPass);
         configurarEfectoFocus(txtPasswordVisible, boxPass);
+
+        usuarioService = new UsuarioServiceImpl();
+        mensajeConfirmacion.setWrapText(true);
     }
 }

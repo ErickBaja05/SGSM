@@ -22,6 +22,8 @@ module com.grupo1.sgsm {
     opens com.grupo1.sgsm.administracion.dashboard to javafx.fxml, javafx.base;
 
     opens com.grupo1.sgsm.administracion.gestionUsuarios.dto to javafx.base;
+    opens com.grupo1.sgsm.administracion.gestionParametros.dto to javafx.base;
+//    opens com.grupo1.sgsm.ventasYfacturacion.dto to javafx.base;
     opens com.grupo1.sgsm.clientes.dto to javafx.base;
     opens com.grupo1.sgsm.inventarioYproductos.dto to javafx.base;
     opens com.grupo1.sgsm.inventarioYproductos.model to javafx.base;

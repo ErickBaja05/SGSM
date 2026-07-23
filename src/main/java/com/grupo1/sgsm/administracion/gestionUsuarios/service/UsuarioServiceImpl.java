@@ -1,8 +1,16 @@
 package com.grupo1.sgsm.administracion.gestionUsuarios.service;
 
+import com.grupo1.sgsm.administracion.gestionParametros.exception.CorreoNoValidoException;
 import com.grupo1.sgsm.administracion.gestionUsuarios.dao.UsuarioDAO;
+import com.grupo1.sgsm.administracion.gestionUsuarios.dto.NuevoUsuarioDTO;
+import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioConsultadoDTO;
 import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
+import com.grupo1.sgsm.administracion.gestionUsuarios.exception.PasswordInseguroException;
+import com.grupo1.sgsm.administracion.gestionUsuarios.exception.UsuarioYaRegistradoException;
 import com.grupo1.sgsm.administracion.gestionUsuarios.model.Usuario;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UsuarioServiceImpl implements IUsuarioService{
 
@@ -36,5 +44,64 @@ public class UsuarioServiceImpl implements IUsuarioService{
                 usuario.getCodigo_sucursal()
         );
     }
+
+    @Override
+    public void crearUsuario(NuevoUsuarioDTO nuevoUsuario) {
+
+        if(usuarioDAO.consultarPorCorreo(nuevoUsuario.getCorreo())!=null){
+            throw new UsuarioYaRegistradoException("Ya existe un Usuario con el correo electronico proporcionado");
+        }
+
+        if(!nuevoUsuario.getPassword().matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,}$\n")){
+            throw new PasswordInseguroException("La contraseña debe tener al menos una letra mayúscula, una minúscula, un símbolo especial y mínimo 8 caracteres");
+        }
+
+        if(!nuevoUsuario.getCorreo().matches("^[\\w\\.-]+@[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}$\n")){
+            throw new CorreoNoValidoException("El correo no tiene formato válido");
+        }
+
+        Usuario usuario = new Usuario();
+        usuario.setNombre(nuevoUsuario.getNombreUsuario());
+        usuario.setRol(nuevoUsuario.getRolUsuario());
+        usuario.setCodigo_sucursal(nuevoUsuario.getCodigo_sucursal());
+        usuario.setCorreo(nuevoUsuario.getCorreo());
+        usuario.setPassword(nuevoUsuario.getPassword());
+        usuarioDAO.insertar(usuario);
+    }
+
+    @Override
+    public List<UsuarioConsultadoDTO> consultarUsuarios() {
+        List<Usuario> usuarios = usuarioDAO.consultarTodos();
+        List<UsuarioConsultadoDTO> usuariosConsultadoDTO = new ArrayList<>();
+        for (Usuario usuario : usuarios) {
+            usuariosConsultadoDTO.add(new UsuarioConsultadoDTO(String.valueOf(usuario.getIdUsuario()),usuario.getNombre(),usuario.getRol(),usuario.getCorreo()));
+        }
+
+        return usuariosConsultadoDTO;
+    }
+
+    @Override
+    public void actualizarNombreUsuario(Integer idUsuario, String nombreUsuario) {
+        usuarioDAO.actualizarNombreUsuarioPorId(idUsuario,nombreUsuario);
+    }
+
+    @Override
+    public void actualizarRolUsuario(Integer idUsuario, String rolUsuario) {
+        usuarioDAO.actualizarRolUsuarioPorId(idUsuario,rolUsuario);
+    }
+
+    @Override
+    public void actualizarCorreoUsuario(Integer idUsuario, String correo) {
+        if(usuarioDAO.consultarPorCorreo(correo)!=null){
+            throw new UsuarioYaRegistradoException("Ya existe un Usuario con el correo proporcionado");
+        }
+        usuarioDAO.actualizarCorreoUsuarioPorId(idUsuario,correo);
+    }
+
+    @Override
+    public void eliminarUsuario(Integer idUsuario) {
+        usuarioDAO.eliminarPorId(idUsuario);
+    }
+
 
 }
