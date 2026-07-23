@@ -101,7 +101,7 @@
                                         <!-- Fila de IVA -->
                                         <HBox alignment="CENTER_LEFT">
                                             <children>
-                                                <Label styleClass="resumen-label" text="IVA (15%)" />
+                                                <Label fx:id="lblTituloIva" styleClass="resumen-label" text="IVA (15%)" />
                                                 <Region HBox.hgrow="ALWAYS" />
                                                 <Label fx:id="lblIva" styleClass="resumen-value" text="\$0.00" />
                                             </children>

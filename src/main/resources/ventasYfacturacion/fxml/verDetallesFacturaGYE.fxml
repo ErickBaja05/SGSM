@@ -125,7 +125,7 @@
 
                                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                                             <children>
-                                                <Label style="-fx-font-size: 13px; -fx-text-fill: #888888; -fx-font-weight: bold;" text="IVA (12%)" />
+                                                <Label fx:id="lblTituloIva" style="-fx-font-size: 13px; -fx-text-fill: #888888; -fx-font-weight: bold;" text="IVA (12%)" />
                                                 <!-- Badge de IMPUESTO -->
                                                 <Label style="-fx-background-color: #E0F2F1; -fx-text-fill: #00796B; -fx-font-size: 9px; -fx-font-weight: bold; -fx-padding: 2 6; -fx-background-radius: 4;" text="IMPUESTO" />
                                                 <Region HBox.hgrow="ALWAYS" />

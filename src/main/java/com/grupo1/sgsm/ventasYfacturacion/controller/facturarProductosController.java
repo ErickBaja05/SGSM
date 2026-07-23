@@ -26,7 +26,12 @@ import java.util.ResourceBundle;
 
 
 
+import com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService;
+import com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl;
+
 public class facturarProductosController implements Initializable {
+
+    private IParametrosService parametrosService = new ParametrosServiceImpl();
 
     // --- SECCIÓN CLIENTE ---
     @FXML private TextField txtCedulaRuc;
@@ -35,6 +40,7 @@ public class facturarProductosController implements Initializable {
 
     // --- SECCIÓN RESUMEN ---
     @FXML private Label lblSubtotal;
+    @FXML private Label lblTituloIva;
     @FXML private Label lblIva;
     @FXML private Label lblTotal;
 
@@ -242,7 +248,12 @@ public class facturarProductosController implements Initializable {
         for (DetalleVenta d : detallesFactura) {
             subtotal += d.getCantidad() * d.getProducto().getPrecio();
         }
-        double iva = subtotal * 0.15;
+        double valIva = parametrosService.obtenerIVA();
+        int porcIva = (int) Math.round(valIva);
+        if (lblTituloIva != null) {
+            lblTituloIva.setText("IVA (" + porcIva + "%)");
+        }
+        double iva = subtotal * (valIva / 100.0);
         double total = subtotal + iva;
 
         lblSubtotal.setText(String.format("$%.2f", subtotal));
@@ -260,6 +271,12 @@ public class facturarProductosController implements Initializable {
         cargarIconos();
         configurarTablaBusqueda();
         configurarTablaDetalle();
+
+        double valIva = parametrosService.obtenerIVA();
+        int porcIva = (int) Math.round(valIva);
+        if (lblTituloIva != null) {
+            lblTituloIva.setText("IVA (" + porcIva + "%)");
+        }
 
         // Búsqueda en tiempo real
         txtBuscarProducto.textProperty().addListener((obs, oldV, newV) -> {

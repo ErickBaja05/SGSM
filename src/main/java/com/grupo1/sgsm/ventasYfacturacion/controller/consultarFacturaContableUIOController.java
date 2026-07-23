@@ -17,6 +17,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService;
+import com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl;
 import com.grupo1.sgsm.ventasYfacturacion.dto.FacturaContableDTO;
 import com.grupo1.sgsm.ventasYfacturacion.service.IFacturacionService;
 import com.grupo1.sgsm.ventasYfacturacion.service.FacturacionService;
@@ -53,6 +55,7 @@ public class consultarFacturaContableUIOController implements Initializable {
 
     // --- Estado ---
     private final IFacturacionService facturacionService = new FacturacionService();
+    private final IParametrosService parametrosService = new ParametrosServiceImpl();
     private final ObservableList<FacturaContableDTO> listaFacturas = FXCollections.observableArrayList();
     private FacturaContableDTO facturaSeleccionada;
 
@@ -158,6 +161,12 @@ public class consultarFacturaContableUIOController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         cargarIconos();
         configurarTabla();
+
+        double valIva = parametrosService.obtenerIVA();
+        int porcIva = (int) Math.round(valIva);
+        if (colIva != null) {
+            colIva.setText("IVA (" + porcIva + "%)");
+        }
 
         // Listener para habilitar/deshabilitar el botón de "Ver Información"
         tbFacturas.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {

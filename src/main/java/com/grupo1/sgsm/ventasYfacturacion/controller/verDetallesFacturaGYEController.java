@@ -12,7 +12,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService;
+import com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl;
+
 public class verDetallesFacturaGYEController {
+
+    private IParametrosService parametrosService = new ParametrosServiceImpl();
 
     // --- Iconos ---
     @FXML private Label lblIconSede;
@@ -35,6 +40,7 @@ public class verDetallesFacturaGYEController {
 
     // --- Totales ---
     @FXML private Label lblSubtotalNeto;
+    @FXML private Label lblTituloIva;
     @FXML private Label lblIva;
     @FXML private Label lblTotalFacturado;
 
@@ -136,7 +142,12 @@ public class verDetallesFacturaGYEController {
         for (DetalleProducto d : listaDetalles) {
             subtotal += d.getCantidad() * d.getPrecioUnitario();
         }
-        double iva = subtotal * 0.12; // En el mockup dice IVA (12%)
+        double valIva = parametrosService.obtenerIVA();
+        int porcIva = (int) Math.round(valIva);
+        if (lblTituloIva != null) {
+            lblTituloIva.setText("IVA (" + porcIva + "%)");
+        }
+        double iva = subtotal * (valIva / 100.0);
         double total = subtotal + iva;
 
         lblSubtotalNeto.setText(String.format("$ %.2f", subtotal));
