@@ -122,11 +122,17 @@ public class mainWindowController implements Initializable {
         cargarVista("/inventarioYproductos/fxml/productoMarketing.fxml");
     }
     @FXML void abrirRegistrarClientes(ActionEvent event) {
-        if(verificarConectividad()){
+        if(ConfigSucursal.getSucursalActual().equalsIgnoreCase("UIO")){
             cargarVista("/clientes/fxml/registrarClientes.fxml");
-            return;
+        }else{
+            if(verificarConectividad()){
+                cargarVista("/clientes/fxml/registrarClientes.fxml");
+                return;
+            }
+            cargarVista("/administracion/fxml/errorConexion.fxml");
         }
-        cargarVista("/administracion/fxml/errorConexion.fxml");
+
+
     }
     @FXML void abrirRegistrarSucursal(ActionEvent event) {
         cargarVista("/administracion/fxml/registrarSucursal.fxml");
