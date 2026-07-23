@@ -17,12 +17,7 @@ import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.service.IFacturacionService;
 import com.grupo1.sgsm.ventasYfacturacion.service.FacturacionService;
 
-import com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService;
-import com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl;
-
 public class verDetallesFacturaUIOContableController {
-
-    private IParametrosService parametrosService = new ParametrosServiceImpl();
 
     // --- Iconos ---
     @FXML private Label lblIconSede;
@@ -87,10 +82,17 @@ public class verDetallesFacturaUIOContableController {
 
     @FXML
     void volverAlListado(ActionEvent event) {
-        System.out.println("Regresando a la lista de facturas contables de UIO...");
+        System.out.println("Regresando a la lista de facturas de UIO...");
         try {
             javafx.scene.layout.Pane contenedorPrincipal = (javafx.scene.layout.Pane) ((Node) event.getSource()).getScene().lookup("#contenedorPrincipal");
-            Parent root = javafx.fxml.FXMLLoader.load(getClass().getResource("/ventasYfacturacion/fxml/consultarFacturaContableUIO.fxml"));
+            String vista = "/ventasYfacturacion/fxml/consultarFacturaContableUIO.fxml";
+            if (com.grupo1.sgsm.core.session.SesionActual.getUsuario() != null) {
+                String rol = com.grupo1.sgsm.core.session.SesionActual.getUsuario().getRol();
+                if ("CAJERO".equalsIgnoreCase(rol) || "ADMINISTRACION".equalsIgnoreCase(rol)) {
+                    vista = "/ventasYfacturacion/fxml/consultarFacturasUIOOperativo.fxml";
+                }
+            }
+            Parent root = javafx.fxml.FXMLLoader.load(getClass().getResource(vista));
             contenedorPrincipal.getChildren().clear();
             contenedorPrincipal.getChildren().add(root);
         } catch (Exception e) {
@@ -101,11 +103,17 @@ public class verDetallesFacturaUIOContableController {
     /**
      * MÉTODO CLAVE: Se llama desde consultarFacturaContableUIOController
      */
+    private com.grupo1.sgsm.ventasYfacturacion.dto.FacturaContableDTO facturaGuardada;
+
+    /**
+     * MÉTODO CLAVE: Se llama desde consultarFacturaContableUIOController
+     */
     public void cargarFacturaContable(String numeroFactura, String sucursal) {
         txtNumFactura.setText(numeroFactura);
         txtSucursal.setText(sucursal);
 
         try {
+            facturaGuardada = facturacionService.obtenerFacturaContablePorNumero(numeroFactura);
             listaDetalles.setAll(facturacionService.obtenerDetallesFactura(numeroFactura));
             tbDetalle.setItems(listaDetalles);
             calcularTotales();
@@ -119,16 +127,29 @@ public class verDetallesFacturaUIOContableController {
         for (DetalleFacturaDTO d : listaDetalles) {
             subtotal += d.getCantidad() * d.getPrecioUnitario();
         }
-        double valIva = parametrosService.obtenerIVA();
+
+        double valIva;
+        double ivaMonto;
+
+        if (facturaGuardada != null && facturaGuardada.getSubtotal() > 0 && facturaGuardada.getIva() > 0) {
+            ivaMonto = facturaGuardada.getIva();
+            valIva = (ivaMonto / facturaGuardada.getSubtotal()) * 100.0;
+        } else if (subtotal > 0) {
+            valIva = facturacionService.obtenerIVA();
+            ivaMonto = subtotal * (valIva / 100.0);
+        } else {
+            valIva = facturacionService.obtenerIVA();
+            ivaMonto = 0;
+        }
+
         int porcIva = (int) Math.round(valIva);
         if (lblTituloIva != null) {
             lblTituloIva.setText("IVA (" + porcIva + "%)");
         }
-        double iva = subtotal * (valIva / 100.0);
-        double total = subtotal + iva;
+        double total = subtotal + ivaMonto;
 
         lblSubtotalNeto.setText(String.format("$ %.2f", subtotal));
-        lblIva.setText(String.format("$ %.2f", iva));
+        lblIva.setText(String.format("$ %.2f", ivaMonto));
         lblTotalFacturado.setText(String.format("$ %.2f", total));
     }
 }

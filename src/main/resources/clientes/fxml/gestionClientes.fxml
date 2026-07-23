@@ -79,10 +79,10 @@
 
                             <children>
                                 <Label styleClass="input-label" text="Nombres" />
-                                <TextField fx:id="txtEditNombres" styleClass="form-field-standalone" GridPane.rowIndex="1" />
+                                <TextField fx:id="txtEditNombres" editable="false" disable="true" styleClass="form-field-standalone" GridPane.rowIndex="1" />
 
                                 <Label styleClass="input-label" text="Apellidos" GridPane.columnIndex="1" />
-                                <TextField fx:id="txtEditApellidos" styleClass="form-field-standalone" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <TextField fx:id="txtEditApellidos" editable="false" disable="true" styleClass="form-field-standalone" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
                                 <Label styleClass="input-label" text="Correo Electrónico" GridPane.columnIndex="2" />
                                 <TextField fx:id="txtEditCorreo" styleClass="form-field-standalone" GridPane.columnIndex="2" GridPane.rowIndex="1" />

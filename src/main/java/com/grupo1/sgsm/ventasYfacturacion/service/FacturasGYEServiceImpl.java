@@ -30,6 +30,13 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
     // Services importados de otros módulos
     private IProductoService productoService = new ProductoService();
     private IStockLocalService stockLocalService = new StockLocalService();
+    private com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService parametrosService =
+            new com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl();
+
+    @Override
+    public double obtenerIVA() {
+        return parametrosService.obtenerIVA();
+    }
 
     @Override
     public List<FacturaGYEConsultadaDTO> consultarFacturas(LocalDate fechaInicio, LocalDate fechaFin) {

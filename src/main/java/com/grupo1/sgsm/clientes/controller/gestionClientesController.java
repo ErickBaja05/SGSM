@@ -219,6 +219,12 @@ public class gestionClientesController implements Initializable {
         lblBtnEliminarIcon.setGraphic(crearIcono("fa-trash-o", "btn-danger-icon-font"));
         lblBtnGuardarIcon.setGraphic(crearIcono("fa-save", "btn-primary-icon-font"));
 
+        // Campos de nombres y apellidos como solo lectura
+        txtEditNombres.setEditable(false);
+        txtEditNombres.setDisable(true);
+        txtEditApellidos.setEditable(false);
+        txtEditApellidos.setDisable(true);
+
         // Propiedades adaptadas a los getters de ClienteConsultaDTO
         colCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         colNombres.setCellValueFactory(new PropertyValueFactory<>("nombre")); // Es getNombre() en el DTO

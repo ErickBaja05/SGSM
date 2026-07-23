@@ -5,7 +5,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -80,8 +83,20 @@ public class consultarFacturasUIOOperativoController implements Initializable {
     void verInformacionCompleta(ActionEvent event) {
         if (facturaActualSeleccionada != null) {
             System.out.println("Abriendo información completa de la factura operativa: " + facturaActualSeleccionada.getNumeroFactura());
-            // Nota: En la versión operativa no hay una vista de detalles específica implementada en FXML,
-            // pero si se requiriera, se cargaría aquí.
+            try {
+                javafx.scene.layout.Pane contenedorPrincipal = (javafx.scene.layout.Pane) ((Node) event.getSource()).getScene().lookup("#contenedorPrincipal");
+
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/ventasYfacturacion/fxml/verDetallesFacturaUIOContable.fxml"));
+                Parent root = loader.load();
+
+                verDetallesFacturaUIOContableController controller = loader.getController();
+                controller.cargarFacturaContable(facturaActualSeleccionada.getNumeroFactura(), "QUITO");
+
+                contenedorPrincipal.getChildren().clear();
+                contenedorPrincipal.getChildren().add(root);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

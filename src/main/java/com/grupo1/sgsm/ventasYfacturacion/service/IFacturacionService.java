@@ -11,4 +11,6 @@ public interface IFacturacionService {
     List<FacturaOperativaDTO> obtenerFacturasOperativas(LocalDate inicio, LocalDate fin);
     List<FacturaContableDTO> obtenerFacturasContables(LocalDate inicio, LocalDate fin);
     List<DetalleFacturaDTO> obtenerDetallesFactura(String numeroFactura);
+    FacturaContableDTO obtenerFacturaContablePorNumero(String numeroFactura);
+    double obtenerIVA();
 }

@@ -35,7 +35,7 @@
                                             <children>
                                                 <Label styleClass="header-title" text="Cliente" />
                                                 <Region HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="btnNuevoCliente" mnemonicParsing="false" styleClass="btn-primary-small">
+                                                <Button fx:id="btnNuevoCliente" mnemonicParsing="false" onAction="#irARegistrarCliente" styleClass="btn-primary-small">
                                                     <graphic>
                                                         <HBox alignment="CENTER" spacing="5.0">
                                                             <Label fx:id="lblIconNuevoCliente" styleClass="btn-primary-icon-font" />

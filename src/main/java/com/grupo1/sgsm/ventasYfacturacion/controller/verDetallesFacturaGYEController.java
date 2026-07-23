@@ -21,7 +21,6 @@ import com.grupo1.sgsm.ventasYfacturacion.service.FacturasGYEServiceImpl;
 
 public class verDetallesFacturaGYEController {
 
-    private IParametrosService parametrosService = new ParametrosServiceImpl();
     private IFacturasGYEService facturasGYEService = new FacturasGYEServiceImpl();
 
     // --- Iconos ---
@@ -98,6 +97,9 @@ public class verDetallesFacturaGYEController {
         }
     }
 
+    private com.grupo1.sgsm.ventasYfacturacion.dao.FacturaGyeDAO facturaGyeDAO = new com.grupo1.sgsm.ventasYfacturacion.dao.FacturaGyeDAO();
+    private com.grupo1.sgsm.ventasYfacturacion.model.FacturaGYE facturaGYEGuardada;
+
     public void cargarFactura(String numeroFactura, String cedula, String cliente, String fecha) {
         txtNumFactura.setText(numeroFactura);
         txtCedula.setText(cedula != null ? cedula : "");
@@ -106,6 +108,7 @@ public class verDetallesFacturaGYEController {
         txtSucursal.setText("GUAYAQUIL");
 
         try {
+            facturaGYEGuardada = facturaGyeDAO.consultarPorNumero(numeroFactura);
             listaDetalles.setAll(facturasGYEService.obtenerDetallesFactura(numeroFactura));
             tbDetalle.setItems(listaDetalles);
             calcularTotales();
@@ -119,16 +122,29 @@ public class verDetallesFacturaGYEController {
         for (DetalleFacturaDTO d : listaDetalles) {
             subtotal += d.getCantidad() * d.getPrecioUnitario();
         }
-        double valIva = parametrosService.obtenerIVA();
+
+        double valIva;
+        double ivaMonto;
+
+        if (facturaGYEGuardada != null && facturaGYEGuardada.getSubtotal() > 0 && facturaGYEGuardada.getIVA() > 0) {
+            ivaMonto = facturaGYEGuardada.getIVA();
+            valIva = (ivaMonto / facturaGYEGuardada.getSubtotal()) * 100.0;
+        } else if (subtotal > 0) {
+            valIva = facturasGYEService.obtenerIVA();
+            ivaMonto = subtotal * (valIva / 100.0);
+        } else {
+            valIva = facturasGYEService.obtenerIVA();
+            ivaMonto = 0;
+        }
+
         int porcIva = (int) Math.round(valIva);
         if (lblTituloIva != null) {
             lblTituloIva.setText("IVA (" + porcIva + "%)");
         }
-        double iva = subtotal * (valIva / 100.0);
-        double total = subtotal + iva;
+        double total = subtotal + ivaMonto;
 
         lblSubtotalNeto.setText(String.format("$ %.2f", subtotal));
-        lblIva.setText(String.format("$ %.2f", iva));
+        lblIva.setText(String.format("$ %.2f", ivaMonto));
         lblTotalFacturado.setText(String.format("$ %.2f", total));
     }
 }

@@ -12,4 +12,5 @@ public interface IFacturarProductosUIO {
     InfoProductoDTO agregarProductoCarrito(String codigoProducto);
     List<ProductoConsultaDTO> productosParaCarrito();
     String obtenerSiguienteNumeroFactura();
+    double obtenerIVA();
 }

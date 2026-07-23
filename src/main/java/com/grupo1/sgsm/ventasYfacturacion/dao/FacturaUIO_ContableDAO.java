@@ -141,13 +141,14 @@ public class FacturaUIO_ContableDAO {
         validarSesion();
         String nodoLocal = ConfigSucursal.getSucursalActual();
         String prefijo = obtenerPrefijoUIO(nodoLocal);
+        String tablaProducto = nodoLocal.equalsIgnoreCase("UIO") ? "UIO.dbo.producto_info" : "[26.194.51.93].UIO.dbo.producto_info";
 
-        // Corregido: Solicitamos exactamente los 5 campos que necesita el DTO sin hacer JOINs innecesarios
         String sql = String.format("""
-            SELECT d.codigo_producto, d.codigo_sucursal, d.cantidad, d.precio_unitario, d.subtotal_producto
+            SELECT d.codigo_producto, p.nombre AS descripcion, d.codigo_sucursal, d.cantidad, d.precio_unitario, d.subtotal_producto
             FROM %sdetalle_facturaUIO d
+            LEFT JOIN %s p ON d.codigo_producto = p.codigo_producto
             WHERE d.numero_factura = ?
-            """, prefijo);
+            """, prefijo, tablaProducto);
 
         List<DetalleFacturaDTO> detalles = new ArrayList<>();
 
@@ -158,10 +159,10 @@ public class FacturaUIO_ContableDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    // Corregido: Instanciamos el DTO con sus 5 parámetros requeridos
                     detalles.add(new DetalleFacturaDTO(
-                            rs.getString("codigo_producto").trim(),
-                            rs.getString("codigo_sucursal").trim(),
+                            rs.getString("codigo_producto") != null ? rs.getString("codigo_producto").trim() : "",
+                            rs.getString("descripcion") != null ? rs.getString("descripcion").trim() : "Producto Desconocido",
+                            rs.getString("codigo_sucursal") != null ? rs.getString("codigo_sucursal").trim() : "UIO",
                             rs.getInt("cantidad"),
                             rs.getDouble("precio_unitario"),
                             rs.getDouble("subtotal_producto")
@@ -174,6 +175,34 @@ public class FacturaUIO_ContableDAO {
         }
 
         return detalles;
+    }
+
+    public FacturaContableDTO consultarPorNumero(String numeroFactura) {
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String prefijo = obtenerPrefijoUIO(nodoLocal);
+
+        String sql = String.format("""
+            SELECT c.numero_factura, c.codigo_sucursal, c.subtotal, c.IVA, c.total, c.metodo_pago
+            FROM %sfacturaUIO_contable c
+            WHERE c.numero_factura = ?
+            """, prefijo);
+
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal.toLowerCase());
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, numeroFactura);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearFacturaContable(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al consultar factura contable UIO por número", e);
+        }
+
+        return null;
     }
 
     // ===============================

@@ -37,9 +37,11 @@ public class facturarProductosController implements Initializable {
     @FXML private TextField txtNombreCliente;
     @FXML private TextField txtApellidoCliente;
     @FXML private Button btnBuscarCliente;
+    @FXML private Button btnNuevoCliente;
 
     // --- SECCIÓN RESUMEN ---
     @FXML private Label lblSubtotal;
+    @FXML private Label lblTituloIva;
     @FXML private Label lblIva;
     @FXML private Label lblTotal;
 
@@ -144,6 +146,8 @@ public class facturarProductosController implements Initializable {
         // Listeners de búsqueda
         txtBuscarProducto.textProperty().addListener((obs, oldV, newV) -> buscarProductoRealTime(newV));
         btnBuscarCliente.setOnAction(e -> buscarClienteEnBD());
+
+        calcularTotales();
     }
 
     private void cargarIconos() {
@@ -198,6 +202,25 @@ public class facturarProductosController implements Initializable {
             }
         } catch (Exception e) {
             mostrarAlerta(Alert.AlertType.ERROR, "Error", "Problema de red al buscar el cliente.");
+        }
+    }
+
+    @FXML
+    void irARegistrarCliente(ActionEvent event) {
+        try {
+            if (!com.grupo1.sgsm.core.database.NetworkChecker.hayConexionUIO()) {
+                mostrarAlerta(Alert.AlertType.WARNING, "Sin Conexión", "No se puede acceder al registro de clientes sin conexión con Matriz (UIO).");
+                return;
+            }
+            javafx.scene.layout.Pane contenedorPrincipal = (javafx.scene.layout.Pane) ((javafx.scene.Node) event.getSource()).getScene().lookup("#contenedorPrincipal");
+            if (contenedorPrincipal != null) {
+                javafx.scene.Parent root = javafx.fxml.FXMLLoader.load(getClass().getResource("/clientes/fxml/registrarClientes.fxml"));
+                contenedorPrincipal.getChildren().clear();
+                contenedorPrincipal.getChildren().add(root);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo abrir la pantalla de registro de clientes: " + e.getMessage());
         }
     }
 
@@ -371,11 +394,17 @@ public class facturarProductosController implements Initializable {
     }
 
     private void calcularTotales() {
+        double valIva = "UIO".equalsIgnoreCase(sedeActual) ? (serviceUIO != null ? serviceUIO.obtenerIVA() : 15.0) : (serviceGYE != null ? serviceGYE.obtenerIVA() : 15.0);
+        int porcIva = (int) Math.round(valIva);
+        if (lblTituloIva != null) {
+            lblTituloIva.setText("IVA (" + porcIva + "%)");
+        }
+
         subtotalGlobal = 0;
         for (ItemCarrito d : detallesFactura) {
             subtotalGlobal += d.getSubtotal();
         }
-        ivaGlobal = subtotalGlobal * 0.15;
+        ivaGlobal = subtotalGlobal * (valIva / 100.0);
         totalGlobal = subtotalGlobal + ivaGlobal;
 
         lblSubtotal.setText(String.format("$%.2f", subtotalGlobal));

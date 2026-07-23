@@ -14,6 +14,9 @@ public class FacturacionService implements IFacturacionService {
     private final FacturaUIO_OperativoDAO facturaOperativoDAO = new FacturaUIO_OperativoDAO();
     private final FacturaUIO_ContableDAO facturaContableDAO = new FacturaUIO_ContableDAO();
 
+    private final com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService parametrosService =
+            new com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl();
+
     @Override
     public List<FacturaOperativaDTO> obtenerFacturasOperativas(LocalDate inicio, LocalDate fin) {
         return facturaOperativoDAO.consultarFacturasOperativas(inicio, fin);
@@ -30,5 +33,18 @@ public class FacturacionService implements IFacturacionService {
             throw new IllegalArgumentException("El número de factura no puede ser nulo o vacío");
         }
         return facturaContableDAO.consultarDetallesFactura(numeroFactura.trim());
+    }
+
+    @Override
+    public FacturaContableDTO obtenerFacturaContablePorNumero(String numeroFactura) {
+        if (numeroFactura == null || numeroFactura.trim().isEmpty()) {
+            return null;
+        }
+        return facturaContableDAO.consultarPorNumero(numeroFactura.trim());
+    }
+
+    @Override
+    public double obtenerIVA() {
+        return parametrosService.obtenerIVA();
     }
 }

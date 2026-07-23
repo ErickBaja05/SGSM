@@ -71,6 +71,12 @@ public class gestionSucursalesController {
 
         cargarDatos();
         lblMensajeIva.setWrapText(true);
+
+        try {
+            txtIva.setText(String.valueOf((int) Math.round(parametrosService.obtenerIVA())));
+        } catch (Exception e) {
+            txtIva.setText("15");
+        }
     }
 
     private void cargarIconos() {
@@ -146,15 +152,15 @@ public class gestionSucursalesController {
         lblMensajeIva.setText("");
         lblMensajeIva.getStyleClass().removeAll("mensaje-error", "mensaje-exito");
 
-        String nuevoIva = txtIva.getText();
+        String nuevoIva = txtIva.getText() != null ? txtIva.getText().trim().replace("%", "") : "";
         if (nuevoIva.isEmpty()) {
             lblMensajeIva.setText("El valor de IVA no puede estar vacío");
             lblMensajeIva.getStyleClass().addAll("mensaje-error");
             return;
         }
 
-        if(!nuevoIva.matches("[0-9]+")){
-            lblMensajeIva.setText("Ingrese solo un número entero que simboliza el porcentaje");
+        if (!nuevoIva.matches("^[0-9]+(\\.[0-9]+)?$")) {
+            lblMensajeIva.setText("Ingrese solo un número que simboliza el porcentaje");
             lblMensajeIva.getStyleClass().addAll("mensaje-error");
             return;
         }
