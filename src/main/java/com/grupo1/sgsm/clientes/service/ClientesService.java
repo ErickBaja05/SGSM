@@ -9,6 +9,7 @@ import com.grupo1.sgsm.clientes.exception.ClienteYaExisteException;
 import com.grupo1.sgsm.clientes.model.ClienteContacto;
 import com.grupo1.sgsm.clientes.model.ClienteFacturacion;
 import com.grupo1.sgsm.core.session.SesionActual;
+import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +62,13 @@ public class ClientesService implements IClientesService {
 
         List<ClienteConsultaDTO> listaClienteConsultaDTO = new ArrayList<>();
 
-        String sucursalSesion = SesionActual.getUsuario().getCodigo_sucursal(); // UIO o GYE
+        UsuarioSesionDTO usuarioActual = SesionActual.getUsuario();
+        String sucursalSesion = (usuarioActual != null && usuarioActual.getCodigo_sucursal() != null)
+                ? usuarioActual.getCodigo_sucursal() : "";
+        String rolUsuario = (usuarioActual != null && usuarioActual.getRol() != null)
+                ? usuarioActual.getRol() : "";
+
+        boolean esAdmin = rolUsuario.equalsIgnoreCase("ADMINISTRADOR");
 
         for (ClienteFacturacion datosFacturacion : facturacionClientes) {
 
@@ -73,8 +80,11 @@ public class ClientesService implements IClientesService {
             ClienteContacto contacto = mapaContactos.get(datosFacturacion.getCedula_ciudadania());
 
             if (contacto != null) {
-                // Aquí decides si mostrar o no según la sucursal
-                if (sucursalSesion.equalsIgnoreCase("UIO") && contacto.getCod_sucursal_registro().equalsIgnoreCase("GYE")) {
+                // Si es administrador, muestra la información original completa de cualquier cliente
+                if (esAdmin) {
+                    clienteConsulta.setDireccion(contacto.getDireccion() != null ? contacto.getDireccion() : "");
+                    clienteConsulta.setCorreo(contacto.getCorreo_electronico() != null ? contacto.getCorreo_electronico() : "");
+                } else if (sucursalSesion.equalsIgnoreCase("UIO") && contacto.getCod_sucursal_registro().equalsIgnoreCase("GYE")) {
                     clienteConsulta.setDireccion("NO DISPONIBLE");
                     clienteConsulta.setCorreo("NO DISPONIBLE");
                 } else if (sucursalSesion.equalsIgnoreCase("GYE") && contacto.getCod_sucursal_registro().equalsIgnoreCase("UIO")) {
@@ -93,8 +103,13 @@ public class ClientesService implements IClientesService {
                     );
                 }
             } else {
-                clienteConsulta.setDireccion("NO DISPONIBLE");
-                clienteConsulta.setCorreo("NO DISPONIBLE");
+                if (esAdmin) {
+                    clienteConsulta.setDireccion("");
+                    clienteConsulta.setCorreo("");
+                } else {
+                    clienteConsulta.setDireccion("NO DISPONIBLE");
+                    clienteConsulta.setCorreo("NO DISPONIBLE");
+                }
             }
 
             listaClienteConsultaDTO.add(clienteConsulta);

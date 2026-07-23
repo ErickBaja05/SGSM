@@ -13,8 +13,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService;
-import com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl;
 import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.service.IFacturasGYEService;
 import com.grupo1.sgsm.ventasYfacturacion.service.FacturasGYEServiceImpl;

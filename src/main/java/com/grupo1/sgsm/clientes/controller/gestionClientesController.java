@@ -13,6 +13,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
+import com.grupo1.sgsm.core.session.SesionActual;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -85,8 +88,12 @@ public class gestionClientesController implements Initializable {
                 } else {
                     ClienteConsultaDTO cliente = getTableView().getItems().get(getIndex());
 
-                    // REGLA DE NEGOCIO: Si son de otra sucursal, no aparece el botón
-                    if ("NO DISPONIBLE".equals(cliente.getCorreo()) || "NO DISPONIBLE".equals(cliente.getDireccion())) {
+                    // REGLA DE NEGOCIO: Si son de otra sucursal y el usuario no es administrador, no aparece el botón
+                    UsuarioSesionDTO usuarioActual = SesionActual.getUsuario();
+                    String rol = usuarioActual != null ? usuarioActual.getRol() : "";
+                    boolean esAdmin = rol != null && rol.equalsIgnoreCase("ADMINISTRADOR");
+
+                    if (!esAdmin && ("NO DISPONIBLE".equals(cliente.getCorreo()) || "NO DISPONIBLE".equals(cliente.getDireccion()))) {
                         setGraphic(null);
                     } else {
                         setGraphic(btnAccion);
