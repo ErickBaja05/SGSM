@@ -4,7 +4,6 @@ import com.grupo1.sgsm.administracion.gestionParametros.dto.SucursalDTO;
 import com.grupo1.sgsm.administracion.gestionParametros.exception.CodigoSucursalNoValidoException;
 import com.grupo1.sgsm.administracion.gestionParametros.exception.SucursalYaExisteException;
 import com.grupo1.sgsm.administracion.gestionParametros.exception.TelefonoNoValidoException;
-import com.grupo1.sgsm.administracion.gestionParametros.model.Sucursal;
 import com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService;
 import com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl;
 import javafx.event.ActionEvent;

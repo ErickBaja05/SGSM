@@ -79,21 +79,21 @@ public class StockLocalService implements IStockLocalService {
         }
         String q = query.trim();
 
-        ProductoInfo productoEncontrado = null;
+        Producto productoEncontrado = null;
         try {
-            List<ProductoInfo> productos = productoInfoDAO.consultarTodos();
+            List<Producto> productos = productoInfoDAO.consultarTodos();
             if (productos != null) {
-                for (ProductoInfo p : productos) {
-                    if ((p.getCodigo_producto() != null && p.getCodigo_producto().equalsIgnoreCase(q)) ||
+                for (Producto p : productos) {
+                    if ((p.getCodigo() != null && p.getCodigo().equalsIgnoreCase(q)) ||
                             (p.getNombre() != null && p.getNombre().equalsIgnoreCase(q))) {
                         productoEncontrado = p;
                         break;
                     }
                 }
                 if (productoEncontrado == null) {
-                    for (ProductoInfo p : productos) {
-                        if ((p.getCodigo_producto() != null
-                                && p.getCodigo_producto().toLowerCase().contains(q.toLowerCase())) ||
+                    for (Producto p : productos) {
+                        if ((p.getCodigo() != null
+                                && p.getCodigo().toLowerCase().contains(q.toLowerCase())) ||
                                 (p.getNombre() != null
                                         && p.getNombre().toLowerCase().contains(q.toLowerCase()))) {
                             productoEncontrado = p;
@@ -110,7 +110,7 @@ public class StockLocalService implements IStockLocalService {
             return null;
         }
 
-        String codigoProd = productoEncontrado.getCodigo_producto();
+        String codigoProd = productoEncontrado.getCodigo();
         String nombre = productoEncontrado.getNombre();
         String categoria = productoEncontrado.getCategoria() != null ? productoEncontrado.getCategoria() : "General";
 
