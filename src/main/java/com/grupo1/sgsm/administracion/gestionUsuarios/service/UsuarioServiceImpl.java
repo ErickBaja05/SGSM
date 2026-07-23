@@ -16,6 +16,12 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
     private UsuarioDAO usuarioDAO = new UsuarioDAO();
 
+    private static final String PASSWORD_REGEX =
+            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$";
+
+    private static final String EMAIL_REGEX =
+            "^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)+$";
+
     @Override
     public UsuarioSesionDTO login(String username, String password) {
 
@@ -52,11 +58,11 @@ public class UsuarioServiceImpl implements IUsuarioService{
             throw new UsuarioYaRegistradoException("Ya existe un Usuario con el correo electronico proporcionado");
         }
 
-        if(!nuevoUsuario.getPassword().matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{8,}$\n")){
+        if(!nuevoUsuario.getPassword().matches(PASSWORD_REGEX)){
             throw new PasswordInseguroException("La contraseña debe tener al menos una letra mayúscula, una minúscula, un símbolo especial y mínimo 8 caracteres");
         }
 
-        if(!nuevoUsuario.getCorreo().matches("^[\\w\\.-]+@[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}$\n")){
+        if(!nuevoUsuario.getCorreo().matches(EMAIL_REGEX)){
             throw new CorreoNoValidoException("El correo no tiene formato válido");
         }
 
