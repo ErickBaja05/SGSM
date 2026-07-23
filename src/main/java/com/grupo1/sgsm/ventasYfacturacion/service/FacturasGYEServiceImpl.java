@@ -1,7 +1,10 @@
 package com.grupo1.sgsm.ventasYfacturacion.service;
 
+import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
 import com.grupo1.sgsm.inventarioYproductos.service.IProductoService;
+import com.grupo1.sgsm.inventarioYproductos.service.IStockLocalService;
 import com.grupo1.sgsm.inventarioYproductos.service.ProductoService;
+import com.grupo1.sgsm.inventarioYproductos.service.StockLocalService;
 import com.grupo1.sgsm.ventasYfacturacion.dao.DetalleFacturaDAO;
 import com.grupo1.sgsm.ventasYfacturacion.dao.FacturaGyeDAO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
@@ -22,6 +25,7 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
     private FacturaGyeDAO facturaGyeDAO = new FacturaGyeDAO();
     private IProductoService productoService = new ProductoService();
     private DetalleFacturaDAO detalleFacturaDAO = new DetalleFacturaDAO();
+    private IStockLocalService stockLocalService = new StockLocalService();
 
     @Override
     public List<FacturaGYEConsultadaDTO> consultarFacturas(LocalDate fechaInicio, LocalDate fechaFin) {
@@ -68,6 +72,13 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
             throw new NoSePudoFacturarException("Error desconocido, no se pudo facturar");
         }
 
+        // TODA LA LOGICA PARA AJUSTAR STOCK A LOS PRODUCTOS
+
+//        for(DetalleFacturaDTO detalleFacturaDTO : detallesFacturaDTO) {
+//            stockLocalService.consultarStockLocal();
+//            stockLocalService.actualizarStock(detalleFacturaDTO.getCodigo_producto(), detalleFacturaDTO.getCantidad());
+//        }
+
     }
 
     @Override
@@ -77,6 +88,11 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
         return new InfoProductoDTO("10","de prueba");
 
 
+    }
+
+    @Override
+    public List<ProductoConsultaDTO> productosParaCarrito() {
+        return List.of();
     }
 
 }

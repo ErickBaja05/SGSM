@@ -10,6 +10,7 @@ module com.grupo1.sgsm {
     requires java.sql;
     requires java.desktop;
     requires javafx.base;
+    requires com.grupo1.sgsm;
     //requires com.grupo1.sgsm;
 
 
