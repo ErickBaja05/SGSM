@@ -5,7 +5,7 @@ import com.grupo1.sgsm.core.session.SesionActual;
 import com.grupo1.sgsm.inventarioYproductos.dao.InventarioDAO;
 import com.grupo1.sgsm.inventarioYproductos.dao.ProductoInfoDAO;
 import com.grupo1.sgsm.inventarioYproductos.model.Inventario;
-import com.grupo1.sgsm.inventarioYproductos.model.ProductoInfo;
+import com.grupo1.sgsm.inventarioYproductos.model.Producto;
 import com.grupo1.sgsm.inventarioYproductos.service.IStockLocalService;
 import com.grupo1.sgsm.inventarioYproductos.service.StockLocalService;
 
@@ -91,12 +91,12 @@ public class ajusteStockController implements Initializable {
         }
 
         // Búsqueda en ProductoInfo (Base de datos)
-        ProductoInfo productoEncontrado = null;
+        Producto productoEncontrado = null;
         try {
-            List<ProductoInfo> productos = productoInfoDAO.consultarTodos();
+            List<Producto> productos = productoInfoDAO.consultarTodos();
             if (productos != null) {
-                for (ProductoInfo p : productos) {
-                    if ((p.getCodigo_producto() != null && p.getCodigo_producto().equalsIgnoreCase(query)) ||
+                for (Producto p : productos) {
+                    if ((p.getCodigo() != null && p.getCodigo().equalsIgnoreCase(query)) ||
                             (p.getNombre() != null && p.getNombre().equalsIgnoreCase(query))) {
                         productoEncontrado = p;
                         break;
@@ -104,9 +104,9 @@ public class ajusteStockController implements Initializable {
                 }
                 // Si no se encontró por coincidencia exacta, buscar por contención
                 if (productoEncontrado == null) {
-                    for (ProductoInfo p : productos) {
-                        if ((p.getCodigo_producto() != null
-                                && p.getCodigo_producto().toLowerCase().contains(query.toLowerCase())) ||
+                    for (Producto p : productos) {
+                        if ((p.getCodigo() != null
+                                && p.getCodigo().toLowerCase().contains(query.toLowerCase())) ||
                                 (p.getNombre() != null
                                         && p.getNombre().toLowerCase().contains(query.toLowerCase()))) {
                             productoEncontrado = p;
@@ -122,14 +122,14 @@ public class ajusteStockController implements Initializable {
         }
 
         if (productoEncontrado != null) {
-            txtCodigo.setText(productoEncontrado.getCodigo_producto());
+            txtCodigo.setText(productoEncontrado.getCodigo());
             txtNombre.setText(productoEncontrado.getNombre());
             txtCategoria.setText(
                     productoEncontrado.getCategoria() != null ? productoEncontrado.getCategoria() : "General");
 
             // Consultar stock e inventario actual para mostrar la sucursal del registro
             try {
-                Inventario inv = inventarioDAO.consultarPorProducto(productoEncontrado.getCodigo_producto());
+                Inventario inv = inventarioDAO.consultarPorProducto(productoEncontrado.getCodigo());
                 if (inv != null) {
                     txtNuevoStock.setText(String.valueOf(inv.getStock()));
                     if (inv.getCodigo_sucursal() != null && !inv.getCodigo_sucursal().trim().isEmpty()) {

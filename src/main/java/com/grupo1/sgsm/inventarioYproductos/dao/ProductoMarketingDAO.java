@@ -9,14 +9,19 @@ import java.util.List;
 
 import com.grupo1.sgsm.inventarioYproductos.model.ProductoMarketing;
 import com.grupo1.sgsm.core.database.DatabaseConnection;
+import com.grupo1.sgsm.core.session.SesionActual;
+import com.grupo1.sgsm.core.util.ConfigSucursal;
+import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
 
 public class ProductoMarketingDAO {
 
-    private static final String TABLA = "UIO.dbo.producto_marketing";
+    private void validarSesion() {
+        UsuarioSesionDTO usuario = SesionActual.getUsuario();
+        if (usuario == null) {
+            throw new RuntimeException("No hay sesión activa");
+        }
+    }
 
-    // ===============================
-    // MÉTODO PRIVADO DE MAPEO
-    // ===============================
     private ProductoMarketing mapearProductoMarketing(ResultSet rs) throws SQLException {
         ProductoMarketing p = new ProductoMarketing();
         p.setCodigo_producto(rs.getString("codigo_producto"));
@@ -28,12 +33,14 @@ public class ProductoMarketingDAO {
     // INSERTAR
     // ===============================
     public void insertar(ProductoMarketing producto) {
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
         String sql = String.format("""
             INSERT INTO %s (codigo_producto, descripcion)
             VALUES (?, ?)
-            """, TABLA);
+            """, obtenerTablaMarketing(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection("UIO");
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, producto.getCodigo_producto());
@@ -50,10 +57,12 @@ public class ProductoMarketingDAO {
     // CONSULTAR TODOS
     // ===============================
     public List<ProductoMarketing> consultarTodos() {
-        String sql = String.format("SELECT * FROM %s", TABLA);
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = String.format("SELECT * FROM %s", obtenerTablaMarketing(nodoLocal));
         List<ProductoMarketing> productos = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnection.getConnection("UIO");
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -72,9 +81,11 @@ public class ProductoMarketingDAO {
     // CONSULTAR POR CÓDIGO
     // ===============================
     public ProductoMarketing consultarPorCodigo(String codigoProducto) {
-        String sql = String.format("SELECT * FROM %s WHERE codigo_producto = ?", TABLA);
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = String.format("SELECT * FROM %s WHERE codigo_producto = ?", obtenerTablaMarketing(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection("UIO");
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, codigoProducto);
@@ -95,9 +106,11 @@ public class ProductoMarketingDAO {
     // ACTUALIZAR DESCRIPCIÓN POR CÓDIGO
     // ===============================
     public void actualizarDescripcionPorCodigo(String codigoProducto, String nuevaDescripcion) {
-        String sql = String.format("UPDATE %s SET descripcion = ? WHERE codigo_producto = ?", TABLA);
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = String.format("UPDATE %s SET descripcion = ? WHERE codigo_producto = ?", obtenerTablaMarketing(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection("UIO");
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, nuevaDescripcion);
@@ -113,9 +126,11 @@ public class ProductoMarketingDAO {
     // ELIMINAR POR CÓDIGO
     // ===============================
     public void eliminarPorCodigo(String codigoProducto) {
-        String sql = String.format("DELETE FROM %s WHERE codigo_producto = ?", TABLA);
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+        String sql = String.format("DELETE FROM %s WHERE codigo_producto = ?", obtenerTablaMarketing(nodoLocal));
 
-        try (Connection conn = DatabaseConnection.getConnection("UIO");
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, codigoProducto);
@@ -123,6 +138,17 @@ public class ProductoMarketingDAO {
 
         } catch (SQLException e) {
             throw new RuntimeException("Error al eliminar producto marketing", e);
+        }
+    }
+
+    // ===============================
+    // MÉTODOS AUXILIARES DE ENRUTAMIENTO
+    // ===============================
+    private String obtenerTablaMarketing(String nodoLocal) {
+        if ("UIO".equalsIgnoreCase(nodoLocal)) {
+            return "UIO.dbo.producto_marketing";
+        } else {
+            return "[26.194.51.93].UIO.dbo.producto_marketing"; // Linked Server de GYE a UIO
         }
     }
 }

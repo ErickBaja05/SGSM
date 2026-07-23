@@ -1,6 +1,6 @@
 package com.grupo1.sgsm.inventarioYproductos.service;
 
-import com.grupo1.sgsm.inventarioYproductos.dao.ProductoDAO;
+import com.grupo1.sgsm.inventarioYproductos.dao.ProductoInfoDAO;
 import com.grupo1.sgsm.inventarioYproductos.dao.ProductoMarketingDAO;
 import com.grupo1.sgsm.inventarioYproductos.dto.NuevoProductoDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
@@ -15,12 +15,12 @@ import java.util.Map;
 
 public class ProductoService implements IProductoService {
 
-    private final ProductoDAO productoDAO = new ProductoDAO();
+    private final ProductoInfoDAO productoInfoDAO = new ProductoInfoDAO();
     private final ProductoMarketingDAO productoMarketingDAO = new ProductoMarketingDAO();
 
     @Override
     public List<ProductoConsultaDTO> obtenerTodosProductos() {
-        List<Producto> productos = productoDAO.consultarTodos();
+        List<Producto> productos = productoInfoDAO.consultarTodos();
         List<ProductoConsultaDTO> resultado = new ArrayList<>();
 
         for (Producto p : productos) {
@@ -41,7 +41,7 @@ public class ProductoService implements IProductoService {
             throw new IllegalArgumentException("El precio debe ser un número positivo.");
         }
 
-        Producto existente = productoDAO.consultarPorCodigo(nuevoProducto.getCodigo());
+        Producto existente = productoInfoDAO.consultarPorCodigo(nuevoProducto.getCodigo());
         if (existente != null) {
             throw new RuntimeException("Ya existe un producto con el código " + nuevoProducto.getCodigo());
         }
@@ -55,7 +55,7 @@ public class ProductoService implements IProductoService {
                 0.0,
                 nuevoProducto.getPrecio()
         );
-        productoDAO.insertar(p);
+        productoInfoDAO.insertar(p);
 
         // 2. Insertar en producto_marketing
         ProductoMarketing pm = new ProductoMarketing();
@@ -66,7 +66,7 @@ public class ProductoService implements IProductoService {
 
     @Override
     public void actualizarProducto(ProductoConsultaDTO dto) {
-        Producto existente = productoDAO.consultarPorCodigo(dto.getCodigo());
+        Producto existente = productoInfoDAO.consultarPorCodigo(dto.getCodigo());
         if (existente == null) {
             throw new RuntimeException("El producto no existe.");
         }
@@ -76,12 +76,12 @@ public class ProductoService implements IProductoService {
         existente.setCategoria(dto.getCategoria());
         existente.setPrecio(dto.getPrecio());
 
-        productoDAO.actualizar(existente);
+        productoInfoDAO.actualizar(existente);
     }
 
     @Override
     public void eliminarProducto(String codigo) {
-        Producto existente = productoDAO.consultarPorCodigo(codigo);
+        Producto existente = productoInfoDAO.consultarPorCodigo(codigo);
         if (existente != null) {
             // Eliminar de marketing primero
             try {
@@ -90,13 +90,13 @@ public class ProductoService implements IProductoService {
                 // Silenciar si no tenía registro de marketing
             }
             // Eliminar de info
-            productoDAO.eliminar(codigo);
+            productoInfoDAO.eliminar(codigo);
         }
     }
 
     @Override
     public List<ProductoMarketingDTO> obtenerProductosMarketing() {
-        List<Producto> productos = productoDAO.consultarTodos();
+        List<Producto> productos = productoInfoDAO.consultarTodos();
         List<ProductoMarketing> marketings = productoMarketingDAO.consultarTodos();
 
         Map<String, String> mapDescripciones = new HashMap<>();
