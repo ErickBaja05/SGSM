@@ -9,6 +9,7 @@ import com.grupo1.sgsm.inventarioYproductos.service.StockLocalService;
 import com.grupo1.sgsm.ventasYfacturacion.dao.DetalleFacturaDAO;
 import com.grupo1.sgsm.ventasYfacturacion.dao.FacturaGyeDAO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
+import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTOFacturacion;
 import com.grupo1.sgsm.ventasYfacturacion.dto.FacturaGYEConsultadaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.NuevaFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.exception.FechasNoValidasException;
@@ -51,7 +52,7 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
     }
 
     @Override
-    public void facturarProductos(NuevaFacturaDTO nuevaFacturaDTO, List<DetalleFacturaDTO> detallesFacturaDTO) {
+    public void facturarProductos(NuevaFacturaDTO nuevaFacturaDTO, List<DetalleFacturaDTOFacturacion> detallesFacturaDTO) {
         try {
             // 1. Mapear y persistir la cabecera de la factura (Tabla unificada en GYE)
             FacturaGYE facturaGYE = new FacturaGYE();
@@ -67,7 +68,7 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
             facturaGyeDAO.insertar(facturaGYE);
 
             // 2. Iterar sobre los detalles para guardarlos y reducir el stock
-            for (DetalleFacturaDTO dto : detallesFacturaDTO) {
+            for (DetalleFacturaDTOFacturacion dto : detallesFacturaDTO) {
                 // A) Guardar el detalle de factura
                 DetalleFactura detalle = new DetalleFactura();
                 detalle.setNumero_factura(nuevaFacturaDTO.getNumero_factura()); // Hereda de la cabecera[cite: 25]

@@ -6,6 +6,7 @@ import com.grupo1.sgsm.clientes.service.IClientesService;
 import com.grupo1.sgsm.core.util.ConfigSucursal;
 import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
+import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTOFacturacion;
 import com.grupo1.sgsm.ventasYfacturacion.dto.NuevaFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.service.FacturarProductosUIOImpl;
 import com.grupo1.sgsm.ventasYfacturacion.service.FacturasGYEServiceImpl;
@@ -197,7 +198,7 @@ public class facturarProductosController implements Initializable {
     // TABLA "BUSCAR PRODUCTO"
     // ==========================================
     private void configurarTablaBusqueda() {
-        colBusqCod.setCellValueFactory(new PropertyValueFactory<>("codigo_producto")); // Asegura que coincida con tu DTO
+        colBusqCod.setCellValueFactory(new PropertyValueFactory<>("codigo")); // Asegura que coincida con tu DTO
         colBusqNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colBusqPrecio.setCellValueFactory(data -> new SimpleStringProperty(String.format("$%.2f", data.getValue().getPrecio())));
 
@@ -391,10 +392,10 @@ public class facturarProductosController implements Initializable {
                     ivaGlobal
             );
 
-            // 5. Mapear DTOs Detalle
-            List<DetalleFacturaDTO> listaDetalles = new ArrayList<>();
+            // 5. Mapear DTOs Detalle con el nuevo DTO de facturación
+            List<DetalleFacturaDTOFacturacion> listaDetalles = new ArrayList<>();
             for (ItemCarrito item : detallesFactura) {
-                listaDetalles.add(new DetalleFacturaDTO(
+                listaDetalles.add(new DetalleFacturaDTOFacturacion(
                         item.getProducto().getCodigo(),
                         sedeActual,
                         item.getCantidad(),

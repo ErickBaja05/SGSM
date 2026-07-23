@@ -10,6 +10,7 @@ import com.grupo1.sgsm.ventasYfacturacion.dao.DetalleFacturaDAO;
 import com.grupo1.sgsm.ventasYfacturacion.dao.FacturaUIO_ContableDAO;
 import com.grupo1.sgsm.ventasYfacturacion.dao.FacturaUIO_OperativoDAO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
+import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTOFacturacion;
 import com.grupo1.sgsm.ventasYfacturacion.dto.NuevaFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.exception.NoSePudoFacturarException;
 import com.grupo1.sgsm.ventasYfacturacion.model.DetalleFactura;
@@ -30,7 +31,7 @@ public class FacturarProductosUIOImpl implements IFacturarProductosUIO {
     private IStockLocalService stockLocalService = new StockLocalService();
 
     @Override
-    public void facturarProductos(NuevaFacturaDTO nuevaFacturaDTO, List<DetalleFacturaDTO> detallesFacturaDTO) {
+    public void facturarProductos(NuevaFacturaDTO nuevaFacturaDTO, List<DetalleFacturaDTOFacturacion> detallesFacturaDTO) {
         try {
             // 1. Mapear y persistir el fragmento CONTABLE
             FacturaUIOContable contable = new FacturaUIOContable();
@@ -51,7 +52,7 @@ public class FacturarProductosUIOImpl implements IFacturarProductosUIO {
             uioOperativoDAO.insertar(operativo);
 
             // 3. Iterar sobre los detalles para guardarlos y reducir el stock
-            for (DetalleFacturaDTO dto : detallesFacturaDTO) {
+            for (DetalleFacturaDTOFacturacion dto : detallesFacturaDTO) {
                 // A) Guardar el detalle de factura
                 DetalleFactura detalle = new DetalleFactura();
                 detalle.setNumero_factura(nuevaFacturaDTO.getNumero_factura()); // Hereda cabecera
