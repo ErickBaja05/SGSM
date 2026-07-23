@@ -1,29 +1,58 @@
 package com.grupo1.sgsm.ventasYfacturacion.dto;
 
 public class DetalleFacturaDTO {
-    private String codigo;
-    private String descripcion;
-    private int cantidad;
-    private double precioUnitario;
 
-    public DetalleFacturaDTO() {}
+    private String codigo_producto;
+    private String codigo_sucursal;
+    private Integer cantidad;
+    private Double precio_unitario;
+    private Double subtotal_producto;
 
-    public DetalleFacturaDTO(String codigo, String descripcion, int cantidad, double precioUnitario) {
-        this.codigo = codigo;
-        this.descripcion = descripcion;
+    public DetalleFacturaDTO(String codigo_producto, String codigo_sucursal, Integer cantidad, Double precio_unitario, Double subtotal_producto) {
+        this.codigo_producto = codigo_producto;
+        this.codigo_sucursal = codigo_sucursal;
         this.cantidad = cantidad;
-        this.precioUnitario = precioUnitario;
+        this.precio_unitario = precio_unitario;
+        this.subtotal_producto = subtotal_producto;
     }
 
-    public String getCodigo() { return codigo; }
-    public void setCodigo(String codigo) { this.codigo = codigo; }
+    public String getCodigo_producto() {
+        return codigo_producto;
+    }
 
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public void setCodigo_producto(String codigo_producto) {
+        this.codigo_producto = codigo_producto;
+    }
 
-    public int getCantidad() { return cantidad; }
-    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+    public String getCodigo_sucursal() {
+        return codigo_sucursal;
+    }
 
-    public double getPrecioUnitario() { return precioUnitario; }
-    public void setPrecioUnitario(double precioUnitario) { this.precioUnitario = precioUnitario; }
+    public void setCodigo_sucursal(String codigo_sucursal) {
+        this.codigo_sucursal = codigo_sucursal;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public Double getPrecio_unitario() {
+        return precio_unitario;
+    }
+
+    public void setPrecio_unitario(Double precio_unitario) {
+        this.precio_unitario = precio_unitario;
+    }
+
+    public Double getSubtotal_producto() {
+        return subtotal_producto;
+    }
+
+    public void setSubtotal_producto(Double subtotal_producto) {
+        this.subtotal_producto = subtotal_producto;
+    }
 }

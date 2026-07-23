@@ -153,6 +153,34 @@ public class FacturaGyeDAO {
     }
 
     // ===============================
+// CONSULTAR ÚLTIMO NÚMERO DE FACTURA
+// ===============================
+    public String consultarUltimoNumeroFactura() {
+        validarSesion();
+        String nodoLocal = ConfigSucursal.getSucursalActual();
+
+        String sql = String.format("""
+        SELECT MAX(numero_factura) AS ultimo_numero
+        FROM %s
+        """, obtenerTablaGye(nodoLocal));
+
+        try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getString("ultimo_numero");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al consultar el último número de factura en GYE", e);
+        }
+
+        return null; // Si no hay facturas aún
+    }
+
+
+    // ===============================
     // MÉTODOS AUXILIARES
     // ===============================
     private void validarSesion() {
