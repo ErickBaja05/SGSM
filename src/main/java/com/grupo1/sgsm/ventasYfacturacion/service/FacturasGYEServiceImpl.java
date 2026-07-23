@@ -25,14 +25,16 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
 
     @Override
     public List<FacturaGYEConsultadaDTO> consultarFacturas(LocalDate fechaInicio, LocalDate fechaFin) {
-        if(fechaInicio.isAfter(fechaFin) || fechaInicio.isAfter(LocalDate.now())) {
-            throw new FechasNoValidasException("Ingrese un rango de fechas valido");
+        if (fechaInicio != null && fechaFin != null) {
+            if (fechaInicio.isAfter(fechaFin) || fechaInicio.isAfter(LocalDate.now())) {
+                throw new FechasNoValidasException("Ingrese un rango de fechas valido");
+            }
         }
 
         List<FacturaGYEConsultadaDTO> consultar = new ArrayList<>();
         List<FacturaGYE> facturas = facturaGyeDAO.consultarPorRangoFechas(fechaInicio, fechaFin);
         for (FacturaGYE facturaGYE : facturas) {
-            consultar.add(new FacturaGYEConsultadaDTO(facturaGYE.getNumero_factura(),String.valueOf(facturaGYE.getFecha_emision()),facturaGYE.getCedula_ciudadania()));
+            consultar.add(new FacturaGYEConsultadaDTO(facturaGYE.getNumero_factura(), String.valueOf(facturaGYE.getFecha_emision()), facturaGYE.getCedula_ciudadania()));
         }
         return consultar;
     }
