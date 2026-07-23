@@ -22,7 +22,7 @@ opens com.grupo1.sgsm.clientes.controller to javafx.fxml;
     opens com.grupo1.sgsm.administracion.dashboard to javafx.fxml;
 
     opens com.grupo1.sgsm.administracion.gestionUsuarios.dto to javafx.base;
-//    opens com.grupo1.sgsm.administracion.gestionParametros.dto to javafx.base;
+    opens com.grupo1.sgsm.administracion.gestionParametros.dto to javafx.base;
 //    opens com.grupo1.sgsm.ventasYfacturacion.dto to javafx.base;
     opens com.grupo1.sgsm.clientes.dto to javafx.base;
     opens com.grupo1.sgsm.inventarioYproductos.model to javafx.base;

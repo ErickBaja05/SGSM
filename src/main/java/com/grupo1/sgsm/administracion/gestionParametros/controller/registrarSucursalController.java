@@ -1,5 +1,12 @@
 package com.grupo1.sgsm.administracion.gestionParametros.controller;
 
+import com.grupo1.sgsm.administracion.gestionParametros.dto.SucursalDTO;
+import com.grupo1.sgsm.administracion.gestionParametros.exception.CodigoSucursalNoValidoException;
+import com.grupo1.sgsm.administracion.gestionParametros.exception.SucursalYaExisteException;
+import com.grupo1.sgsm.administracion.gestionParametros.exception.TelefonoNoValidoException;
+import com.grupo1.sgsm.administracion.gestionParametros.model.Sucursal;
+import com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService;
+import com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -14,6 +21,7 @@ public class registrarSucursalController {
     @FXML private TextField txtDireccion;
     @FXML private TextField txtNombre;
     @FXML private TextField txtTelefono;
+    @FXML private TextField txtCiudad;
 
     // --- Elementos de UI ---
     @FXML private Label lblBtnRegistrarIcon;
@@ -22,6 +30,8 @@ public class registrarSucursalController {
     // --- Botones ---
     @FXML private Button btnCancelar;
     @FXML private Button btnRegistrar;
+
+    private IParametrosService parametrosService = new ParametrosServiceImpl()  ;
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
@@ -42,21 +52,30 @@ public class registrarSucursalController {
         mensajeConfirmacion.getStyleClass().removeAll("mensaje-error", "mensaje-exito");
 
         // Validación básica
-        if (txtCodigo.getText().isEmpty() || txtNombre.getText().isEmpty() || txtDireccion.getText().isEmpty()) {
-            mensajeConfirmacion.setText("Por favor, complete los campos obligatorios.");
-            mensajeConfirmacion.getStyleClass().add("mensaje-error");
+        if (txtCodigo.getText().isEmpty() || txtNombre.getText().isEmpty() || txtDireccion.getText().isEmpty() || txtTelefono.getText().isEmpty() || txtCiudad.getText().isEmpty()) {
+            mensajeConfirmacion.setText("Todos los campos son obligatorios");
+            mensajeConfirmacion.getStyleClass().addAll("mensaje-error");
             return;
         }
 
-        // Lógica para enviar los datos a la BD distribuida iría aquí.
-        System.out.println("Registrando nueva sucursal: " + txtCodigo.getText() + " - " + txtNombre.getText());
+        if(!txtTelefono.getText().matches("[0-9]+")){
+            mensajeConfirmacion.setText("El telefono debe ser un numero");
+            mensajeConfirmacion.getStyleClass().addAll("mensaje-error");
+            return;
+        }
 
-        // Mensaje de éxito
-        mensajeConfirmacion.setText("Sucursal registrada exitosamente.");
-        mensajeConfirmacion.getStyleClass().add("mensaje-exito");
+        SucursalDTO nuevaSucursal = new SucursalDTO(txtCodigo.getText(),txtDireccion.getText(),txtNombre.getText(),txtCiudad.getText(),txtTelefono.getText());
+       try{
+            parametrosService.registrarSucursal(nuevaSucursal);
+           mensajeConfirmacion.setText("Sucursal registrada exitosamente.");
+           mensajeConfirmacion.getStyleClass().addAll("mensaje-exito");
+           limpiarFormulario();
+       }catch(CodigoSucursalNoValidoException | TelefonoNoValidoException | SucursalYaExisteException e ){
+           mensajeConfirmacion.setText(e.getMessage());
+           mensajeConfirmacion.getStyleClass().addAll("mensaje-error");
+       }
 
-        // Opcional: limpiar los campos después de guardar
-        // limpiarFormulario();
+
     }
 
     @FXML
@@ -70,6 +89,5 @@ public class registrarSucursalController {
         txtNombre.clear();
         txtDireccion.clear();
         txtTelefono.clear();
-        mensajeConfirmacion.setText("");
     }
 }

@@ -1,5 +1,9 @@
 package com.grupo1.sgsm.administracion.gestionParametros.controller;
 
+import com.grupo1.sgsm.administracion.gestionParametros.dto.SucursalDTO;
+import com.grupo1.sgsm.administracion.gestionParametros.service.IParametrosService;
+import com.grupo1.sgsm.administracion.gestionParametros.service.ParametrosServiceImpl;
+import com.grupo1.sgsm.core.session.SesionActual;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -26,12 +30,12 @@ public class gestionSucursalesController {
     @FXML private Label lblIconDirectorio;
     @FXML private Label lblIconBuscar;
 
-    @FXML private TableView<Sucursal> tbSucursales;
-    @FXML private TableColumn<Sucursal, String> colId;
-    @FXML private TableColumn<Sucursal, String> colNombre;
-    @FXML private TableColumn<Sucursal, String> colDireccion;
-    @FXML private TableColumn<Sucursal, String> colTelefono;
-    @FXML private TableColumn<Sucursal, Void> colAccion;
+    @FXML private TableView<SucursalDTO> tbSucursales;
+    @FXML private TableColumn<SucursalDTO, String> colId;
+    @FXML private TableColumn<SucursalDTO, String> colNombre;
+    @FXML private TableColumn<SucursalDTO, String> colDireccion;
+    @FXML private TableColumn<SucursalDTO, String> colTelefono;
+    @FXML private TableColumn<SucursalDTO, Void> colAccion;
 
     // --- Tarjeta Edición ---
     @FXML private Label lblEditTitle;
@@ -45,8 +49,10 @@ public class gestionSucursalesController {
     @FXML private Label lblIconEditHeader;
     @FXML private Label lblIconGuardarSucursal;
 
-    private ObservableList<Sucursal> masterData = FXCollections.observableArrayList();
-    private Sucursal sucursalSeleccionada;
+    private ObservableList<SucursalDTO> masterData = FXCollections.observableArrayList();
+    private SucursalDTO sucursalSeleccionada;
+
+    private IParametrosService parametrosService = new ParametrosServiceImpl();
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
@@ -64,7 +70,8 @@ public class gestionSucursalesController {
             buscarSucursalRealTime(newValue);
         });
 
-        cargarDatosPrueba();
+        cargarDatos();
+        lblMensajeIva.setWrapText(true);
     }
 
     private void cargarIconos() {
@@ -79,13 +86,13 @@ public class gestionSucursalesController {
     }
 
     private void configurarTabla() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("codigo_sucursal"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colDireccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
         colTelefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
 
         // Magia visual: Columna de Acción con el botón del lápiz
-        colAccion.setCellFactory(param -> new TableCell<Sucursal, Void>() {
+        colAccion.setCellFactory(param -> new TableCell<SucursalDTO, Void>() {
             private final Button btnEdit = new Button();
 
             {
@@ -93,7 +100,7 @@ public class gestionSucursalesController {
                 btnEdit.getStyleClass().add("btn-transparent");
 
                 btnEdit.setOnAction(event -> {
-                    Sucursal data = getTableView().getItems().get(getIndex());
+                    SucursalDTO data = getTableView().getItems().get(getIndex());
                     cargarDetalleEdicion(data);
                 });
             }
@@ -110,10 +117,10 @@ public class gestionSucursalesController {
         });
     }
 
-    private void cargarDetalleEdicion(Sucursal sucursal) {
+    private void cargarDetalleEdicion(SucursalDTO sucursal) {
         this.sucursalSeleccionada = sucursal;
 
-        lblEditTitle.setText("Edición de Sucursal: " + sucursal.getId());
+        lblEditTitle.setText("Edición de Sucursal: " + sucursal.getCodigo_sucursal());
         txtEditNombre.setText(sucursal.getNombre());
         txtEditDireccion.setText(sucursal.getDireccion());
         txtEditTelefono.setText(sucursal.getTelefono());
@@ -142,12 +149,17 @@ public class gestionSucursalesController {
 
         String nuevoIva = txtIva.getText();
         if (nuevoIva.isEmpty()) {
-            lblMensajeIva.setText("Ingrese un valor");
-            lblMensajeIva.getStyleClass().add("mensaje-error");
+            lblMensajeIva.setText("El valor de IVA no puede estar vacío");
+            lblMensajeIva.getStyleClass().addAll("mensaje-error");
             return;
         }
 
-        System.out.println("Actualizando IVA general a: " + nuevoIva);
+        if(!nuevoIva.matches("[0-9]+")){
+            lblMensajeIva.setText("Ingrese solo un número entero que simboliza el porcentaje");
+            lblMensajeIva.getStyleClass().addAll("mensaje-error");
+            return;
+        }
+        SesionActual.setValorIva(Double.parseDouble(nuevoIva));
         lblMensajeIva.setText("IVA Actualizado");
         lblMensajeIva.getStyleClass().add("mensaje-exito");
     }
@@ -160,8 +172,11 @@ public class gestionSucursalesController {
         sucursalSeleccionada.setDireccion(txtEditDireccion.getText());
         sucursalSeleccionada.setTelefono(txtEditTelefono.getText());
 
+        parametrosService.actualizarNombreSucursal(sucursalSeleccionada.getCodigo_sucursal(), sucursalSeleccionada.getNombre());
+        parametrosService.actualizarDireccionSucursal(sucursalSeleccionada.getCodigo_sucursal(), sucursalSeleccionada.getDireccion());
+        parametrosService.actualizarTelefonoSucursal(sucursalSeleccionada.getCodigo_sucursal(), sucursalSeleccionada.getTelefono());
         tbSucursales.refresh();
-        System.out.println("Guardando cambios para la sucursal: " + sucursalSeleccionada.getId());
+
 
         lblMensajeSucursal.setText("Cambios guardados correctamente");
         lblMensajeSucursal.getStyleClass().setAll("mensaje-confirmacion", "mensaje-exito");
@@ -179,41 +194,24 @@ public class gestionSucursalesController {
             return;
         }
         String filter = query.toLowerCase();
-        ObservableList<Sucursal> filteredData = FXCollections.observableArrayList();
-        for (Sucursal s : masterData) {
-            if (s.getId().toLowerCase().contains(filter) || s.getNombre().toLowerCase().contains(filter)) {
+        ObservableList<SucursalDTO> filteredData = FXCollections.observableArrayList();
+        for (SucursalDTO s : masterData) {
+            if (s.getCodigo_sucursal().toLowerCase().contains(filter) || s.getNombre().toLowerCase().contains(filter)) {
                 filteredData.add(s);
             }
         }
         tbSucursales.setItems(filteredData);
     }
 
-    private void cargarDatosPrueba() {
-        masterData.addAll(
-                new Sucursal("SM-001", "Matriz Quito North", "Av. Amazonas N45-12 y Gaspar de Villaroel", "02-2456-789"),
-                new Sucursal("SM-002", "Guayaquil Terminal", "C.C. Terminal Terrestre, Local 124", "04-2134-567"),
-                new Sucursal("SM-003", "Cuenca El Ejido", "Av. Solano 4-15 y Tadeo Torres", "07-4109-876")
-        );
-        tbSucursales.setItems(masterData);
-    }
-
-    // --- Clase Auxiliar ---
-    public static class Sucursal {
-        private String id;
-        private String nombre;
-        private String direccion;
-        private String telefono;
-
-        public Sucursal(String id, String nombre, String direccion, String telefono) {
-            this.id = id; this.nombre = nombre; this.direccion = direccion; this.telefono = telefono;
+    private void cargarDatos() {
+        try {
+            masterData.clear();
+            masterData.addAll(parametrosService.consultarSucursales());
+            tbSucursales.setItems(masterData);
+        } catch (Exception e) {
+            System.err.println("Error al cargar los datos de la base de datos: " + e.getMessage());
         }
-
-        public String getId() { return id; }
-        public String getNombre() { return nombre; }
-        public void setNombre(String nombre) { this.nombre = nombre; }
-        public String getDireccion() { return direccion; }
-        public void setDireccion(String direccion) { this.direccion = direccion; }
-        public String getTelefono() { return telefono; }
-        public void setTelefono(String telefono) { this.telefono = telefono; }
     }
+
+
 }

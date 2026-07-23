@@ -1,9 +1,13 @@
 package com.grupo1.sgsm.administracion.gestionUsuarios.controller;
 
+import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioConsultadoDTO;
+import com.grupo1.sgsm.administracion.gestionUsuarios.service.IUsuarioService;
+import com.grupo1.sgsm.administracion.gestionUsuarios.service.UsuarioServiceImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -13,7 +17,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-public class gestionUsuariosController {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class gestionUsuariosController implements Initializable {
 
     // --- Búsqueda y Totales ---
     @FXML private TextField txtBuscar;
@@ -21,11 +28,11 @@ public class gestionUsuariosController {
     @FXML private Label lblTotalAdmins;
 
     // --- Tabla ---
-    @FXML private TableView<Usuario> tbUsuarios;
-    @FXML private TableColumn<Usuario, String> colId;
-    @FXML private TableColumn<Usuario, String> colUsuario;
-    @FXML private TableColumn<Usuario, String> colRol;
-    @FXML private TableColumn<Usuario, String> colCorreo;
+    @FXML private TableView<UsuarioConsultadoDTO> tbUsuarios;
+    @FXML private TableColumn<UsuarioConsultadoDTO, String> colId;
+    @FXML private TableColumn<UsuarioConsultadoDTO, String> colUsuario;
+    @FXML private TableColumn<UsuarioConsultadoDTO, String> colRol;
+    @FXML private TableColumn<UsuarioConsultadoDTO, String> colCorreo;
 
     // --- Panel de Edición ---
     @FXML private Label lblEditId;
@@ -44,37 +51,16 @@ public class gestionUsuariosController {
     @FXML private Label lblBtnModificarIcon;
     @FXML private Label lblBtnEliminarIcon;
 
-    private ObservableList<Usuario> masterData = FXCollections.observableArrayList();
-    private Usuario usuarioSeleccionado;
+    private ObservableList<UsuarioConsultadoDTO> masterData = FXCollections.observableArrayList();
+    private UsuarioConsultadoDTO usuarioSeleccionado;
+
+    // Instancia del servicio que conecta con tu DAO
+    private final IUsuarioService usuarioService = new UsuarioServiceImpl();
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
         icon.getStyleClass().add(styleClass);
         return icon;
-    }
-
-    @FXML
-    public void initialize() {
-        cargarIconos();
-        configurarTabla();
-
-        cmbEditRol.setItems(FXCollections.observableArrayList("ADMINISTRADOR", "VENDEDOR", "LOGÍSTICA", "GERENTE"));
-
-        // Búsqueda Dinámica
-        txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
-            buscarUsuarioRealTime(newValue);
-        });
-
-        // Listener de Selección de Tabla
-        tbUsuarios.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                cargarDetalleEdicion(newSelection);
-            } else {
-                limpiarPanelEdicion();
-            }
-        });
-
-        cargarDatosPrueba();
     }
 
     private void cargarIconos() {
@@ -85,16 +71,16 @@ public class gestionUsuariosController {
     }
 
     private void configurarTabla() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("idUsuario"));
         colUsuario.setCellValueFactory(new PropertyValueFactory<>("nombreUsuario"));
         colRol.setCellValueFactory(new PropertyValueFactory<>("rol"));
         colCorreo.setCellValueFactory(new PropertyValueFactory<>("correo"));
     }
 
-    private void cargarDetalleEdicion(Usuario user) {
+    private void cargarDetalleEdicion(UsuarioConsultadoDTO user) {
         usuarioSeleccionado = user;
 
-        lblEditId.setText("ID: " + user.getId());
+        lblEditId.setText("ID: " + user.getIdUsuario());
         txtEditUsuario.setText(user.getNombreUsuario());
         txtEditCorreo.setText(user.getCorreo());
         cmbEditRol.setValue(user.getRol());
@@ -122,8 +108,9 @@ public class gestionUsuariosController {
             return;
         }
         String lowerCaseFilter = query.toLowerCase();
-        ObservableList<Usuario> filteredData = FXCollections.observableArrayList();
-        for (Usuario u : masterData) {
+        ObservableList<UsuarioConsultadoDTO> filteredData = FXCollections.observableArrayList();
+
+        for (UsuarioConsultadoDTO u : masterData) {
             if (u.getNombreUsuario().toLowerCase().contains(lowerCaseFilter) ||
                     u.getRol().toLowerCase().contains(lowerCaseFilter)) {
                 filteredData.add(u);
@@ -135,69 +122,109 @@ public class gestionUsuariosController {
     private void actualizarEstadisticas() {
         int total = masterData.size();
         int admins = 0;
-        for (Usuario u : masterData) {
-            if (u.getRol().equalsIgnoreCase("ADMINISTRADOR")) {
+        for (UsuarioConsultadoDTO u : masterData) {
+            if (u.getRol() != null && u.getRol().equalsIgnoreCase("ADMINISTRADOR")) {
                 admins++;
             }
         }
         lblTotalUsuarios.setText(String.valueOf(total));
-        lblTotalAdmins.setText(String.format("%02d", admins)); // Formato 04
+        lblTotalAdmins.setText(String.format("%02d", admins));
+    }
+
+    // Método que reemplaza los datos quemados usando el Service
+    private void cargarDatos() {
+        try {
+            masterData.clear();
+            masterData.addAll(usuarioService.consultarUsuarios());
+            tbUsuarios.setItems(masterData);
+            actualizarEstadisticas();
+        } catch (Exception e) {
+            System.err.println("Error al cargar los datos de la base de datos: " + e.getMessage());
+        }
     }
 
     @FXML
     void modificarUsuario(ActionEvent event) {
         if (usuarioSeleccionado == null) return;
 
-        usuarioSeleccionado.setNombreUsuario(txtEditUsuario.getText());
-        usuarioSeleccionado.setCorreo(txtEditCorreo.getText());
-        usuarioSeleccionado.setRol(cmbEditRol.getValue());
+        try {
+            // Parseamos el ID para enviarlo a los métodos del service
+            Integer idUsuario = Integer.parseInt(usuarioSeleccionado.getIdUsuario());
 
-        tbUsuarios.refresh();
-        actualizarEstadisticas();
+            String nuevoNombre = txtEditUsuario.getText();
+            String nuevoCorreo = txtEditCorreo.getText();
+            String nuevoRol = cmbEditRol.getValue();
 
-        lblMensajeConfirmacion.setText("Usuario modificado con éxito");
-        lblMensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-exito");
+            // Evaluamos y mandamos a actualizar solo lo que se modificó en el Service
+            if (!nuevoNombre.equals(usuarioSeleccionado.getNombreUsuario())) {
+                usuarioService.actualizarNombreUsuario(idUsuario, nuevoNombre);
+            }
+            if (!nuevoCorreo.equals(usuarioSeleccionado.getCorreo())) {
+                usuarioService.actualizarCorreoUsuario(idUsuario, nuevoCorreo);
+            }
+            if (!nuevoRol.equals(usuarioSeleccionado.getRol())) {
+                usuarioService.actualizarRolUsuario(idUsuario, nuevoRol);
+            }
+
+            // Recargamos la tabla desde la base de datos para asegurar consistencia
+            cargarDatos();
+            limpiarPanelEdicion();
+
+            lblMensajeConfirmacion.setText("Usuario modificado con éxito");
+            lblMensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-exito");
+
+        } catch (NumberFormatException e) {
+            lblMensajeConfirmacion.setText("Error: Formato de ID inválido");
+            lblMensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-error");
+        } catch (Exception e) {
+            // Captura las excepciones lanzadas por el Service (ej. UsuarioYaRegistradoException)
+            lblMensajeConfirmacion.setText(e.getMessage());
+            lblMensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-error");
+        }
     }
 
     @FXML
     void eliminarUsuario(ActionEvent event) {
         if (usuarioSeleccionado == null) return;
 
-        masterData.remove(usuarioSeleccionado);
-        tbUsuarios.getSelectionModel().clearSelection();
-        actualizarEstadisticas();
+        try {
 
-        lblMensajeConfirmacion.setText("Usuario eliminado");
-        lblMensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-error");
-    }
+            Integer idUsuario = Integer.parseInt(usuarioSeleccionado.getIdUsuario());
+            usuarioService.eliminarUsuario(idUsuario);
 
-    private void cargarDatosPrueba() {
-        masterData.addAll(
-                new Usuario("#USR-001", "Admin_SportMaster", "ADMINISTRADOR", "admin@sportmaster.com.ec"),
-                new Usuario("#USR-002", "Ventas_Quito1", "VENDEDOR", "v.quito1@sportmaster.com.ec"),
-                new Usuario("#USR-003", "Bodega_Surtidor", "LOGÍSTICA", "bodega@sportmaster.com.ec"),
-                new Usuario("#USR-004", "Gerencia_GYE", "ADMINISTRADOR", "gye.admin@sportmaster.com.ec")
-        );
-        tbUsuarios.setItems(masterData);
-        actualizarEstadisticas();
-    }
+            masterData.remove(usuarioSeleccionado);
+            tbUsuarios.getSelectionModel().clearSelection();
+            actualizarEstadisticas();
+            limpiarPanelEdicion();
 
-    public static class Usuario {
-        private String id;
-        private String nombreUsuario;
-        private String rol;
-        private String correo;
-
-        public Usuario(String id, String nombreUsuario, String rol, String correo) {
-            this.id = id; this.nombreUsuario = nombreUsuario; this.rol = rol; this.correo = correo;
+            lblMensajeConfirmacion.setText("Usuario removido de la vista (Implementar en DAO)");
+            lblMensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-error");
+        } catch (Exception e) {
+            lblMensajeConfirmacion.setText("Error al eliminar");
+            lblMensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-error");
         }
+    }
 
-        public String getId() { return id; }
-        public String getNombreUsuario() { return nombreUsuario; }
-        public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
-        public String getRol() { return rol; }
-        public void setRol(String rol) { this.rol = rol; }
-        public String getCorreo() { return correo; }
-        public void setCorreo(String correo) { this.correo = correo; }
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        cargarIconos();
+        configurarTabla();
+
+        cmbEditRol.setItems(FXCollections.observableArrayList("ADMINISTRADOR", "VENDEDOR", "LOGÍSTICA", "GERENTE"));
+
+        txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
+            buscarUsuarioRealTime(newValue);
+        });
+
+        tbUsuarios.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                cargarDetalleEdicion(newSelection);
+            } else {
+                limpiarPanelEdicion();
+            }
+        });
+
+        // Llamar a los datos reales
+        cargarDatos();
     }
 }
