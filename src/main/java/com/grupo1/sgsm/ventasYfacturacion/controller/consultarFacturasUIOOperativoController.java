@@ -1,13 +1,17 @@
 package com.grupo1.sgsm.ventasYfacturacion.controller;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
+
+import com.grupo1.sgsm.ventasYfacturacion.dto.FacturaOperativaDTO;
+import com.grupo1.sgsm.ventasYfacturacion.service.IFacturacionService;
+import com.grupo1.sgsm.ventasYfacturacion.service.FacturacionService;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -21,24 +25,24 @@ public class consultarFacturasUIOOperativoController implements Initializable {
     @FXML private Button btnFiltrar;
 
     // --- Tabla ---
-    @FXML private TableView<FacturaResumen> tbFacturas;
-    @FXML private TableColumn<FacturaResumen, String> colNumeroFactura;
-    @FXML private TableColumn<FacturaResumen, String> colFechaEmision;
-    @FXML private TableColumn<FacturaResumen, String> colCedulaCliente;
+    @FXML private TableView<FacturaOperativaDTO> tbFacturas;
+    @FXML private TableColumn<FacturaOperativaDTO, String> colNumeroFactura;
+    @FXML private TableColumn<FacturaOperativaDTO, String> colFechaEmision;
+    @FXML private TableColumn<FacturaOperativaDTO, String> colCedulaCliente;
 
     // --- Paginación y Footer ---
     @FXML private Label lblPaginacion;
-
+    @FXML private Label lblFacturaSeleccionada;
+    @FXML private Button btnVerCompleta;
 
     // --- Íconos ---
     @FXML private Label lblIconFiltrar;
-
+    @FXML private Label lblIconVer;
 
     // --- Variables de Estado ---
-    private ObservableList<FacturaResumen> listaFacturas = FXCollections.observableArrayList();
-
-    // AQUÍ SE GUARDA LA FACTURA SELECCIONADA PARA MANDARLA A LA OTRA VENTANA
-    private FacturaResumen facturaActualSeleccionada;
+    private final IFacturacionService facturacionService = new FacturacionService();
+    private final ObservableList<FacturaOperativaDTO> listaFacturas = FXCollections.observableArrayList();
+    private FacturaOperativaDTO facturaActualSeleccionada;
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
@@ -48,48 +52,50 @@ public class consultarFacturasUIOOperativoController implements Initializable {
 
     private void cargarIconos() {
         lblIconFiltrar.setGraphic(crearIcono("fa-filter", "btn-primary-icon-font"));
-
+        if (lblIconVer != null) {
+            lblIconVer.setGraphic(crearIcono("fa-eye", "btn-primary-icon-font"));
+        }
     }
 
     private void configurarTabla() {
-        colNumeroFactura.setCellValueFactory(new PropertyValueFactory<>("numeroFactura"));
-        colFechaEmision.setCellValueFactory(new PropertyValueFactory<>("fechaEmision"));
-        colCedulaCliente.setCellValueFactory(new PropertyValueFactory<>("cedulaCliente"));
+        colNumeroFactura.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNumeroFactura()));
+        colFechaEmision.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFechaEmision()));
+        colCedulaCliente.setCellValueFactory(cellData -> {
+            String cedula = cellData.getValue().getCedulaCliente();
+            String nombre = cellData.getValue().getNombreCliente();
+            if (nombre != null && !nombre.isEmpty() && !nombre.equalsIgnoreCase("Consumidor Final")) {
+                return new SimpleStringProperty(cedula + " (" + nombre + ")");
+            }
+            return new SimpleStringProperty(cedula);
+        });
     }
 
     @FXML
     void filtrarFacturas(ActionEvent event) {
-        LocalDate fechaInicio = dpFechaInicio.getValue();
-        LocalDate fechaFin = dpFechaFin.getValue();
-
-        // Lógica de BD: Aquí harías tu consulta SELECT con los parámetros de fecha.
-        System.out.println("Filtrando facturas desde " + fechaInicio + " hasta " + fechaFin);
-
-        // Al volver a cargar datos, es buena práctica limpiar la selección actual
         tbFacturas.getSelectionModel().clearSelection();
+        cargarDatos();
     }
 
     @FXML
     void verInformacionCompleta(ActionEvent event) {
         if (facturaActualSeleccionada != null) {
-            System.out.println("Abriendo información completa de la factura: " + facturaActualSeleccionada.getNumeroFactura());
-
-            // Aquí puedes llamar a tu NavigationUtil o cargar el nuevo FXML
-            // pasándole el objeto 'facturaActualSeleccionada' al controlador de destino.
+            System.out.println("Abriendo información completa de la factura operativa: " + facturaActualSeleccionada.getNumeroFactura());
+            // Nota: En la versión operativa no hay una vista de detalles específica implementada en FXML,
+            // pero si se requiriera, se cargaría aquí.
         }
     }
 
-    // --- Datos de Prueba ---
-    private void cargarDatosPrueba() {
-        listaFacturas.addAll(
-                new FacturaResumen("FAC-001-002-000456123", "15/10/2023", "1726543210"),
-                new FacturaResumen("FAC-001-002-000456124", "15/10/2023", "0912345678"),
-                new FacturaResumen("FAC-001-002-000456125", "14/10/2023", "1718273645"),
-                new FacturaResumen("FAC-001-002-000456126", "14/10/2023", "0809876543"),
-                new FacturaResumen("FAC-001-002-000456127", "13/10/2023", "1314151617")
-        );
-        tbFacturas.setItems(listaFacturas);
-        lblPaginacion.setText("Mostrando " + listaFacturas.size() + " de 156 comprobantes");
+    private void cargarDatos() {
+        LocalDate inicio = dpFechaInicio.getValue();
+        LocalDate fin = dpFechaFin.getValue();
+        try {
+            listaFacturas.setAll(facturacionService.obtenerFacturasOperativas(inicio, fin));
+            tbFacturas.setItems(listaFacturas);
+            lblPaginacion.setText("Mostrando " + listaFacturas.size() + " comprobantes");
+        } catch (Exception e) {
+            System.err.println("Error al cargar facturas operativas: " + e.getMessage());
+            lblPaginacion.setText("Error al cargar comprobantes");
+        }
     }
 
     @Override
@@ -97,25 +103,25 @@ public class consultarFacturasUIOOperativoController implements Initializable {
         cargarIconos();
         configurarTabla();
 
+        // Listener para detectar fila seleccionada y activar botón de detalles
+        tbFacturas.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                facturaActualSeleccionada = newSelection;
+                if (btnVerCompleta != null) btnVerCompleta.setDisable(false);
+                if (lblFacturaSeleccionada != null) {
+                    lblFacturaSeleccionada.setText("Factura seleccionada: " + newSelection.getNumeroFactura());
+                    lblFacturaSeleccionada.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #00796B;");
+                }
+            } else {
+                facturaActualSeleccionada = null;
+                if (btnVerCompleta != null) btnVerCompleta.setDisable(true);
+                if (lblFacturaSeleccionada != null) {
+                    lblFacturaSeleccionada.setText("Factura seleccionada: Ninguna");
+                    lblFacturaSeleccionada.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555555;");
+                }
+            }
+        });
 
-        // (Opcional) Cargar datos de prueba al iniciar si así lo deseas
-        cargarDatosPrueba();
-    }
-
-    // --- Modelo Auxiliar ---
-    public static class FacturaResumen {
-        private String numeroFactura;
-        private String fechaEmision;
-        private String cedulaCliente;
-
-        public FacturaResumen(String numeroFactura, String fechaEmision, String cedulaCliente) {
-            this.numeroFactura = numeroFactura;
-            this.fechaEmision = fechaEmision;
-            this.cedulaCliente = cedulaCliente;
-        }
-
-        public String getNumeroFactura() { return numeroFactura; }
-        public String getFechaEmision() { return fechaEmision; }
-        public String getCedulaCliente() { return cedulaCliente; }
+        cargarDatos();
     }
 }

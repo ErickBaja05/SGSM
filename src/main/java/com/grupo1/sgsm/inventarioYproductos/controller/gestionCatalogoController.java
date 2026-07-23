@@ -12,7 +12,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
