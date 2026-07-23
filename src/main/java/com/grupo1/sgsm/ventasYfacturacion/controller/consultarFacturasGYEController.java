@@ -145,7 +145,7 @@ public class consultarFacturasGYEController implements Initializable {
                 lblFacturaSeleccionada.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555555;");
             }
         });
-        
+
     }
 
     // --- Método utilitario para no repetir código de alertas ---

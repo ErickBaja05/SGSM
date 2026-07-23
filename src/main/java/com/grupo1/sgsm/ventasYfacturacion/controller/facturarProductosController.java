@@ -4,8 +4,8 @@ import com.grupo1.sgsm.clientes.dto.ClienteConsultaDTO;
 import com.grupo1.sgsm.clientes.service.ClientesService;
 import com.grupo1.sgsm.clientes.service.IClientesService;
 import com.grupo1.sgsm.core.util.ConfigSucursal;
+import com.grupo1.sgsm.inventarioYproductos.dto.InfoProductoDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
-import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.dto.DetalleFacturaDTOFacturacion;
 import com.grupo1.sgsm.ventasYfacturacion.dto.NuevaFacturaDTO;
 import com.grupo1.sgsm.ventasYfacturacion.service.FacturarProductosUIOImpl;
@@ -96,15 +96,22 @@ public class facturarProductosController implements Initializable {
     public static class ItemCarrito {
         private ProductoConsultaDTO producto;
         private int cantidad;
+        private int stockDisponible;
+        private String categoria;
 
-        public ItemCarrito(ProductoConsultaDTO producto, int cantidad) {
+        public ItemCarrito(ProductoConsultaDTO producto, int cantidad, int stockDisponible, String categoria) {
             this.producto = producto;
             this.cantidad = cantidad;
+            this.stockDisponible = stockDisponible;
+            this.categoria = categoria;
         }
 
         public ProductoConsultaDTO getProducto() { return producto; }
         public int getCantidad() { return cantidad; }
         public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+        public int getStockDisponible() { return stockDisponible; }
+        public void setStockDisponible(int stockDisponible) { this.stockDisponible = stockDisponible; }
+        public String getCategoria() { return categoria; }
         public double getSubtotal() { return producto.getPrecio() * cantidad; }
     }
 
@@ -198,7 +205,7 @@ public class facturarProductosController implements Initializable {
     // TABLA "BUSCAR PRODUCTO"
     // ==========================================
     private void configurarTablaBusqueda() {
-        colBusqCod.setCellValueFactory(new PropertyValueFactory<>("codigo")); // Asegura que coincida con tu DTO
+        colBusqCod.setCellValueFactory(new PropertyValueFactory<>("codigo"));
         colBusqNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colBusqPrecio.setCellValueFactory(data -> new SimpleStringProperty(String.format("$%.2f", data.getValue().getPrecio())));
 
@@ -240,7 +247,7 @@ public class facturarProductosController implements Initializable {
                     Label lblNombre = new Label(detalle.getProducto().getNombre());
                     lblNombre.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
 
-                    Label lblSub = new Label("Cat: " + detalle.getProducto().getCategoria());
+                    Label lblSub = new Label("Cat: " + detalle.getCategoria() + " | Stock: " + detalle.getStockDisponible());
                     lblSub.setStyle("-fx-font-size: 10px; -fx-text-fill: #888;");
 
                     box.getChildren().addAll(lblNombre, lblSub);
@@ -260,7 +267,17 @@ public class facturarProductosController implements Initializable {
                     if (getTableRow() != null && getTableRow().getItem() != null) {
                         ItemCarrito det = getTableRow().getItem();
                         int nuevaCant = newV.isEmpty() ? 0 : Integer.parseInt(newV);
-                        det.setCantidad(nuevaCant);
+
+                        if (nuevaCant > det.getStockDisponible()) {
+                            mostrarAlerta(Alert.AlertType.WARNING, "Límite Excedido",
+                                    "Solo hay " + det.getStockDisponible() + " unidades disponibles en inventario.");
+
+                            txtCant.setText(oldV);
+                            det.setCantidad(oldV.isEmpty() ? 0 : Integer.parseInt(oldV));
+                        } else {
+                            det.setCantidad(nuevaCant);
+                        }
+
                         tbDetalleFactura.refresh();
                         calcularTotales();
                     }
@@ -301,15 +318,40 @@ public class facturarProductosController implements Initializable {
     }
 
     private void agregarAlDetalle(ProductoConsultaDTO p) {
+        // 1. Consultar en vivo el InfoProductoDTO utilizando el método correspondiente
+        InfoProductoDTO info;
+        if ("UIO".equals(sedeActual)) {
+            info = serviceUIO.agregarProductoCarrito(p.getCodigo());
+        } else {
+            info = serviceGYE.agregarProductoCarrito(p.getCodigo());
+        }
+
+        int stockActual = Integer.parseInt(info.getStock());
+
+        if (stockActual < 1) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Agotado", "Este producto no tiene stock disponible.");
+            return;
+        }
+
+        // 2. Verificar si ya existe en la factura
         for (ItemCarrito det : detallesFactura) {
             if (det.getProducto().getCodigo().equals(p.getCodigo())) {
+                if ((det.getCantidad() + 1) > stockActual) {
+                    mostrarAlerta(Alert.AlertType.WARNING, "Stock Insuficiente",
+                            "No puede agregar más. El stock máximo de este producto es " + stockActual);
+                    return;
+                }
+
+                det.setStockDisponible(stockActual);
                 det.setCantidad(det.getCantidad() + 1);
                 tbDetalleFactura.refresh();
                 calcularTotales();
                 return;
             }
         }
-        detallesFactura.add(new ItemCarrito(p, 1));
+
+        // 3. Si no existe, agregarlo al carrito con su stock y categoría reales
+        detallesFactura.add(new ItemCarrito(p, 1, stockActual, info.getCategoria()));
         calcularTotales();
     }
 
@@ -346,7 +388,6 @@ public class facturarProductosController implements Initializable {
     // ==========================================
     @FXML
     void generarFactura(ActionEvent event) {
-        // 1. Validaciones
         if (txtCedulaRuc.getText().trim().isEmpty() || txtNombreCliente.getText().trim().isEmpty()) {
             mostrarAlerta(Alert.AlertType.WARNING, "Falta Cliente", "Por favor, busque y seleccione un cliente válido.");
             return;
@@ -362,9 +403,8 @@ public class facturarProductosController implements Initializable {
             }
         }
 
-        // 2. Determinar Método de Pago
         ToggleButton btnPagoSeleccionado = (ToggleButton) tgMetodoPago.getSelectedToggle();
-        String metodoPago = "Efectivo"; // Default
+        String metodoPago = "Efectivo";
         if (btnPagoSeleccionado == btnTarjeta) {
             metodoPago = "Tarjeta de Crédito";
         } else if (btnPagoSeleccionado == btnTransf) {
@@ -372,7 +412,6 @@ public class facturarProductosController implements Initializable {
         }
 
         try {
-            // 3. Obtener correlativo dinámico desde BD
             String numeroFactura;
             if ("UIO".equals(sedeActual)) {
                 numeroFactura = serviceUIO.obtenerSiguienteNumeroFactura();
@@ -380,7 +419,6 @@ public class facturarProductosController implements Initializable {
                 numeroFactura = serviceGYE.obtenerSiguienteNumeroFactura();
             }
 
-            // 4. Mapear DTO Cabecera
             NuevaFacturaDTO nuevaFactura = new NuevaFacturaDTO(
                     numeroFactura,
                     txtCedulaRuc.getText().trim(),
@@ -392,7 +430,6 @@ public class facturarProductosController implements Initializable {
                     ivaGlobal
             );
 
-            // 5. Mapear DTOs Detalle con el nuevo DTO de facturación
             List<DetalleFacturaDTOFacturacion> listaDetalles = new ArrayList<>();
             for (ItemCarrito item : detallesFactura) {
                 listaDetalles.add(new DetalleFacturaDTOFacturacion(
@@ -404,7 +441,6 @@ public class facturarProductosController implements Initializable {
                 ));
             }
 
-            // 6. Inyectar en el Backend
             if ("UIO".equals(sedeActual)) {
                 serviceUIO.facturarProductos(nuevaFactura, listaDetalles);
             } else {
@@ -426,7 +462,6 @@ public class facturarProductosController implements Initializable {
         detallesFactura.clear();
         calcularTotales();
         tgMetodoPago.selectToggle(btnEfectivo);
-        // Volver a cargar stock real (por las rebajas hechas)
         cargarProductosDesdeBD();
     }
 
