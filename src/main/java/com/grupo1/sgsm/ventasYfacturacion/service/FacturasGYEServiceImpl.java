@@ -25,6 +25,7 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
     private FacturaGyeDAO facturaGyeDAO = new FacturaGyeDAO();
     private IProductoService productoService = new ProductoService();
     private DetalleFacturaDAO detalleFacturaDAO = new DetalleFacturaDAO();
+    @SuppressWarnings("unused")
     private IStockLocalService stockLocalService = new StockLocalService();
 
     @Override
@@ -46,7 +47,7 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
     @Override
     public void facturarProductos(NuevaFacturaDTO nuevaFacturaDTO, List<DetalleFacturaDTO> detallesFacturaDTO) {
 
-        try{
+        try {
             FacturaGYE facturaGYE = new FacturaGYE();
             facturaGYE.setNumero_factura(nuevaFacturaDTO.getNumero_factura());
             facturaGYE.setFecha_emision(nuevaFacturaDTO.getFecha_emision());
@@ -68,33 +69,27 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
                 detalle.setCodigo_sucursal(facturaGYE.getCodigo_sucursal());
                 detalle.setSubtotal_producto(detalleFacturaDTO.getSubtotal_producto());
                 detalleFacturaDAO.insertar(detalle);
-
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new NoSePudoFacturarException("Error desconocido, no se pudo facturar");
         }
 
         // TODA LA LOGICA PARA AJUSTAR STOCK A LOS PRODUCTOS
-
-//        for(DetalleFacturaDTO detalleFacturaDTO : detallesFacturaDTO) {
-//            stockLocalService.consultarStockLocal();
-//            stockLocalService.actualizarStock(detalleFacturaDTO.getCodigo_producto(), detalleFacturaDTO.getCantidad());
-//        }
-
+        // for(DetalleFacturaDTO detalleFacturaDTO : detallesFacturaDTO) {
+        //     stockLocalService.consultarStockLocal();
+        //     stockLocalService.actualizarStock(detalleFacturaDTO.getCodigo_producto(), detalleFacturaDTO.getCantidad());
+        // }
     }
 
     @Override
     public InfoProductoDTO agregarProductoCarrito(String codigoProducto) {
         // LINEA DEL SERVICE DE PRODUCTO PARA CONSULTAR UN STOCK
         // InfoProductoDTO info = productoService.consultarStockProducto(codigoProducto)
-        return new InfoProductoDTO("10","de prueba");
-
-
+        return new InfoProductoDTO("10", "de prueba");
     }
 
     @Override
     public List<ProductoConsultaDTO> productosParaCarrito() {
-        return List.of();
+        return productoService.obtenerProductosConStockDisponible();
     }
-
 }
