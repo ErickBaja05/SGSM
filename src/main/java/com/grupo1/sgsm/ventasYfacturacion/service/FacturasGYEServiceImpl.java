@@ -1,5 +1,6 @@
 package com.grupo1.sgsm.ventasYfacturacion.service;
 
+import com.grupo1.sgsm.core.util.ConfigSucursal;
 import com.grupo1.sgsm.inventarioYproductos.dto.InfoProductoDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
 import com.grupo1.sgsm.inventarioYproductos.service.IProductoService;
@@ -61,11 +62,13 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
     @Override
     public void facturarProductos(NuevaFacturaDTO nuevaFacturaDTO, List<DetalleFacturaDTOFacturacion> detallesFacturaDTO) {
         try {
+            String nodoEjecucion = ConfigSucursal.getSucursalActual().toUpperCase();
+
             // 1. Mapear y persistir la cabecera de la factura (Tabla unificada en GYE)
             FacturaGYE facturaGYE = new FacturaGYE();
             facturaGYE.setNumero_factura(nuevaFacturaDTO.getNumero_factura());
             facturaGYE.setCedula_ciudadania(nuevaFacturaDTO.getCedula_ciudadania());
-            facturaGYE.setCodigo_sucursal(nuevaFacturaDTO.getCodigo_sucursal());
+            facturaGYE.setCodigo_sucursal(nodoEjecucion);
             facturaGYE.setFecha_emision(nuevaFacturaDTO.getFecha_emision());
             facturaGYE.setTotal(nuevaFacturaDTO.getTotal());
             facturaGYE.setMetodo_pago(nuevaFacturaDTO.getMetodo_pago());
@@ -78,9 +81,9 @@ public class FacturasGYEServiceImpl implements IFacturasGYEService {
             for (DetalleFacturaDTOFacturacion dto : detallesFacturaDTO) {
                 // A) Guardar el detalle de factura
                 DetalleFactura detalle = new DetalleFactura();
-                detalle.setNumero_factura(nuevaFacturaDTO.getNumero_factura()); // Hereda de la cabecera[cite: 25]
+                detalle.setNumero_factura(nuevaFacturaDTO.getNumero_factura()); // Hereda de la cabecera
                 detalle.setCodigo_producto(dto.getCodigo_producto());
-                detalle.setCodigo_sucursal(nuevaFacturaDTO.getCodigo_sucursal()); // Hereda de la cabecera[cite: 25]
+                detalle.setCodigo_sucursal(nodoEjecucion); // Hereda nodo de ejecución
                 detalle.setCantidad(dto.getCantidad());
                 detalle.setPrecio_unitario(dto.getPrecio_unitario());
                 detalle.setSubtotal_producto(dto.getSubtotal_producto());

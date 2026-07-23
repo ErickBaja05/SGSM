@@ -1,5 +1,6 @@
 package com.grupo1.sgsm.ventasYfacturacion.service;
 
+import com.grupo1.sgsm.core.util.ConfigSucursal;
 import com.grupo1.sgsm.inventarioYproductos.dto.InfoProductoDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
 import com.grupo1.sgsm.inventarioYproductos.service.IProductoService;
@@ -39,10 +40,12 @@ public class FacturarProductosUIOImpl implements IFacturarProductosUIO {
     @Override
     public void facturarProductos(NuevaFacturaDTO nuevaFacturaDTO, List<DetalleFacturaDTOFacturacion> detallesFacturaDTO) {
         try {
+            String nodoEjecucion = ConfigSucursal.getSucursalActual().toUpperCase();
+
             // 1. Mapear y persistir el fragmento CONTABLE
             FacturaUIOContable contable = new FacturaUIOContable();
             contable.setNumero_factura(nuevaFacturaDTO.getNumero_factura());
-            contable.setCodigo_sucursal(nuevaFacturaDTO.getCodigo_sucursal());
+            contable.setCodigo_sucursal(nodoEjecucion);
             contable.setTotal(nuevaFacturaDTO.getTotal());
             contable.setMetodo_pago(nuevaFacturaDTO.getMetodo_pago());
             contable.setSubtotal(nuevaFacturaDTO.getSubtotal());
@@ -52,7 +55,7 @@ public class FacturarProductosUIOImpl implements IFacturarProductosUIO {
             // 2. Mapear y persistir el fragmento OPERATIVO
             FacturaUIOOperativo operativo = new FacturaUIOOperativo();
             operativo.setNumero_factura(nuevaFacturaDTO.getNumero_factura());
-            operativo.setCodigo_sucursal(nuevaFacturaDTO.getCodigo_sucursal());
+            operativo.setCodigo_sucursal(nodoEjecucion);
             operativo.setCedula_ciudadania(nuevaFacturaDTO.getCedula_ciudadania());
             operativo.setFecha_emision(nuevaFacturaDTO.getFecha_emision());
             uioOperativoDAO.insertar(operativo);
@@ -63,7 +66,7 @@ public class FacturarProductosUIOImpl implements IFacturarProductosUIO {
                 DetalleFactura detalle = new DetalleFactura();
                 detalle.setNumero_factura(nuevaFacturaDTO.getNumero_factura()); // Hereda cabecera
                 detalle.setCodigo_producto(dto.getCodigo_producto());
-                detalle.setCodigo_sucursal(nuevaFacturaDTO.getCodigo_sucursal()); // Hereda cabecera
+                detalle.setCodigo_sucursal(nodoEjecucion); // Hereda nodo de ejecución
                 detalle.setCantidad(dto.getCantidad());
                 detalle.setPrecio_unitario(dto.getPrecio_unitario());
                 detalle.setSubtotal_producto(dto.getSubtotal_producto());
