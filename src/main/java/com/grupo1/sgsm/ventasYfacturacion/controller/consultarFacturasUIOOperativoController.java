@@ -137,6 +137,5 @@ public class consultarFacturasUIOOperativoController implements Initializable {
             }
         });
 
-        cargarDatos();
     }
 }

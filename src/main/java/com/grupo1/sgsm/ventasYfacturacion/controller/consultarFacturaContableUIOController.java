@@ -176,6 +176,5 @@ public class consultarFacturaContableUIOController implements Initializable {
             }
         });
 
-        cargarDatos();
     }
 }
