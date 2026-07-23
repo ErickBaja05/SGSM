@@ -13,23 +13,42 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.grupo1.sgsm.inventarioYproductos.dto.ConsultaStockLocalDTO;
+import com.grupo1.sgsm.inventarioYproductos.service.IStockLocalService;
+import com.grupo1.sgsm.inventarioYproductos.service.StockLocalService;
+
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class consultarStockLocalController implements Initializable {
 
-    @FXML private TextField txtBuscar;
-    @FXML private Label lblSearchIcon;
+    @FXML
+    private TextField txtBuscar;
+    @FXML
+    private Label lblSearchIcon;
+    @FXML
+    private Label lblSubtitulo;
 
     // --- Tabla y Columnas ---
-    @FXML private TableView<StockLocal> tbStock;
-    @FXML private TableColumn<StockLocal, String> colCodigo;
-    @FXML private TableColumn<StockLocal, String> colNombre;
-    @FXML private TableColumn<StockLocal, Integer> colStock;
-    @FXML private TableColumn<StockLocal, String> colSucursal;
+    @FXML
+    private TableView<ConsultaStockLocalDTO> tbStock;
+    @FXML
+    private TableColumn<ConsultaStockLocalDTO, String> colCodigo;
+    @FXML
+    private TableColumn<ConsultaStockLocalDTO, String> colNombre;
+    @FXML
+    private TableColumn<ConsultaStockLocalDTO, Integer> colStock;
+    @FXML
+    private TableColumn<ConsultaStockLocalDTO, String> colSucursal;
 
+    private IStockLocalService stockLocalService;
     // Lista maestra para la búsqueda dinámica
-    private ObservableList<StockLocal> masterData = FXCollections.observableArrayList();
+    private ObservableList<ConsultaStockLocalDTO> masterData = FXCollections.observableArrayList();
+
+    public consultarStockLocalController() {
+        this.stockLocalService = new StockLocalService();
+    }
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
@@ -37,17 +56,31 @@ public class consultarStockLocalController implements Initializable {
         return icon;
     }
 
+    private void cargarDatos() {
+        try {
+            List<ConsultaStockLocalDTO> datos = stockLocalService.consultarStockLocal();
+            if (datos != null) {
+                masterData.setAll(datos);
+            } else {
+                masterData.clear();
+            }
+            tbStock.setItems(masterData);
+        } catch (Exception e) {
+            System.err.println("Error al cargar datos de stock local: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     private void configurarTabla() {
-        colCodigo.setCellValueFactory(new PropertyValueFactory<>("codigo"));
-        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        colSucursal.setCellValueFactory(new PropertyValueFactory<>("sucursal"));
+        colCodigo.setCellValueFactory(new PropertyValueFactory<>("codigo_producto"));
+        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre_producto"));
+        colSucursal.setCellValueFactory(new PropertyValueFactory<>("codigo_sucursal"));
 
         // Mapear el valor del stock
         colStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
-        // Magia visual: Crear las "píldoras" de stock y pintar de rojo si es bajo
-        colStock.setCellFactory(param -> new TableCell<StockLocal, Integer>() {
+        // Magia visual: Crear las "píldoras" de stock y pintar de rojo si es bajo (< 10)
+        colStock.setCellFactory(param -> new TableCell<ConsultaStockLocalDTO, Integer>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
@@ -57,17 +90,17 @@ public class consultarStockLocalController implements Initializable {
                     setText(null);
                 } else {
                     Label lblPildora = new Label(String.valueOf(item));
-                    lblPildora.setStyle("-fx-padding: 4 12; -fx-background-radius: 12; -fx-font-weight: bold; -fx-font-size: 11px;");
+                    lblPildora.setStyle(
+                            "-fx-padding: 4 12; -fx-background-radius: 12; -fx-font-weight: bold; -fx-font-size: 11px;");
 
-                    // Si el stock es menor a 10, lo pintamos de rojo/rosado como en el mockup
                     if (item < 10) {
-                        lblPildora.setStyle(lblPildora.getStyle() + "-fx-background-color: #FDF2F2; -fx-text-fill: #D32F2F;");
+                        lblPildora.setStyle(
+                                lblPildora.getStyle() + "-fx-background-color: #FDF2F2; -fx-text-fill: #D32F2F;");
                     } else {
-                        // Stock normal: fondo gris, texto oscuro
-                        lblPildora.setStyle(lblPildora.getStyle() + "-fx-background-color: #E2E8F0; -fx-text-fill: #333333;");
+                        lblPildora.setStyle(
+                                lblPildora.getStyle() + "-fx-background-color: #E2E8F0; -fx-text-fill: #333333;");
                     }
 
-                    // Centramos el label dentro de la celda
                     HBox box = new HBox(lblPildora);
                     box.setStyle("-fx-alignment: CENTER;");
 
@@ -85,33 +118,27 @@ public class consultarStockLocalController implements Initializable {
         }
 
         String lowerCaseFilter = query.toLowerCase();
-        ObservableList<StockLocal> filteredData = FXCollections.observableArrayList();
+        ObservableList<ConsultaStockLocalDTO> filteredData = FXCollections.observableArrayList();
 
-        for (StockLocal p : masterData) {
-            if (p.getCodigo().toLowerCase().contains(lowerCaseFilter) ||
-                    p.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+        for (ConsultaStockLocalDTO p : masterData) {
+            if ((p.getCodigo_producto() != null && p.getCodigo_producto().toLowerCase().contains(lowerCaseFilter)) ||
+                    (p.getNombre_producto() != null
+                            && p.getNombre_producto().toLowerCase().contains(lowerCaseFilter))) {
                 filteredData.add(p);
             }
         }
         tbStock.setItems(filteredData);
     }
 
-    // --- Clase Auxiliar (Reemplaza con tu modelo real) ---
-    private void cargarDatosPrueba() {
-        masterData.addAll(
-                new StockLocal("SM-SHO-001", "Zapatillas de Running X1", 45, "UIO"),
-                new StockLocal("SM-APP-104", "Camiseta Técnica Pro (Talla M)", 120, "UIO"),
-                new StockLocal("SM-ACC-055", "Mochila Deportiva 30L", 3, "UIO"), // Este saldrá rojo
-                new StockLocal("SM-EQU-221", "Balón de Fútbol Sala N°4", 28, "UIO"),
-                new StockLocal("SM-SHO-089", "Botines Césped Sintético Evo", 15, "UIO")
-        );
-        tbStock.setItems(masterData);
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Cargar ícono de lupa
         lblSearchIcon.setGraphic(crearIcono("fa-search", "search-icon-font"));
+
+        String sucursalLocal = com.grupo1.sgsm.core.util.ConfigSucursal.getSucursalActual().toUpperCase();
+        if (lblSubtitulo != null) {
+            lblSubtitulo.setText("Revisa la disponibilidad de productos en la sucursal " + sucursalLocal + ".");
+        }
 
         configurarTabla();
 
@@ -120,23 +147,7 @@ public class consultarStockLocalController implements Initializable {
             buscarProductoRealTime(newValue);
         });
 
-        // Cargar datos (Esto se reemplaza con tu consulta SQL a la sede UIO)
-        cargarDatosPrueba();
-    }
-
-    // Clase Modelo Interna
-    public static class StockLocal {
-        private String codigo;
-        private String nombre;
-        private int stock;
-        private String sucursal;
-
-        public StockLocal(String codigo, String nombre, int stock, String sucursal) {
-            this.codigo = codigo; this.nombre = nombre; this.stock = stock; this.sucursal = sucursal;
-        }
-        public String getCodigo() { return codigo; }
-        public String getNombre() { return nombre; }
-        public int getStock() { return stock; }
-        public String getSucursal() { return sucursal; }
+        // Cargar datos reales desde el servicio
+        cargarDatos();
     }
 }

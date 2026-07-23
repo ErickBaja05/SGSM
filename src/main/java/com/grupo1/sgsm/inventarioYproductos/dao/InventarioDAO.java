@@ -1,6 +1,5 @@
 package com.grupo1.sgsm.inventarioYproductos.dao;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,8 +9,8 @@ import java.util.List;
 
 import com.grupo1.sgsm.inventarioYproductos.model.Inventario;
 import com.grupo1.sgsm.core.database.DatabaseConnection;
-import com.grupo1.sgsm.core.session.SesionActual;
-import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
+import com.grupo1.sgsm.core.database.NetworkChecker;
+import com.grupo1.sgsm.core.util.ConfigSucursal;
 
 public class InventarioDAO {
 
@@ -27,29 +26,87 @@ public class InventarioDAO {
     }
 
     // ===============================
-    // CONSULTAR TODOS
+    // CONSULTAR TODOS CON DOBLE VALIDACIÓN DE RED Y NODO FÍSICO
     // ===============================
     public List<Inventario> consultarTodos() {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
-
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = String.format("SELECT * FROM %s", vista);
-
+        String nodoFisico = ConfigSucursal.getSucursalActual().toUpperCase();
+        boolean redDisponible = verificarConectividad();
         List<Inventario> inventarios = new ArrayList<>();
 
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
-             PreparedStatement ps = conn.prepareStatement(sql);
+        // 1. Si la red está activa, consultamos el stock perteneciente al nodo local físico
+        if (redDisponible) {
+            String vista = nodoFisico + ".dbo.V_inventario";
+            String sql = String.format("""
+                SELECT v.codigo_producto, v.stock, COALESCE(s.codigo_sucursal, v.codigo_sucursal) AS codigo_sucursal
+                FROM %s v
+                LEFT JOIN %s.dbo.sucursal s ON v.codigo_sucursal = s.codigo_sucursal
+                WHERE UPPER(v.codigo_sucursal) = ?
+                """, vista, nodoFisico);
+
+            try (Connection conn = DatabaseConnection.getConnection(nodoFisico);
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, nodoFisico);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        inventarios.add(mapearInventario(rs));
+                    }
+                }
+                return inventarios;
+            } catch (SQLException e) {
+                // Fallback si la vista falla
+            }
+        }
+
+        // 2. Si la red está CAÍDA (o falla la vista), se redirige al fragmento físico local disponible
+        String tablaFragmentoLocal = nodoFisico + ".dbo.inventario" + nodoFisico;
+        String sqlFallback = String.format("SELECT * FROM %s", tablaFragmentoLocal);
+
+        try (Connection conn = DatabaseConnection.getConnection(nodoFisico);
+             PreparedStatement ps = conn.prepareStatement(sqlFallback);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 inventarios.add(mapearInventario(rs));
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException("Error al consultar inventario", e);
+            System.err.println("Error al consultar inventario en nodo local físico: " + e.getMessage());
+        }
+
+        return inventarios;
+    }
+
+    // ===============================
+    // CONSULTAR REMOTO (NODOS DIFERENTES AL NODO LOCAL FÍSICO)
+    // ===============================
+    public List<Inventario> consultarRemoto() {
+        String nodoFisico = ConfigSucursal.getSucursalActual().toUpperCase();
+        List<Inventario> inventarios = new ArrayList<>();
+
+        if (!verificarConectividad()) {
+            // Sin red no se puede consultar inventario remoto
+            return inventarios;
+        }
+
+        String vista = nodoFisico + ".dbo.V_inventario";
+        String sql = String.format("""
+            SELECT v.codigo_producto, v.stock, COALESCE(s.codigo_sucursal, v.codigo_sucursal) AS codigo_sucursal
+            FROM %s v
+            LEFT JOIN %s.dbo.sucursal s ON v.codigo_sucursal = s.codigo_sucursal
+            WHERE UPPER(v.codigo_sucursal) <> ?
+            """, vista, nodoFisico);
+
+        try (Connection conn = DatabaseConnection.getConnection(nodoFisico);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, nodoFisico);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    inventarios.add(mapearInventario(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al consultar inventario remoto: " + e.getMessage());
         }
 
         return inventarios;
@@ -59,22 +116,18 @@ public class InventarioDAO {
     // CONSULTAR POR PRODUCTO
     // ===============================
     public Inventario consultarPorProducto(String codigoProducto) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
+        String nodoFisico = ConfigSucursal.getSucursalActual();
+        String tablaOVista = obtenerTablaOVistaInventario();
+        String sql = String.format("SELECT * FROM %s WHERE codigo_producto = ?", tablaOVista);
 
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = String.format("SELECT * FROM %s WHERE codigo_producto = ?", vista);
-
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoFisico);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, codigoProducto);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mapearInventario(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearInventario(rs);
+                }
             }
 
         } catch (SQLException e) {
@@ -88,44 +141,35 @@ public class InventarioDAO {
     // INSERTAR
     // ===============================
     public void insertar(Inventario inv) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
-
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
+        String nodoFisico = ConfigSucursal.getSucursalActual();
+        String tablaOVista = obtenerTablaOVistaInventario();
         String sql = String.format("""
             INSERT INTO %s (codigo_sucursal, codigo_producto, stock)
             VALUES (?, ?, ?)
-            """, vista);
+            """, tablaOVista);
 
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoFisico);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, inv.getCodigo_sucursal());
             ps.setString(2, inv.getCodigo_producto());
-            ps.setInt(3, inv.getStock());
-
+            ps.setInt(3, inv.getStock() != null ? inv.getStock() : 0);
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error al insertar inventario", e);
+            throw new RuntimeException("Error al insertar en inventario", e);
         }
     }
 
     // ===============================
-    // ACTUALIZAR STOCK POR PRODUCTO
+    // ACTUALIZAR STOCK
     // ===============================
     public void actualizarStock(String codigoProducto, int nuevoStock) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
+        String nodoFisico = ConfigSucursal.getSucursalActual();
+        String tablaOVista = obtenerTablaOVistaInventario();
+        String sql = String.format("UPDATE %s SET stock = ? WHERE codigo_producto = ?", tablaOVista);
 
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = String.format("UPDATE %s SET stock = ? WHERE codigo_producto = ?", vista);
-
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoFisico);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, nuevoStock);
@@ -141,15 +185,11 @@ public class InventarioDAO {
     // ELIMINAR POR PRODUCTO
     // ===============================
     public void eliminarPorProducto(String codigoProducto) {
-        UsuarioSesionDTO usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            throw new RuntimeException("No hay sesión activa");
-        }
+        String nodoFisico = ConfigSucursal.getSucursalActual();
+        String tablaOVista = obtenerTablaOVistaInventario();
+        String sql = String.format("DELETE FROM %s WHERE codigo_producto = ?", tablaOVista);
 
-        String vista = obtenerVistaPorSucursal(usuario.getCodigo_sucursal());
-        String sql = String.format("DELETE FROM %s WHERE codigo_producto = ?", vista);
-
-        try (Connection conn = DatabaseConnection.getConnection(usuario.getCodigo_sucursal());
+        try (Connection conn = DatabaseConnection.getConnection(nodoFisico);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, codigoProducto);
@@ -161,17 +201,20 @@ public class InventarioDAO {
     }
 
     // ===============================
-    // AUXILIAR PARA VISTA
+    // MÉTODOS AUXILIARES Y VERIFICACIÓN DE RED
     // ===============================
-    private String obtenerVistaPorSucursal(String codigoSucursal) {
-        switch (codigoSucursal.toUpperCase()) {
-            case "UIO":
-                return "[26.194.51.93].UIO.dbo.V_inventario";
-            case "GYE":
-                return "[26.34.243.93].GYE.dbo.V_inventario";
-            default:
-                throw new IllegalArgumentException("Sucursal desconocida: " + codigoSucursal);
+    private String obtenerTablaOVistaInventario() {
+        String nodoFisico = ConfigSucursal.getSucursalActual().toUpperCase();
+        if (verificarConectividad()) {
+            return nodoFisico + ".dbo.V_inventario";
         }
+        return nodoFisico + ".dbo.inventario" + nodoFisico;
+    }
+
+    private boolean verificarConectividad() {
+        if (ConfigSucursal.getSucursalActual().equalsIgnoreCase("UIO")) {
+            return NetworkChecker.hayConexionGYE();
+        }
+        return NetworkChecker.hayConexionUIO();
     }
 }
-

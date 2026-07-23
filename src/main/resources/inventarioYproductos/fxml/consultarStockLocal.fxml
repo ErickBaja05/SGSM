@@ -24,7 +24,7 @@
                         <VBox spacing="2.0">
                             <children>
                                 <Label styleClass="page-title" text="CONSULTAR STOCK LOCAL" />
-                                <Label styleClass="page-subtitle" text="Revisa la disponibilidad de productos en la sucursal UIO." />
+                                <Label fx:id="lblSubtitulo" styleClass="page-subtitle" text="Revisa la disponibilidad de productos en la sucursal UIO." />
                             </children>
                         </VBox>
 

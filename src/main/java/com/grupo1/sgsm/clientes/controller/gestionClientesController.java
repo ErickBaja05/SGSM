@@ -57,7 +57,6 @@ public class gestionClientesController implements Initializable {
         this.clientesService = new ClientesService();
     }
 
-
     private void cargarDatos() {
         // Obtenemos los datos desde el service y llenamos la tabla
         masterData.setAll(clientesService.consultarTodosLosClientes());
@@ -102,7 +101,8 @@ public class gestionClientesController implements Initializable {
             // Guardamos la cédula para el update
             this.cedulaSeleccionada = cliente.getCedula();
 
-            // Llenamos los textfields (Deshabilitar Nombres/Apellidos en la UI si no se deben editar)
+            // Llenamos los textfields (Deshabilitar Nombres/Apellidos en la UI si no se
+            // deben editar)
             txtEditNombres.setText(cliente.getNombre());
             txtEditApellidos.setText(cliente.getApellidos());
             txtEditCorreo.setText(cliente.getCorreo());
@@ -130,7 +130,6 @@ public class gestionClientesController implements Initializable {
         tbClientes.setItems(filteredData);
     }
 
-
     @FXML
     void eliminarCliente(ActionEvent event) {
         if (cedulaSeleccionada != null) {
@@ -145,7 +144,7 @@ public class gestionClientesController implements Initializable {
                 return;
             }
 
-            try{
+            try {
                 clientesService.eliminarCliente(cedulaSeleccionada);
                 // Limpiamos la memoria de la interfaz y refrescamos la tabla
                 cedulaSeleccionada = null;
@@ -156,7 +155,7 @@ public class gestionClientesController implements Initializable {
                 alert.setHeaderText("Cambios guardados con éxito");
                 alert.setContentText("Cliente eliminado exitosamente");
                 alert.showAndWait(); // Te faltaba el .showAndWait() para que la alerta se vea jeje
-            }catch(ClienteReferenciadoException e){
+            } catch (ClienteReferenciadoException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText("Cambios no efectuados");
@@ -182,7 +181,8 @@ public class gestionClientesController implements Initializable {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Problema de Red");
                 alert.setHeaderText("Sin conexión con Matriz");
-                alert.setContentText("No se pueden actualizar los datos en este momento. Verifique su conexión con UIO.");
+                alert.setContentText(
+                        "No se pueden actualizar los datos en este momento. Verifique su conexión con UIO.");
                 alert.showAndWait();
                 return;
             }
