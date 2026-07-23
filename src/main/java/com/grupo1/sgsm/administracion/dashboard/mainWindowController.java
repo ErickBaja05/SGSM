@@ -112,12 +112,7 @@ public class mainWindowController implements Initializable {
 
     }
     @FXML void abrirGestionClientes(ActionEvent event) {
-
-        if(verificarConectividad()){
-            cargarVista("/clientes/fxml/gestionClientes.fxml");
-            return;
-        }
-        cargarVista("/administracion/fxml/errorConexion.fxml");
+        cargarVista("/clientes/fxml/gestionClientes.fxml");
 
     }
     @FXML void abrirGestionParametros(ActionEvent event) {
