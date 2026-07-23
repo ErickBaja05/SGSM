@@ -12,7 +12,7 @@ import com.grupo1.sgsm.core.database.DatabaseConnection;
 
 public class ProductoMarketingDAO {
 
-    private static final String TABLA = "[26.194.51.93].UIO.dbo.producto_marketing";
+    private static final String TABLA = "UIO.dbo.producto_marketing";
 
     // ===============================
     // MÉTODO PRIVADO DE MAPEO

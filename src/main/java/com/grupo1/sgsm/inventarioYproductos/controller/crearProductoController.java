@@ -12,6 +12,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import com.grupo1.sgsm.inventarioYproductos.dto.NuevoProductoDTO;
+import com.grupo1.sgsm.inventarioYproductos.service.IProductoService;
+import com.grupo1.sgsm.inventarioYproductos.service.ProductoService;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -41,6 +45,8 @@ public class crearProductoController implements Initializable {
     // Botones
     @FXML private Button btnRegistrar;
     @FXML private Button btnCancelar;
+
+    private final IProductoService productoService = new ProductoService();
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
@@ -73,23 +79,50 @@ public class crearProductoController implements Initializable {
             return;
         }
 
-        // Simulación de registro exitoso
-        System.out.println("Registrando: " + txtNombre.getText());
-        mensajeConfirmacion.setText("Producto agregado al catálogo satisfactoriamente");
-        mensajeConfirmacion.getStyleClass().add("mensaje-exito");
+        try {
+            double precio = Double.parseDouble(txtPrecio.getText().trim());
+            NuevoProductoDTO nuevoDTO = new NuevoProductoDTO(
+                    txtCodigo.getText().trim(),
+                    txtNombre.getText().trim(),
+                    txtMarca.getText().trim(),
+                    cmbCategoria.getValue() != null ? cmbCategoria.getValue() : "",
+                    txtDescripcion.getText() != null ? txtDescripcion.getText().trim() : "",
+                    precio
+            );
 
-        // Aquí podrías agregar un método para limpiar el formulario tras registrar
+            productoService.guardarNuevoProducto(nuevoDTO);
+
+            mensajeConfirmacion.setText("Producto agregado al catálogo satisfactoriamente");
+            mensajeConfirmacion.getStyleClass().add("mensaje-exito");
+            limpiarFormulario();
+        } catch (NumberFormatException e) {
+            mensajeConfirmacion.setText("El precio debe ser un valor numérico válido.");
+            mensajeConfirmacion.getStyleClass().add("mensaje-error");
+        } catch (Exception e) {
+            mensajeConfirmacion.setText(e.getMessage());
+            mensajeConfirmacion.getStyleClass().add("mensaje-error");
+        }
     }
 
     @FXML
     void cancelarOperacion(ActionEvent event) {
-        System.out.println("Operación cancelada.");
-        // Lógica para regresar o limpiar
+        limpiarFormulario();
+        mensajeConfirmacion.setText("");
+        mensajeConfirmacion.getStyleClass().removeAll("mensaje-error", "mensaje-exito");
+    }
+
+    private void limpiarFormulario() {
+        txtCodigo.clear();
+        txtNombre.clear();
+        txtMarca.clear();
+        txtDescripcion.clear();
+        txtPrecio.clear();
+        cmbCategoria.setValue(null);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Cargar Íconos (Ajusta los literales según tu versión de FontAwesome)
+        // Cargar Íconos
         lblHeaderIcon.setGraphic(crearIcono("fa-archive", "header-icon-font"));
         lblCodigoIcon.setGraphic(crearIcono("fa-barcode", "input-icon-font"));
         lblPrecioIcon.setGraphic(crearIcono("fa-usd", "input-icon-font"));
@@ -107,6 +140,5 @@ public class crearProductoController implements Initializable {
         // Configurar Focus para los contenedores con HBox
         configurarEfectoFocus(txtCodigo, boxCodigo);
         configurarEfectoFocus(txtPrecio, boxPrecio);
-
     }
 }

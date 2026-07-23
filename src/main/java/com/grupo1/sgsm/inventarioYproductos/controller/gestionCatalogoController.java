@@ -15,8 +15,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-// IMPORTANTE: Importa aquí tu clase modelo Producto
-import com.grupo1.sgsm.inventarioYproductos.model.Producto;
+import com.grupo1.sgsm.inventarioYproductos.dto.ProductoConsultaDTO;
+import com.grupo1.sgsm.inventarioYproductos.service.IProductoService;
+import com.grupo1.sgsm.inventarioYproductos.service.ProductoService;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -26,13 +27,13 @@ public class gestionCatalogoController implements Initializable {
     @FXML private TextField txtBuscar;
 
     // Configuración de Tabla
-    @FXML private TableView<Producto> tbProductos;
-    @FXML private TableColumn<Producto, String> colCodigo;
-    @FXML private TableColumn<Producto, String> colNombre;
-    @FXML private TableColumn<Producto, String> colMarca;
-    @FXML private TableColumn<Producto, String> colCategoria;
-    @FXML private TableColumn<Producto, String> colPrecio;
-    @FXML private TableColumn<Producto, Void> colAccion;
+    @FXML private TableView<ProductoConsultaDTO> tbProductos;
+    @FXML private TableColumn<ProductoConsultaDTO, String> colCodigo;
+    @FXML private TableColumn<ProductoConsultaDTO, String> colNombre;
+    @FXML private TableColumn<ProductoConsultaDTO, String> colMarca;
+    @FXML private TableColumn<ProductoConsultaDTO, String> colCategoria;
+    @FXML private TableColumn<ProductoConsultaDTO, String> colPrecio;
+    @FXML private TableColumn<ProductoConsultaDTO, Void> colAccion;
 
     // Campos de Edición
     @FXML private TextField txtEditCodigo;
@@ -48,7 +49,8 @@ public class gestionCatalogoController implements Initializable {
     @FXML private Label lblBtnGuardarIcon;
     @FXML private Label mensajeConfirmacion;
 
-    private ObservableList<Producto> masterData = FXCollections.observableArrayList();
+    private final IProductoService productoService = new ProductoService();
+    private final ObservableList<ProductoConsultaDTO> masterData = FXCollections.observableArrayList();
 
     private FontIcon crearIcono(String iconLiteral, String styleClass) {
         FontIcon icon = new FontIcon(iconLiteral);
@@ -57,16 +59,15 @@ public class gestionCatalogoController implements Initializable {
     }
 
     private void configurarColumnaAccion() {
-        colAccion.setCellFactory(param -> new TableCell<Producto, Void>() {
+        colAccion.setCellFactory(param -> new TableCell<ProductoConsultaDTO, Void>() {
             private final Button btnAccion = new Button();
 
             {
-                // Inyectamos el lapicito (fa-pencil)
                 btnAccion.setGraphic(crearIcono("fa-pencil", "action-table-icon"));
                 btnAccion.getStyleClass().add("btn-transparent");
 
                 btnAccion.setOnAction(event -> {
-                    Producto productoSeleccionado = getTableView().getItems().get(getIndex());
+                    ProductoConsultaDTO productoSeleccionado = getTableView().getItems().get(getIndex());
                     cargarDatosEdicion(productoSeleccionado);
                 });
             }
@@ -83,12 +84,9 @@ public class gestionCatalogoController implements Initializable {
         });
     }
 
-    private void cargarDatosEdicion(Producto producto) {
+    private void cargarDatosEdicion(ProductoConsultaDTO producto) {
         if (producto != null) {
-            // Limpiar mensajes anteriores
             mensajeConfirmacion.setText("");
-
-            // Llenar formulario
             txtEditCodigo.setText(producto.getCodigo());
             txtEditNombre.setText(producto.getNombre());
             txtEditMarca.setText(producto.getMarca());
@@ -104,11 +102,18 @@ public class gestionCatalogoController implements Initializable {
         }
 
         String lowerCaseFilter = filtro.toLowerCase();
-        ObservableList<Producto> filteredData = FXCollections.observableArrayList();
+        ObservableList<ProductoConsultaDTO> filteredData = FXCollections.observableArrayList();
 
-        for (Producto prod : masterData) {
-            if (prod.getCodigo().toLowerCase().contains(lowerCaseFilter) ||
-                    prod.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+        for (ProductoConsultaDTO prod : masterData) {
+            String precioStr = String.valueOf(prod.getPrecio());
+            String precioFormateado = "$ " + prod.getPrecio();
+
+            if ((prod.getCodigo() != null && prod.getCodigo().toLowerCase().contains(lowerCaseFilter)) ||
+                (prod.getNombre() != null && prod.getNombre().toLowerCase().contains(lowerCaseFilter)) ||
+                (prod.getMarca() != null && prod.getMarca().toLowerCase().contains(lowerCaseFilter)) ||
+                (prod.getCategoria() != null && prod.getCategoria().toLowerCase().contains(lowerCaseFilter)) ||
+                (precioStr.contains(lowerCaseFilter)) ||
+                (precioFormateado.toLowerCase().contains(lowerCaseFilter))) {
                 filteredData.add(prod);
             }
         }
@@ -120,9 +125,16 @@ public class gestionCatalogoController implements Initializable {
         if (txtEditCodigo.getText().isEmpty()) {
             return;
         }
-        System.out.println("Eliminando producto: " + txtEditCodigo.getText());
-        mensajeConfirmacion.setText("Producto eliminado exitosamente");
-        mensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-error"); // rojo para eliminar
+        try {
+            productoService.eliminarProducto(txtEditCodigo.getText());
+            mensajeConfirmacion.setText("Producto eliminado exitosamente");
+            mensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-error");
+            limpiarFormulario();
+            cargarDatos();
+        } catch (Exception e) {
+            mensajeConfirmacion.setText(e.getMessage());
+            mensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-error");
+        }
     }
 
     @FXML
@@ -130,9 +142,39 @@ public class gestionCatalogoController implements Initializable {
         if (txtEditCodigo.getText().isEmpty()) {
             return;
         }
-        System.out.println("Actualizando producto: " + txtEditNombre.getText());
-        mensajeConfirmacion.setText("Cambios guardados correctamente");
-        mensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-exito"); // verde corporativo
+        try {
+            double precio = Double.parseDouble(txtEditPrecio.getText());
+            ProductoConsultaDTO dto = new ProductoConsultaDTO(
+                    txtEditCodigo.getText(),
+                    txtEditNombre.getText(),
+                    txtEditMarca.getText(),
+                    txtEditCategoria.getText(),
+                    precio
+            );
+            productoService.actualizarProducto(dto);
+            mensajeConfirmacion.setText("Cambios guardados correctamente");
+            mensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-exito");
+            cargarDatos();
+        } catch (NumberFormatException e) {
+            mensajeConfirmacion.setText("Precio inválido");
+            mensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-error");
+        } catch (Exception e) {
+            mensajeConfirmacion.setText(e.getMessage());
+            mensajeConfirmacion.getStyleClass().setAll("mensaje-confirmacion", "mensaje-error");
+        }
+    }
+
+    private void limpiarFormulario() {
+        txtEditCodigo.clear();
+        txtEditNombre.clear();
+        txtEditMarca.clear();
+        txtEditCategoria.clear();
+        txtEditPrecio.clear();
+    }
+
+    private void cargarDatos() {
+        masterData.setAll(productoService.obtenerTodosProductos());
+        tbProductos.setItems(masterData);
     }
 
     @Override
@@ -144,14 +186,13 @@ public class gestionCatalogoController implements Initializable {
         lblBtnGuardarIcon.setGraphic(crearIcono("fa-save", "btn-primary-icon-font"));
 
         // 2. Configurar Columnas
-        colCodigo.setCellValueFactory(new PropertyValueFactory<>("codigo"));
-        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        colMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
-        colCategoria.setCellValueFactory(new PropertyValueFactory<>("categoria"));
+        colCodigo.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCodigo()));
+        colNombre.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNombre()));
+        colMarca.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getMarca()));
+        colCategoria.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCategoria()));
 
         // Formato especial para añadir el símbolo "$" al precio en la tabla
         colPrecio.setCellValueFactory(cellData -> {
-            // Asumiendo que getPrecio() devuelve un Double o String
             return new SimpleStringProperty("$ " + cellData.getValue().getPrecio());
         });
 
@@ -166,5 +207,7 @@ public class gestionCatalogoController implements Initializable {
         // limpiar mensaje al inicio
         mensajeConfirmacion.setText("");
 
+        // Cargar los datos desde el servicio
+        cargarDatos();
     }
 }
