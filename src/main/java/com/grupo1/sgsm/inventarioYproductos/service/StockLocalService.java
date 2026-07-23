@@ -14,7 +14,7 @@ import com.grupo1.sgsm.inventarioYproductos.dto.NuevoStockLocalDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.ConsultaStockLocalDTO;
 import com.grupo1.sgsm.inventarioYproductos.dto.DetalleAjusteStockDTO;
 import com.grupo1.sgsm.inventarioYproductos.model.Inventario;
-import com.grupo1.sgsm.inventarioYproductos.model.ProductoInfo;
+import com.grupo1.sgsm.inventarioYproductos.model.Producto;
 
 public class StockLocalService implements IStockLocalService {
 
@@ -36,11 +36,11 @@ public class StockLocalService implements IStockLocalService {
         
         Map<String, String> mapaProductos = new HashMap<>();
         try {
-            List<ProductoInfo> productos = productoInfoDAO.consultarTodos();
+            List<Producto> productos = productoInfoDAO.consultarTodos();
             if (productos != null) {
-                for (ProductoInfo p : productos) {
-                    if (p.getCodigo_producto() != null) {
-                        mapaProductos.put(p.getCodigo_producto().trim(), p.getNombre());
+                for (Producto p : productos) {
+                    if (p.getCodigo() != null) {
+                        mapaProductos.put(p.getCodigo().trim(), p.getNombre());
                     }
                 }
             }
