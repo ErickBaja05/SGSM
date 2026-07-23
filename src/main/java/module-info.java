@@ -10,7 +10,6 @@ module com.grupo1.sgsm {
     requires java.sql;
     requires java.desktop;
     requires javafx.base;
-    //requires com.grupo1.sgsm;
 
 
     // Abre los paquetes con controladores para FXML y PropertyValueFactory (javafx.base)

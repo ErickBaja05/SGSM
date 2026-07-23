@@ -43,10 +43,12 @@ public class ParametrosServiceImpl implements IParametrosService{
 
     @Override
     public void actualizarIVA(Double valorIVA) {
-
-        Double nuevoIva = valorIVA / 100;
         SesionActual.setValorIva(valorIVA);
+    }
 
+    @Override
+    public Double obtenerIVA() {
+        return SesionActual.getValorIva();
     }
 
     @Override

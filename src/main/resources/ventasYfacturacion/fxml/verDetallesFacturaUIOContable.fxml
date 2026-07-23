@@ -132,7 +132,7 @@
 
                                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                                             <children>
-                                                <Label style="-fx-font-size: 13px; -fx-text-fill: #555555; -fx-font-weight: bold;" text="IVA (12%)" />
+                                                <Label fx:id="lblTituloIva" style="-fx-font-size: 13px; -fx-text-fill: #555555; -fx-font-weight: bold;" text="IVA (12%)" />
                                                 <Region HBox.hgrow="ALWAYS" />
                                                 <Label fx:id="lblIva" style="-fx-font-size: 14px; -fx-text-fill: #333333; -fx-font-weight: bold;" text="\$0.00" />
                                             </children>

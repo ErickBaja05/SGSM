@@ -130,23 +130,33 @@ public class FacturaGyeDAO {
     public List<FacturaGYE> consultarPorRangoFechas(LocalDate fechaInicio, LocalDate fechaFin) {
         validarSesion();
         String nodoLocal = ConfigSucursal.getSucursalActual();
-        String sql = "SELECT * FROM " + obtenerTablaGye(nodoLocal) + " WHERE fecha_emision BETWEEN ? AND ?";
+        boolean usarRango = (fechaInicio != null && fechaFin != null);
+
+        String sql;
+        if (usarRango) {
+            sql = "SELECT * FROM " + obtenerTablaGye(nodoLocal) + " WHERE fecha_emision BETWEEN ? AND ? ORDER BY fecha_emision DESC";
+        } else {
+            sql = "SELECT * FROM " + obtenerTablaGye(nodoLocal) + " ORDER BY fecha_emision DESC";
+        }
 
         List<FacturaGYE> facturas = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection(nodoLocal);
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setDate(1, java.sql.Date.valueOf(fechaInicio));
-            ps.setDate(2, java.sql.Date.valueOf(fechaFin));
-            ResultSet rs = ps.executeQuery();
+            if (usarRango) {
+                ps.setDate(1, java.sql.Date.valueOf(fechaInicio));
+                ps.setDate(2, java.sql.Date.valueOf(fechaFin));
+            }
 
-            while (rs.next()) {
-                facturas.add(mapearFactura(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    facturas.add(mapearFactura(rs));
+                }
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error al consultar facturas por rango de fechas", e);
+            throw new RuntimeException("Error al consultar facturas por rango de fechas en GYE", e);
         }
 
         return facturas;

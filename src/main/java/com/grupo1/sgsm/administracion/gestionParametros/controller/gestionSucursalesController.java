@@ -159,7 +159,7 @@ public class gestionSucursalesController {
             lblMensajeIva.getStyleClass().addAll("mensaje-error");
             return;
         }
-        SesionActual.setValorIva(Double.parseDouble(nuevoIva));
+        parametrosService.actualizarIVA(Double.parseDouble(nuevoIva));
         lblMensajeIva.setText("IVA Actualizado");
         lblMensajeIva.getStyleClass().add("mensaje-exito");
     }

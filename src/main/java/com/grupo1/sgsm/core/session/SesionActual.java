@@ -6,7 +6,7 @@ import com.grupo1.sgsm.administracion.gestionUsuarios.dto.UsuarioSesionDTO;
 public class SesionActual {
 
     private static UsuarioSesionDTO usuario;
-    private static Double valorIva = 0.15;
+    private static Double valorIva = 15.0;
 
     private SesionActual() {
         // Evita instanciación

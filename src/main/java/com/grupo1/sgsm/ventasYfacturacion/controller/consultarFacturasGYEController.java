@@ -74,46 +74,50 @@ public class consultarFacturasGYEController implements Initializable {
         colCedulaCliente.setCellValueFactory(new PropertyValueFactory<>("cedula_cliente"));
     }
 
-    @FXML
-    void filtrarFacturas(ActionEvent event) {
+    private void cargarDatos() {
         LocalDate fechaInicio = dpFechaInicio.getValue();
         LocalDate fechaFin = dpFechaFin.getValue();
 
-        // 1. Validar que el usuario sí haya seleccionado ambas fechas
-        if (fechaInicio == null || fechaFin == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Campos Vacíos", "Por favor, seleccione una fecha de inicio y una fecha de fin.");
-            return;
-        }
-
         try {
-            // 2. Consumir el Service (Que internamente valida las fechas contra LocalDate.now())
             List<FacturaGYEConsultadaDTO> facturas = facturaGYEService.consultarFacturas(fechaInicio, fechaFin);
-
-            // 3. Limpiar y llenar la ObservableList con los datos reales de SQL Server
             listaFacturas.setAll(facturas);
-
-            // 4. Actualizar la tabla visualmente
             tbFacturas.setItems(listaFacturas);
             tbFacturas.getSelectionModel().clearSelection();
-
         } catch (FechasNoValidasException e) {
-            // Atrapa la excepción personalizada de tu Service y la muestra bonito en pantalla
             mostrarAlerta(Alert.AlertType.ERROR, "Fechas Inválidas", e.getMessage());
         } catch (Exception e) {
-            // Catch de seguridad por si el DAO falla por red (NetworkChecker, Linked Servers, etc.)
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de Consulta", "No se pudo consultar las facturas. Verifique su conexión de red.");
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de Consulta", "No se pudo consultar las facturas: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     @FXML
+    void filtrarFacturas(ActionEvent event) {
+        cargarDatos();
+    }
+
+    @FXML
     void verInformacionCompleta(ActionEvent event) {
         if (facturaActualSeleccionada != null) {
-            // Dependiendo del nombre del getter en tu DTO, puede ser getNumero_factura()
             System.out.println("Abriendo información completa de la factura: " + facturaActualSeleccionada.getNumero_factura());
+            try {
+                javafx.scene.layout.Pane contenedorPrincipal = (javafx.scene.layout.Pane) ((javafx.scene.Node) event.getSource()).getScene().lookup("#contenedorPrincipal");
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/ventasYfacturacion/fxml/verDetallesFacturaGYE.fxml"));
+                javafx.scene.Parent root = loader.load();
 
-            // Aquí puedes llamar a tu NavigationUtil o cargar el nuevo FXML
-            // pasándole el objeto 'facturaActualSeleccionada' al controlador de destino.
+                verDetallesFacturaGYEController controller = loader.getController();
+                controller.cargarFactura(
+                        facturaActualSeleccionada.getNumero_factura(),
+                        facturaActualSeleccionada.getCedula_cliente(),
+                        "",
+                        facturaActualSeleccionada.getFecha_emision()
+                );
+
+                contenedorPrincipal.getChildren().clear();
+                contenedorPrincipal.getChildren().add(root);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -141,6 +145,8 @@ public class consultarFacturasGYEController implements Initializable {
                 lblFacturaSeleccionada.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555555;");
             }
         });
+
+        cargarDatos();
     }
 
     // --- Método utilitario para no repetir código de alertas ---
